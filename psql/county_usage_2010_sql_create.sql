@@ -1,0 +1,7 @@
+CREATE TABLE county_usage_2010 (
+	"STATE" VARCHAR(2) NOT NULL, 
+	"FIPS" VARCHAR(5) NOT NULL, 
+	"TP-TotPop" FLOAT NOT NULL, 
+	"TO-WGWTo" FLOAT, 
+	"TO-WTotl" FLOAT
+);
