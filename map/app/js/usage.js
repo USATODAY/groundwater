@@ -10,8 +10,9 @@ var width = 960,
 
 var rateById = d3.map();
 
-var VAL_COLUMN = "pcnt_groundwater";
-var DATA_URL = "data/county_usage_average_2010.topojson.json";
+var VAL_COLUMN = "TO-WGWTo";
+var DATA_URL = "data/county_usage_2010.json";
+var $details;
 
 
 
@@ -20,8 +21,8 @@ var DATA_URL = "data/county_usage_average_2010.topojson.json";
 
    
 
-  var COLORS = ['#eff3ff','#bdd7e7','#6baed6','#3182bd','#08519c'];
-  var scaleBreaks = [0, .25, .5, .75, 1]
+  var COLORS = ['#eff3ff','#c6dbef','#9ecae1','#6baed6','#3182bd','#08519c'];
+  var scaleBreaks = [0, 1, 5, 10, 50, 100]
 
 
 
@@ -32,7 +33,7 @@ var projection = d3.geo.albersUsa()
 var path = d3.geo.path()
     .projection(projection);
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#map").append("svg")
     .attr("width", width)
     .attr("height", height);
 
@@ -46,17 +47,16 @@ function init() {
 
 
 function addLegend() {
-    var html = "<div>percent of total water consumed that is groundwater<div>";
+    var html = "<div class='map-legend'>groundwater consumed in millions of gallons per day<div>";
     _.each(scaleBreaks, function(breakpoint, i) {
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + COLORS[i] +"'></span><span>" + parseInt(breakpoint * 100) + "%</span>";
+        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + COLORS[i] +"'></span><span>>" + breakpoint + "</span>";
     });
     html += "</div>"
-    $('body').append(html);
+    $('#legend').html(html);
 }
 
 function ready(error, us, usage) {
     if (error) throw error;
-    console.log(usage);
     // colorScale.domain(d3.extent(usage.objects.countyp010.geometries, function(d) {
     //   console.log(d);
     //   return +d.properties[VAL_COLUMN];
@@ -66,17 +66,18 @@ function ready(error, us, usage) {
     //   return +d.properties[VAL_COLUMN];
     // }));
 
-
+    $details = $('#details');
     svg.append("g")
       .attr("class", "counties")
     .selectAll("path")
-      .data(topojson.feature(usage, usage.objects.countyp010).features)
+      .data(topojson.feature(usage, usage.objects.counties).features)
     .enter().append("path")
       .attr("fill", function(d) { 
-              
               if (d.properties[VAL_COLUMN]) {
                 var val =+d.properties[VAL_COLUMN];
-                if (val >= scaleBreaks[4]) {
+                if (val >= scaleBreaks[5]) {
+                  return COLORS[5];
+                } else if (val > scaleBreaks[4]) {
                   return COLORS[4];
                 } else if (val > scaleBreaks[3]) {
                   return COLORS[3];
@@ -91,16 +92,33 @@ function ready(error, us, usage) {
                 return "none";
               }
       })
-      .attr("d", path);
+      .attr("d", path)
+      .on("mouseover", mouseOver)
+      .on("mouseout", mouseOut);
 
-      // svg.append("path")
-      // .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
-      // .attr("class", "states")
-      // .attr("d", path);
+      svg.append("path")
+      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+      .attr("class", "states")
+      .attr("d", path);
 
       addLegend();
       
 
+}
+function mouseOut(d) {
+  d3.select(this).classed("county-active", false);
+  console.log(this);
+}
+function mouseOver(d) {
+  d3.select(this).classed("county-active", true);
+  console.log(this);
+  var content;
+  if (d.properties[VAL_COLUMN]) {
+    content = "<h3 class='county'>" + d.properties.COUNTY + ", " + d.properties.STATE + "</h3> <p><strong>2010 Groundwater consumed per day: </strong>" + d.properties[VAL_COLUMN] + " million gallons</p>";
+  } else {
+    content = "<h3 class='county'>" + d.properties.COUNTY + ", " + d.properties.STATE + "</h3> <p>no groundwater data for this county</p>"
+  }
+  $details.html(content);
 }
 
 

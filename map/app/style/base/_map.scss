@@ -5,9 +5,13 @@
   // stroke-width: 0.5px;
   path {
 
-    stroke: $medium-grey;
-    stroke-width: 0.5px;
+    // stroke: black;
+    // stroke-width: 0.5px;
   }
+}
+
+.map-legend {
+  margin-left: 2em;
 }
 
 svg {
@@ -33,6 +37,16 @@ svg {
 #mapboxmap {
     height: 400px;
     width: 900px;
+}
+
+.counties path.county-active {
+  stroke: white;
+  stroke-width: 1px;
+  z-index: 100;
+}
+
+#details {
+
 }
 
 .q0-9 { fill:#d73027; }

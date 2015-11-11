@@ -35,7 +35,8 @@ module.exports = function(env) {
   if (env !== 'test') {
     webpackConfig.entry = {
       main: ['./main.js'],
-      usage: ['./usage.js']
+      usage: ['./usage.js'],
+      usagechange: ['./usage-change.js']
     };
 
     webpackConfig.output = {

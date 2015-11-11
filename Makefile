@@ -1,26 +1,44 @@
 DBNAME="gwater" # the name of the database you're using. you can name this whatever you want.
 
-topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json
+topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json
 
-map/app/data/county_usage_change.topojson.json: output_data/county_usage_change.csv shapefiles/countyp010_nt00795/countyp010.shp
+map/app/data/county_usage_change.topojson.json: output_data/county_usage_change.csv shapefiles/counties/counties.shp
 	topojson \
 	-o $@ \
+	--no-pre-quantization \
+	--post-quantization=1e6 \
+	--simplify=7e-7 \
 	-e output_data/county_usage_change.csv \
 	--id-property=+FIPS \
 	-p usage_difference \
-	-- shapefiles/countyp010_nt00795/countyp010.shp
+	-- shapefiles/counties/counties.shp
 
 output_data/county_usage_change.csv: dbtables/county_usage_2000_table dbtables/county_usage_2005_table dbtables/county_usage_2010_table
-	psql -d $(DBNAME) -c "COPY (WITH counties AS (SELECT county_usage_2010.\"FIPS\", county_usage_2010.\"TO-WGWTo\" - county_usage_2000.\"TO-WGWTo\" as usage_difference FROM county_usage_2010 join county_usage_2000 on county_usage_2010.\"FIPS\" = county_usage_2000.\"FIPS\") SELECT * FROM counties ORDER BY usage_difference DESC) TO '$(abspath $@)' HEADER CSV;"
+	psql -d $(DBNAME) -c "COPY (WITH counties AS (SELECT county_usage_2010.\"FIPS\", county_usage_2010.\"TO-WGWTo\" - county_usage_2005.\"TO-WGWTo\" as usage_difference FROM county_usage_2010 join county_usage_2005 on county_usage_2010.\"FIPS\" = county_usage_2005.\"FIPS\") SELECT * FROM counties ORDER BY usage_difference DESC) TO '$(abspath $@)' HEADER CSV;"
 	touch $@
 
-map/app/data/county_usage_average_2010.topojson.json: output_data/county_usage_with_percentage.csv shapefiles/countyp010_nt00795/countyp010.shp
+map/app/data/county_usage_average_2010.topojson.json: output_data/county_usage_with_percentage.csv shapefiles/counties/counties.shp
 	topojson \
-	-o output_data/county_usage_percent.topojson.json \
+	-o $@ \
+	--no-pre-quantization \
+	--post-quantization=1e6 \
+	--simplify=7e-7 \
 	-e output_data/county_usage_with_percentage.csv \
 	--id-property=+FIPS \
 	-p pcnt_groundwater \
-	-- shapefiles/countyp010_nt00795/countyp010.shp
+	-- shapefiles/counties/counties.shp
+
+# convert county shapefile to topojson and join with 2010 county usage data
+map/app/data/county_usage_2010.json: shapefiles/counties/counties.shp county_usage_csvs_simplified
+	topojson \
+	-o $@ \
+	--no-pre-quantization \
+	--post-quantization=1e6 \
+	--simplify=7e-7 \
+	-e input_data/county_usage_2010.csv \
+	--id-property=+FIPS \
+	-p \
+	-- $<
 
 #export CSV file of 2010 data with percentages
 output_data/county_usage_with_percentage.csv: dbtables/county_usage_table_percent_groundwater
@@ -98,19 +116,14 @@ input_data/usco2000.xls:
 	wget http://water.usgs.gov/watuse/data/2000/usco2000.xls
 	mv usco2000.xls input_data
 
-# convert county shapefile to topojson and join with 2010 county usage data
-output_data/county_usage_2010.json: shapefiles/countyp010_nt00795/countyp010.shp county_usage_csvs_simplified
-	topojson \
-	-o output_data/county_usage_2010.json \
-	-e input_data/county_usage_2010.csv \
-	--id-property=+FIPS \
-	-p \
-	-- shapefiles/countyp010_nt00795/countyp010_nt00795.shp
+shapefiles/counties/counties.shp: shapefiles/countyp010_nt00795/countyp010.shp
+	mkdir -p shapefiles/counties
+	ogr2ogr -f 'ESRI Shapefile' -where "FIPS NOT LIKE '%000'" $@ $<
 
 #download county shapefile from US ATLAS
 shapefiles/countyp010_nt00795/countyp010.shp:
 	wget http://dds.cr.usgs.gov/pub/data/nationalatlas/countyp010_nt00795.tar.gz
-	mkdir shapefiles/countyp010_nt00795
+	mkdir -p shapefiles/countyp010_nt00795
 	mv countyp010_nt00795.tar.gz shapefiles/countyp010_nt00795
 	tar xvfz shapefiles/countyp010_nt00795/countyp010_nt00795.tar.gz --directory shapefiles/countyp010_nt00795
 	rm shapefiles/countyp010_nt00795/countyp010_nt00795.tar.gz
