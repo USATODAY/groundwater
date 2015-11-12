@@ -36,7 +36,8 @@ module.exports = function(env) {
     webpackConfig.entry = {
       main: ['./main.js'],
       usage: ['./usage.js'],
-      usagechange: ['./usage-change.js']
+      usagechange: ['./usage-change.js'],
+      aquifers: ['./aquifers.js']
     };
 
     webpackConfig.output = {

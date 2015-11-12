@@ -1,0 +1,21 @@
+{#
+  Swig Templating!
+  Docs: http://paularmstrong.github.io/swig/docs/
+#}
+
+{% extends 'layouts/application.html' %}
+
+{% block head %}
+<link href='https://api.mapbox.com/mapbox.js/v2.2.1/mapbox.css' rel='stylesheet' />
+<link rel="stylesheet" href="http://www.gannett-cdn.com/experiments/usatoday/_common/_css/bootstrap.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="aquifer-map-container">
+    <div id="map" class="aquifer-map"></div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="js/aquifers.js"></script>
+{% endblock %}

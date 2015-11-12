@@ -1,6 +1,6 @@
 DBNAME="gwater" # the name of the database you're using. you can name this whatever you want.
 
-topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json
+topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json map/app/data/ogallala.topojson.json
 
 map/app/data/county_usage_change.topojson.json: output_data/county_usage_change.csv shapefiles/counties/counties.shp
 	topojson \
@@ -38,6 +38,15 @@ map/app/data/county_usage_2010.json: shapefiles/counties/counties.shp county_usa
 	-e input_data/county_usage_2010.csv \
 	--id-property=+FIPS \
 	-p \
+	-- $<
+
+map/app/data/ogallala.topojson.json: shapefiles/ogallala/ogallala.shp
+	topojson \
+	-o $@ \
+	--no-pre-quantization \
+	--post-quantization=1e6 \
+	--simplify=7e-7 \
+	-p name=AQ_NAME \
 	-- $<
 
 #export CSV file of 2010 data with percentages
@@ -116,9 +125,55 @@ input_data/usco2000.xls:
 	wget http://water.usgs.gov/watuse/data/2000/usco2000.xls
 	mv usco2000.xls input_data
 
+dbtables/geotables: dbtables/counties dbtables/states dbtables/us_aquifers
+	touch $@
+
+dbtables/counties: psql/counties.sql dbtables
+	psql -d $(DBNAME) -f $<
+	touch $@
+
+dbtables/states: psql/states.sql dbtables
+	psql -d $(DBNAME) -f $<
+	touch $@
+
+dbtables/us_aquifers: psql/us_aquifers.sql dbtables
+	psql -d $(DBNAME) -f $<
+	touch $@
+
+psql/us_aquifers.sql: shapefiles/aquifers_us/us_aquifers.shp
+	shp2pgsql -I -s 4269 $< > $@
+
+psql/counties.sql: shapefiles/counties/counties.shp
+	shp2pgsql -I -s 4269 $< > $@
+
+psql/states.sql: shapefiles/states/states.shp
+	shp2pgsql -I -s 4269 $< > $@
+
+shapefiles/ogallala/ogallala.shp: shapefiles/aquifers_us/us_aquifers.shp
+	mkdir -p shapefiles/ogallala
+	ogr2ogr \
+	  -where "AQ_NAME='High Plains aquifer'" \
+	  shapefiles/ogallala/ogallala.shp \
+	  shapefiles/aquifers_us/us_aquifers.shp
+
+shapefiles/aquifers_us/us_aquifers.shp:
+	wget http://water.usgs.gov/GIS/dsdl/aquifers_us.zip
+	unzip -d shapefiles/aquifers_us aquifers_us.zip
+	rm aquifers_us.zip
+
 shapefiles/counties/counties.shp: shapefiles/countyp010_nt00795/countyp010.shp
 	mkdir -p shapefiles/counties
 	ogr2ogr -f 'ESRI Shapefile' -where "FIPS NOT LIKE '%000'" $@ $<
+
+shapefiles/states/states.shp: shapefiles/statesp010g/statesp010g.shp
+	mkdir -p shapefiles/states
+	ogr2ogr -f 'ESRI Shapefile' $@ $<
+
+shapefiles/statesp010g/statesp010g.shp:
+	wget http://dds.cr.usgs.gov/pub/data/nationalatlas/statesp010g.shp_nt00938.tar.gz
+	mkdir -p shapefiles/statesp010g
+	tar xvfz statesp010g.shp_nt00938.tar.gz --directory shapefiles/statesp010g
+	rm statesp010g.shp_nt00938.tar.gz
 
 #download county shapefile from US ATLAS
 shapefiles/countyp010_nt00795/countyp010.shp:
