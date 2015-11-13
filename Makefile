@@ -149,6 +149,21 @@ psql/counties.sql: shapefiles/counties/counties.shp
 psql/states.sql: shapefiles/states/states.shp
 	shp2pgsql -I -s 4269 $< > $@
 
+shapefiles/IND_adm/IND_adm.shp:
+	wget http://biogeo.ucdavis.edu/data/diva/adm/IND_adm.zip
+	unzip IND_adm.zip -d shapefiles/IND_adm
+	rm IND_adm.zip
+
+shapefiles/ne_110m_admin_1_states_provinces/ne_110m_admin_1_states_provinces.shp:
+	wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_1_states_provinces.zip
+	unzip ne_110m_admin_1_states_provinces.zip -d shapefiles/ne_110m_admin_1_states_provinces
+	rm ne_110m_admin_1_states_provinces.zip
+
+shapefiles/ne_110m_admin_0_countries_lakes/ne_110m_admin_0_countries_lakes.shp:
+	wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_countries_lakes.zip
+	unzip ne_110m_admin_0_countries_lakes.zip -d shapefiles/ne_110m_admin_0_countries_lakes
+	rm ne_110m_admin_0_countries_lakes.zip
+
 shapefiles/ogallala/ogallala.shp: shapefiles/aquifers_us/us_aquifers.shp
 	mkdir -p shapefiles/ogallala
 	ogr2ogr \

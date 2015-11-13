@@ -111,7 +111,27 @@ function ready(error, us, aquifers) {
       .attr("opacity", 1)
       .attr("d", path);
 
-      svg.selectAll('aquifer-label')
+      
+
+      svg.append("g")
+      .attr("class", "states")
+      // .selectAll('path')
+      .datum(topojson.mesh(us, us.objects.states))
+      // .enter()
+      .append('path')
+      .attr("stroke-width", 0.5)
+      .attr("fill", function(d) {
+        // console.log(d);
+        // if (d.properties.STATE == "20") {
+        //   return "none";
+        // } else {
+        //   return "rgba(0, 0, 0, 0.25)";
+        // }
+      })
+      .attr("d", path);
+
+      
+    svg.selectAll('aquifer-label')
         .data(topojson.feature(aquifers, aquifers.objects.ogallala).features)
         .enter()
         .append("text")
@@ -120,18 +140,6 @@ function ready(error, us, aquifers) {
         .attr("dy", ".35em")
         .attr("fill", "white")
         .text(function(d) { return d.properties.name; });
-
-      svg.append("g")
-      .attr("class", "states")
-      .selectAll('path')
-      .data(topojson.feature(us, us.objects.states).features)
-      .enter()
-      .append('path')
-      .attr("stroke-width", 0.5)
-      .attr("d", path);
-
-      
-
       
 
 }
