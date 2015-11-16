@@ -26,7 +26,6 @@ var scaleBreaks = [0, 10, 50, 100, 500];
 var scaleBreaks2 = [-500, -100, -50, -10, 0];
 
 function getColor(val) {
-  console.log(val);
     if (val < 0) {
         if (val < scaleBreaks2[0]) {
           return COLORS2[0];

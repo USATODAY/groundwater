@@ -46,7 +46,18 @@ svg {
 }
 
 #details {
+  display: none;
+}
 
+html body {
+  background: black;
+  color: white;
+}
+
+.country-shape {
+  fill: none;
+  stroke: white;
+  stroke-width: 1px;
 }
 
 .q0-9 { fill:#d73027; }

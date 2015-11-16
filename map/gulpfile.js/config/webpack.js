@@ -37,7 +37,8 @@ module.exports = function(env) {
       main: ['./main.js'],
       usage: ['./usage.js'],
       usagechange: ['./usage-change.js'],
-      aquifers: ['./aquifers.js']
+      aquifers: ['./aquifers.js'],
+      india: ['./india.js']
     };
 
     webpackConfig.output = {

@@ -1,6 +1,14 @@
 DBNAME="gwater" # the name of the database you're using. you can name this whatever you want.
 
-topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json map/app/data/ogallala.topojson.json
+topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json map/app/data/ogallala.topojson.json map/app/data/india.topo.json
+
+map/app/data/india.topo.json: shapefiles/IND_adm/IND_adm3.shp output_data/india_levels.csv
+	topojson \
+	-o $@ \
+	-e output_data/india_levels.csv \
+	-p district=District,differece=Difference_Feet \
+	--id-property=District,NAME_2 \
+	-- $<
 
 map/app/data/county_usage_change.topojson.json: output_data/county_usage_change.csv shapefiles/counties/counties.shp
 	topojson \
@@ -35,7 +43,7 @@ map/app/data/county_usage_2010.json: shapefiles/counties/counties.shp county_usa
 	--no-pre-quantization \
 	--post-quantization=1e6 \
 	--simplify=7e-7 \
-	-e input_data/county_usage_2010.csv \
+	-e output_data/county_usage_2010.csv \
 	--id-property=+FIPS \
 	-p \
 	-- $<
@@ -61,69 +69,72 @@ dbtables/county_usage_table_percent_groundwater: dbtables/county_usage_2010_tabl
 	touch $@
 
 #import county usage data into database table
-dbtables/county_usage_2000_table:  input_data/county_usage_2000.csv psql/county_usage_2000_sql_create.sql dbtables
+dbtables/county_usage_2000_table:  output_data/county_usage_2000.csv psql/county_usage_2000_sql_create.sql dbtables
 	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS county_usage_2000;"
 	psql -d $(DBNAME) -f psql/county_usage_2000_sql_create.sql
 	psql -d $(DBNAME) -c "\COPY county_usage_2000 FROM '$(abspath $<)' DELIMITER ',' CSV HEADER;"
 	touch $@
 
-dbtables/county_usage_2005_table:  input_data/county_usage_2005.csv psql/county_usage_2005_sql_create.sql dbtables
+dbtables/county_usage_2005_table:  output_data/county_usage_2005.csv psql/county_usage_2005_sql_create.sql dbtables
 	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS county_usage_2005;"
 	psql -d $(DBNAME) -f psql/county_usage_2005_sql_create.sql
 	psql -d $(DBNAME) -c "\COPY county_usage_2005 FROM '$(abspath $<)' DELIMITER ',' CSV HEADER;"
 	touch $@
 
-dbtables/county_usage_2010_table:  input_data/county_usage_2010.csv psql/county_usage_2010_sql_create.sql dbtables
+dbtables/county_usage_2010_table:  output_data/county_usage_2010.csv psql/county_usage_2010_sql_create.sql dbtables
 	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS county_usage_2010;"
 	psql -d $(DBNAME) -f psql/county_usage_2010_sql_create.sql
 	psql -d $(DBNAME) -c "\COPY county_usage_2010 FROM '$(abspath $<)' DELIMITER ',' CSV HEADER;"
 	touch $@
 
-psql/county_usage_2005_sql_create.sql: input_data/county_usage_2005.csv
-	csvsql -i postgresql --tables county_usage_2005 input_data/county_usage_2005.csv > psql/county_usage_2005_sql_create.sql
-psql/county_usage_2000_sql_create.sql: input_data/county_usage_2000.csv
-	csvsql -i postgresql --tables county_usage_2000 input_data/county_usage_2000.csv > psql/county_usage_2000_sql_create.sql
-psql/county_usage_2010_sql_create.sql: input_data/county_usage_2010.csv
-	csvsql -i postgresql --tables county_usage_2010 input_data/county_usage_2010.csv > psql/county_usage_2010_sql_create.sql
+psql/county_usage_2005_sql_create.sql: output_data/county_usage_2005.csv
+	csvsql -i postgresql --tables county_usage_2005 output_data/county_usage_2005.csv > psql/county_usage_2005_sql_create.sql
+psql/county_usage_2000_sql_create.sql: output_data/county_usage_2000.csv
+	csvsql -i postgresql --tables county_usage_2000 output_data/county_usage_2000.csv > psql/county_usage_2000_sql_create.sql
+psql/county_usage_2010_sql_create.sql: output_data/county_usage_2010.csv
+	csvsql -i postgresql --tables county_usage_2010 output_data/county_usage_2010.csv > psql/county_usage_2010_sql_create.sql
 
-input_data/county_usage_summary.csv: county_usage_csvs_simplified
-	csvstack -g 2000,2005,2010 -n YEAR input_data/county_usage_2000.csv input_data/county_usage_2005.csv input_data/county_usage_2010.csv > input_data/county_usage_summary.csv
+output_data/county_usage_summary.csv: county_usage_csvs_simplified
+	csvstack -g 2000,2005,2010 -n YEAR output_data/county_usage_2000.csv output_data/county_usage_2005.csv output_data/county_usage_2010.csv > $@
 
-county_usage_csvs_simplified: input_data/county_usage_2000.csv input_data/county_usage_2005.csv input_data/county_usage_2010.csv
+county_usage_csvs_simplified: output_data/county_usage_2000.csv output_data/county_usage_2005.csv output_data/county_usage_2010.csv
 
-input_data/county_usage_2000.csv:
-	csvcut -c STATE,FIPS,"TP-TotPop","TO-WGWTo","TO-WTotl" input_data/usco2000.csv > input_data/county_usage_2000.csv
+output_data/india_levels.csv:
+	in2csv input_data/India_district-level_groundwater_data.xlsx > $@
 
-input_data/county_usage_2005.csv:
-	csvcut -c STATE,FIPS,"TP-TotPop","TO-WGWTo","TO-WTotl" input_data/usco2005.csv > input_data/county_usage_2005.csv
+output_data/county_usage_2000.csv: output_data/usco2000.csv
+	csvcut -c STATE,FIPS,"TP-TotPop","TO-WGWTo","TO-WTotl" $< > $@
 
-input_data/county_usage_2010.csv:
-	csvcut -c STATE,FIPS,"TP-TotPop","TO-WGWTo","TO-WTotl" input_data/usco2010.csv > input_data/county_usage_2010.csv
+output_data/county_usage_2005.csv: output_data/usco2005.csv
+	csvcut -c STATE,FIPS,"TP-TotPop","TO-WGWTo","TO-WTotl" $< > $@
 
-county_usage_csvs: input_data/usco2000.csv input_data/usco2005.csv input_data/usco2010.csv
+output_data/county_usage_2010.csv: output_data/usco2010.csv
+	csvcut -c STATE,FIPS,"TP-TotPop","TO-WGWTo","TO-WTotl" $< > $@
 
-input_data/usco2000.csv: county_usage_raw
-	in2csv input_data/usco2000.xls > input_data/usco2000.csv
+county_usage_csvs: output_data/usco2000.csv output_data/usco2005.csv output_data/usco2010.csv
 
-input_data/usco2005.csv: county_usage_raw
-	in2csv input_data/usco2005.xls > input_data/usco2005.csv
+output_data/usco2000.csv: county_usage_raw
+	in2csv output_data/usco2000.xls > output_data/usco2000.csv
 
-input_data/usco2010.csv: county_usage_raw
-	in2csv -f xls input_data/usco2010.xls > input_data/usco2010.csv
+output_data/usco2005.csv: county_usage_raw
+	in2csv output_data/usco2005.xls > output_data/usco2005.csv
 
-county_usage_raw: input_data/usco2000.xls input_data/usco2010.xls input_data/usco2005.xls
+output_data/usco2010.csv: county_usage_raw
+	in2csv -f xls output_data/usco2010.xls > output_data/usco2010.csv
 
-input_data/usco2010.xls:
+county_usage_raw: output_data/usco2000.xls output_data/usco2010.xls output_data/usco2005.xls
+
+output_data/usco2010.xls:
 	wget http://water.usgs.gov/watuse/data/2010/usco2010.xlsx
-	mv usco2010.xlsx input_data/usco2010.xls
+	mv usco2010.xlsx output_data/usco2010.xls
 
-input_data/usco2005.xls:
+output_data/usco2005.xls:
 	wget http://water.usgs.gov/watuse/data/2005/usco2005.xls
-	mv usco2005.xls input_data
+	mv usco2005.xls output_data
 
-input_data/usco2000.xls:
+output_data/usco2000.xls:
 	wget http://water.usgs.gov/watuse/data/2000/usco2000.xls
-	mv usco2000.xls input_data
+	mv usco2000.xls output_data
 
 dbtables/geotables: dbtables/counties dbtables/states dbtables/us_aquifers
 	touch $@
@@ -149,7 +160,7 @@ psql/counties.sql: shapefiles/counties/counties.shp
 psql/states.sql: shapefiles/states/states.shp
 	shp2pgsql -I -s 4269 $< > $@
 
-shapefiles/IND_adm/IND_adm.shp:
+shapefiles/IND_adm/IND_adm3.shp:
 	wget http://biogeo.ucdavis.edu/data/diva/adm/IND_adm.zip
 	unzip IND_adm.zip -d shapefiles/IND_adm
 	rm IND_adm.zip
