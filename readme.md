@@ -23,6 +23,8 @@ to create deployable files.
 
 Graphics make use of [Nunjucks templating](https://mozilla.github.io/nunjucks/). For development, edit the index.html template, and copy this template into the embed.html file as well (for embedding in story page later).
 
+JS must be written as a RequireJS module.
+
 Make sure all JS code is well name-spaced as multiple graphics may run on the same page.
 
 ##Groundwater data conversion and analysis
