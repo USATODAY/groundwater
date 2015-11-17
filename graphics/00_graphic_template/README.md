@@ -4,7 +4,7 @@ USAT-APP-KIT
 # What this kit does
 - processes SASS into CSS
 - runs autoprefixer on CSS
-- bundles JS files via Webpack/Babel
+- bundles JS files via RequireJS :(
 - generates static HTML from [Nunjucks templates](http://mozilla.github.io/nunjucks/)
 - runs a dev server with live reload
 
