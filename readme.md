@@ -4,7 +4,26 @@
 This repository contains both the raw data and data analysis scripts, as well as the code that powers several interactive graphics
 
 ##Graphics
-TO DO include template folder and example for each new interactive graphic.
+
+###Creating a new graphic
+In the [graphics folder](graphics/), there is a folder called 00_graphic_template. This folder should be copied as a starter for each individual graphic. Once a folder is created, `cd` into the folder, and run:
+```
+npm install && bower install
+```
+This will download development dependencies.
+
+Run ```
+gulp
+``` 
+to run graphic locally, and run 
+```
+gulp build:production
+```
+to create deployable files.
+
+Graphics make use of [Nunjucks templating](https://mozilla.github.io/nunjucks/). For development, edit the index.html template, and copy this template into the embed.html file as well (for embedding in story page later).
+
+Make sure all JS code is well name-spaced as multiple graphics may run on the same page.
 
 ##Groundwater data conversion and analysis
 
