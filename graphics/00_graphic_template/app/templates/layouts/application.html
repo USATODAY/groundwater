@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}USA TODAY APP KIT{% endblock %}</title>
+  <link rel="stylesheet" href="style/project.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+    <div id="{{GRAPHICINFO[GRAPHIC_SLUG]}}" class="graphic">
+        {% block content %}{% endblock %}
+    </div>
+  <script src="js/require.js" data-main="js/main"></script>
+  {% block javascript %}{% endblock %}
+</body>
+</html>
