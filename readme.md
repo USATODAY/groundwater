@@ -12,9 +12,11 @@ npm install && bower install
 ```
 This will download development dependencies.
 
-Run ```
+Run 
+```
 gulp
 ``` 
+
 to run graphic locally, and run 
 ```
 gulp build:production
