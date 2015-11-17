@@ -2,9 +2,9 @@
 __pycache__/
 *.py[cod]
 
-output_data/
-shapefiles/
-dbtables/
+data/output_data/
+data/shapefiles/
+data/dbtables/
 
 # Build steps
 src/js/templates.js
