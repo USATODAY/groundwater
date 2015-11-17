@@ -5,6 +5,7 @@ __pycache__/
 data/output_data/
 data/shapefiles/
 data/dbtables/
+data/psql/
 
 # Build steps
 src/js/templates.js

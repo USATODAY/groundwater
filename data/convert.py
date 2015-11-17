@@ -39,9 +39,10 @@ def parse_data(raw_list):
     return new_list
 
 def write_file(data):
-    with open("output_data/sites.csv", "wb") as writefile:
+    with open("data/output_data/sites.csv", "wb") as writefile:
         keys = data[0].keys()
         writer = csvkit.DictWriter(writefile, fieldnames=keys)
+        writer.writeheader()
         for row in data:
             writer.writerow(row)
 
