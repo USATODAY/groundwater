@@ -3,6 +3,7 @@
  */
 require.config({
     paths: {
-        'd3': 'http://www.gannett-cdn.com/experiments/usatoday/_common/_scripts/d3.min.js'
+        'd3': 'http://www.gannett-cdn.com/experiments/usatoday/_common/_scripts/d3.min.js',
+        'topojson': 'http://www.gannett-cdn.com/experiments/usatoday/_common/_scripts/topojson.v1.min.js'
     }
 })

@@ -2,7 +2,7 @@ DBNAME=gwater # the name of the database you're using. you can name this whateve
 
 topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json map/app/data/ogallala.topojson.json map/app/data/india.topo.json map/app/data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json
 
-map/app/data/india.topo.json: data/shapefiles/IND_adm/IND_adm3.shp data/output_data/india_levels.csv
+graphics/india-map/app/data/india.topo.json: data/shapefiles/IND_adm/IND_adm3.shp data/output_data/india_levels.csv
 	topojson \
 	-o $@ \
 	-e data/output_data/india_levels.csv \
