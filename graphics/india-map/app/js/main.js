@@ -79,6 +79,8 @@ function getDataURL(dataURL) {
       if (GRAPHICINFO.FULL_WIDTH) {
         $('#india-map').parents('.story-asset').height(height);
       }
+
+      $(window).on("scroll", onScroll);
       d3.json(DATA_URL, ready);
   }
 
@@ -112,7 +114,7 @@ function getDataURL(dataURL) {
       var path = d3.geo.path()
       .projection(projection);
 
-      var svg = d3.select("#india-map").append("svg")
+      var svg = d3.select("#india-map .gig-graphic-slide-1").append("svg")
       .attr("width", width)
       .attr("height", height);
 
@@ -156,5 +158,9 @@ function getDataURL(dataURL) {
       content = "<h3 class='county'>" + d.properties.COUNTY + ", " + d.properties.STATE + "</h3> <p>no groundwater data for this county</p>"
     }
     $details.html(content);
+  }
+
+  function onScroll(e) {
+    console.log(e);
   }
   document.addEventListener("DOMContentLoaded", start);
