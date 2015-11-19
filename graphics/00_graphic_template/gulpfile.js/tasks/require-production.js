@@ -11,6 +11,7 @@ gulp.task('require:production', function() {
    gulp.src(config.src + "main.js")
     .pipe(requirejsOptimize({
         name: 'main',
+        shim: config.shim,
         paths: config.paths,
         exclude: ['d3', 'topojson', 'jquery', 'backbone', 'underscore', 'api/analytics']
     }))

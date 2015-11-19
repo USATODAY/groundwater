@@ -5,6 +5,9 @@ topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/dat
 graphics/india-map/app/data/india.topo.json: data/shapefiles/IND_adm/IND_adm3.shp data/output_data/india_levels.csv
 	topojson \
 	-o $@ \
+	--no-pre-quantization \
+	--post-quantization=1e6 \
+	--simplify=7e-7 \
 	-e data/output_data/india_levels.csv \
 	-p district=District,differece=Difference_Feet \
 	--id-property=District,NAME_2 \

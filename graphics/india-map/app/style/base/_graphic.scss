@@ -1,0 +1,71 @@
+.counties {
+  fill: none;
+  // opacity: 0.25;
+  // stroke: #fff;
+  // stroke-width: 0.5px;
+  path {
+
+    // stroke: black;
+    // stroke-width: 0.5px;
+  }
+}
+
+.map-legend {
+  margin-left: 2em;
+}
+
+svg {
+  display: block;
+  margin: 2em auto;
+}
+
+.states {
+  fill: none;
+  // opacity: 0.15;
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-width: 2px;
+}
+
+
+.aquifer {
+    // fill: none;
+  // stroke: rgba(69,117,180,1);
+  opacity: 0.75;
+}
+
+#mapboxmap {
+    height: 400px;
+    width: 900px;
+}
+
+.counties path.county-active {
+  stroke: white;
+  stroke-width: 1px;
+  z-index: 100;
+}
+
+#details {
+  display: none;
+}
+
+.country-shape {
+  fill: none;
+  stroke: white;
+  stroke-width: 1px;
+}
+
+#india-map {
+  background: black;
+}
+
+.q0-9 { fill:#d73027; }
+.q1-9 { fill:#f46d43; }
+.q2-9 { fill:#fdae61; }
+.q3-9 { fill:#fee08b; }
+.q4-9 { fill:#ffffbf; }
+.q5-9 { fill:#d9ef8b; }
+.q6-9 { fill:#a6d96a; }
+.q7-9 { fill:#66bd63; }
+.q8-9 { fill:#1a9850; }
+

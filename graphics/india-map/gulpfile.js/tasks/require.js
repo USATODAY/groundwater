@@ -12,6 +12,7 @@ gulp.task('require:development', function() {
     .pipe(requirejsOptimize({
         name: "main",
         optimize: 'none',
+        shim: config.shim,
         paths: config.paths
     }))
     

@@ -1,5 +1,7 @@
 {
     "HEADLINE": "GRAPHIC",
     "GRAPHIC_SLUG": "graphic-slug",
-    "CHATTER": "ABOUT THIS GRAPHIC"
+    "CHATTER": "ABOUT THIS GRAPHIC",
+    "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/india-map/data/india.topo.json",
+    "FULL_WIDTH": true
 }

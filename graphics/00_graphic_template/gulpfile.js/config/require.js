@@ -4,7 +4,9 @@ module.exports = {
     src:  config.sourceDirectory + "/js/",
     dest: config.publicDirectory + "/js",
     shim: {
-
+        "underscore": {
+            "exports": "_"
+        }
     },
     paths: {
         "d3": '../../bower_components/d3/d3',

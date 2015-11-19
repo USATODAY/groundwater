@@ -1,5 +1,7 @@
 {
     "HEADLINE": "India",
     "GRAPHIC_SLUG": "india-map",
-    "CHATTER": "Map of changing water levels in India"
+    "CHATTER": "Map of changing water levels in India",
+    "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/india-map/data/india.topo.json",
+    "FULL_WIDTH": true
 }
