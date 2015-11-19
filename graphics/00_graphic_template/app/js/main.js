@@ -1,3 +1,1 @@
-require(['app'], function(app) {
-    app.init();
-});
+console.log('main.js');
