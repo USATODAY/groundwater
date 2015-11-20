@@ -7,10 +7,11 @@ var $details;
 var GRAPHICINFO = require("../data/GRAPHICINFO.json");
 var VAL_COLUMN = "differece";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
+var topojson_features_obj = "IND_adm3";
+var _ = require("lodash");
 
 //bundle map data into file
-var GRAPHICDATA = require("../data/india.topo.json");
-
+var GRAPHICDATA;
 
 var colorScale = d3.scale.linear()
   .range(['#deebf7', '#3182bd']);
@@ -73,16 +74,15 @@ function getColor(val) {
   
 
 function start() {
-    width = $(window).width();
-    height = width * (6/16);
+    
     if (GRAPHICINFO.FULL_WIDTH) {
       $('#india-map').parents('.story-asset').height(height);
     }
     $window = $(window);
     $graphic = $('#' + GRAPHICINFO.GRAPHIC_SLUG);
     $details = $graphic.find('#details');
-    // d3.json(DATA_URL, ready);
-    ready(GRAPHICDATA);
+    d3.json(DATA_URL, ready);
+    addEventListeners();
 }
 
 
@@ -98,30 +98,35 @@ function addLegend() {
     $('#legend').html(html);
 }
 
-function ready(india) {
-
+function ready(data) {
+    width = $(window).width();
+    height = width * (6/16);
+    $graphic.empty();
+    if(!GRAPHICDATA) {
+      GRAPHICDATA = data;
+    }
     var geo = {
       type: "FeatureCollection",
-      features: topojson.feature(india, india.objects.IND_adm3).features
+      features: topojson.feature(data, data.objects[topojson_features_obj]).features
     };
 
     var center = d3.geo.centroid(geo);
 
     var projection = d3.geo.mercator()
-    .scale(1080)
+    .scale(width/1.5)
     .center(center)
     .translate([width / 2, height / 2]);
 
     var path = d3.geo.path()
     .projection(projection);
 
-    var svg = d3.select("#india-map .gig-graphic-slide-1").append("svg")
+    var svg = d3.select("#" + GRAPHICINFO.GRAPHIC_SLUG).append("svg")
     .attr("width", width)
     .attr("height", height);
 
 
     svg.append('path')
-      .datum(topojson.merge(india, india.objects.IND_adm3.geometries))
+      .datum(topojson.merge(data, data.objects[topojson_features_obj].geometries))
       .attr("class", "country-shape")
       .attr("d", path);
 
@@ -138,27 +143,16 @@ function ready(india) {
               }
       })
       .attr("d", path);
-      // .on("mouseover", mouseOver)
-      // .on("mouseout", mouseOut);
 
-      
       addLegend();
       
 
 }
-function mouseOut(d) {
-  d3.select(this).classed("county-active", false);
-}
 
-function mouseOver(d) {
-  d3.select(this).classed("county-active", true);
-  var content;
-  if (d.properties[VAL_COLUMN]) {
-    content = "<h3 class='county'>" + d.properties.COUNTY + ", " + d.properties.STATE + "</h3> <p><strong>2010 Groundwater consumed per day: </strong>" + d.properties[VAL_COLUMN] + " million gallons</p>";
-  } else {
-    content = "<h3 class='county'>" + d.properties.COUNTY + ", " + d.properties.STATE + "</h3> <p>no groundwater data for this county</p>"
-  }
-  $details.html(content);
+function addEventListeners() {
+  $window.on("resize", function(e) {
+    _.throttle(ready, 200)(GRAPHICDATA);
+  });
 }
 
 function getGraphicLocation() {
@@ -168,7 +162,6 @@ function getGraphicLocation() {
 }
 
 function onScroll(e) {
-  console.log(e);
   var graphicLocation = getGraphicLocation();
   if (graphicLocation <= 0) {
     e.preventDefault();
