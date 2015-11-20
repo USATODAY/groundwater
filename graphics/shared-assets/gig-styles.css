@@ -1,0 +1,76 @@
+/**
+ * Fonts
+ */
+@font-face {
+  font-family: 'Futura Today Light';
+  src: url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_light.eot") format("eot");
+  src: url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_light.woff") format("woff"), url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_light.ttf") format("truetype"), url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_light.svg") format("svg");
+  font-weight: 100; }
+@font-face {
+  font-family: 'Futura Today Normal';
+  src: url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_normal.eot") format("eot");
+  src: url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_normal.woff") format("woff"), url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_normal.ttf") format("truetype");
+  font-weight: 300; }
+@font-face {
+  font-family: 'Futura Today Demibold';
+  src: url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_demibold.eot") format("eot");
+  src: url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_demibold.woff") format("woff"), url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_demibold.ttf") format("truetype");
+  font-weight: 500; }
+@font-face {
+  font-family: 'Futura Today Bold';
+  src: url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_bold.eot") format("eot");
+  src: url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_bold.woff") format("woff"), url("http://www.gannett-cdn.com/GDContent/global/fonts/futura_today_bold.ttf") format("truetype");
+  font-weight: 700; }
+/**
+ * Colors
+ */
+/**
+ * Framework Overrides
+ */
+.longform-content .oembed-asset,
+.longform-content .story-oembed-wrap,
+.story-oembed {
+  display: block;
+  max-width: 100% !important; }
+
+.story-oembed {
+  width: auto !important; }
+
+/**
+ * The .gig-embed class
+ */
+.gig-embed * {
+  -moz-box-sizing: border-box;
+  /* Firefox 1, probably can drop this */
+  -webkit-box-sizing: border-box;
+  /* Safari 3-4, also probably droppable */
+  box-sizing: border-box;
+  /* Everything else */ }
+
+.gig-embed {
+  left: 0;
+  position: absolute;
+  font-weight: normal;
+  font-family: "Futura Today Normal", Arial,sans-serif; }
+  .gig-embed h1, .gig-embed h2, .gig-embed h3, .gig-embed h4, .gig-embed h5, .gig-embed h6 {
+    font-family: "Futura Today Bold", Arial,sans-serif; }
+  .gig-embed .chatter {
+    font-size: 1em;
+    margin: 0 auto 2em auto;
+    max-width: 30em; }
+  .gig-embed .page-header {
+    font-size: 1.2em;
+    margin: 0.5em 0;
+    text-transform: uppercase; }
+    @media (min-width: 1100px) {
+      .gig-embed .page-header {
+        font-size: 2em; } }
+  .gig-embed .detail-header {
+    font-family: "Futura Today DemiBold", Arial,sans-serif; }
+  .gig-embed .info-text {
+    max-width: 30em;
+    margin: 0 auto; }
+  .gig-embed strong {
+    font-family: "Futura Today Bold", Arial,sans-serif; }
+
+/*# sourceMappingURL=gig-styles.css.map */

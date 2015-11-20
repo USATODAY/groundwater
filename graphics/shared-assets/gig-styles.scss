@@ -1,0 +1,59 @@
+@import 'partials/fonts';
+@import 'partials/colors';
+
+/**
+ * Framework Overrides
+ */
+
+.longform-content .oembed-asset,
+.longform-content .story-oembed-wrap,
+.story-oembed {
+    display: block;
+    max-width: 100% !important;
+}
+
+.story-oembed {
+    width: auto !important;
+}
+
+/**
+ * The .gig-embed class
+ */
+
+.gig-embed * {
+   -moz-box-sizing:    border-box;   /* Firefox 1, probably can drop this */
+   -webkit-box-sizing: border-box;   /* Safari 3-4, also probably droppable */
+    box-sizing:        border-box;   /* Everything else */
+}
+
+.gig-embed {
+    left: 0;
+    position: absolute;
+    font-weight: normal; font-family: "Futura Today Normal", Arial,sans-serif;
+    h1, h2, h3, h4, h5, h6 {
+      font-family: "Futura Today Bold", Arial,sans-serif;
+    }
+    .chatter {
+      font-size: 1em;
+      margin: 0 auto 2em auto;
+      max-width: 30em;
+    }
+    .page-header {
+      font-size: 1.2em;
+      margin: 0.5em 0;
+      text-transform: uppercase;
+      @media (min-width: 1100px) {
+        font-size: 2em;
+      }
+    }
+    .detail-header {
+      font-family: "Futura Today DemiBold", Arial,sans-serif;
+    }
+    .info-text {
+      max-width: 30em;
+      margin: 0 auto;
+    }
+    strong {
+      font-family: "Futura Today Bold", Arial,sans-serif;
+    }
+}
