@@ -1,4 +1,4 @@
-# Instructions
+# CSS Instructions
 
 1. `cd` to this directory in command line.
 2. Generate `.css` file with `sass` command:
