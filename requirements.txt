@@ -1,3 +1,4 @@
+BeautifulSoup==3.2.1
 Fiona==1.6.2
 SQLAlchemy==1.0.9
 appnope==0.1.0
@@ -17,6 +18,7 @@ pexpect==4.0.1
 pickleshare==0.5
 ptyprocess==0.5
 python-dateutil==2.2
+requests==2.8.1
 simplegeneric==0.8.1
 six==1.10.0
 traitlets==4.0.0
