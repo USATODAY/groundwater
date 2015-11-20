@@ -75,9 +75,7 @@ function getColor(val) {
 
 function start() {
     
-    if (GRAPHICINFO.FULL_WIDTH) {
-      $('#india-map').parents('.story-asset').height(height);
-    }
+    
     $window = $(window);
     $graphic = $('#' + GRAPHICINFO.GRAPHIC_SLUG);
     $details = $graphic.find('#details');
@@ -102,6 +100,9 @@ function ready(data) {
     width = $(window).width();
     height = width * (6/16);
     $graphic.empty();
+    if (GRAPHICINFO.FULL_WIDTH) {
+      $('#india-map').parents('.story-asset').height(height);
+    }
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
