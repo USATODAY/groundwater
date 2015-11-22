@@ -150,7 +150,7 @@ data/psql/sites.sql: data/output_data/sites.csv data/psql
 	csvsql -i postgresql --tables sites $< > $@
 
 data/output_data/sites.csv:
-	python data/convert.py data/input_data/USGS_data_for_map_1020.csv
+	python data/scripts/convert.py data/input_data/USGS_data_for_map_1020.csv
 
 data/output_data/india_levels.csv:
 	in2csv data/input_data/India_district-level_groundwater_data.xlsx > $@

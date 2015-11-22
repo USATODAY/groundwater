@@ -2,6 +2,7 @@ BeautifulSoup==3.2.1
 Fiona==1.6.2
 SQLAlchemy==1.0.9
 appnope==0.1.0
+beautifulsoup4==4.4.1
 click==5.1
 click-plugins==1.0.2
 cligj==0.3.0
