@@ -1,0 +1,21 @@
+{
+    "HEADLINE": "Ground Water Slider",
+    "GRAPHIC_SLUG": "gig-slider",
+    "CHATTER": "ABOUT THIS GRAPHIC",
+    "DATA_URL": "",
+    "FULL_WIDTH": true,
+    "SLIDER_IMAGES": [
+      {
+        "title:": "SLIDE ONE TITLE",
+        "url": "https://unsplash.it/600/400/?random"
+      },
+      {
+        "title:": "",
+        "url": "https://unsplash.it/600/400/?random"
+      },
+      {
+        "title:": "SLIDE TWO HAS NO TITLE",
+        "url": "https://unsplash.it/600/400/?random"
+      }
+    ]
+}
