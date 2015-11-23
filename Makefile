@@ -216,6 +216,15 @@ data/psql/counties.sql: data/shapefiles/counties/counties.shp data/psql
 data/psql/states.sql: data/shapefiles/states/states.shp data/psql
 	shp2pgsql -I -s 4269 $< > $@
 
+#convert california wells data to csv
+data/output_data/california_dry_wells.csv: data/output_data/california_dry_wells_raw.json
+	python data/scripts/california_wells.py $< > $@
+
+#download raw California state data regarding failing wells from https://mydrywatersupply.water.ca.gov/report/publicpage
+data/output_data/california_dry_wells_raw.json:
+	wget https://mydrywatersupply.water.ca.gov/report/resources/json/tablePage.json
+	mv tablePage.json data/output_data/california_dry_wells_raw.json
+
 data/shapefiles/IND_adm/IND_adm3.shp:
 	wget http://biogeo.ucdavis.edu/data/diva/adm/IND_adm.zip
 	unzip IND_adm.zip -d data/shapefiles/IND_adm
