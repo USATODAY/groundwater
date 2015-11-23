@@ -1,0 +1,27 @@
+//@import "base/fonts";
+
+html, body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+.section {
+  position: relative;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+#slider-1 {
+  background-image: url(../img/unsplash.jpg);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#gig-slider {
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
