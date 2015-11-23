@@ -17,6 +17,7 @@ openpyxl==2.2.0-b1
 path.py==8.1.2
 pexpect==4.0.1
 pickleshare==0.5
+psycopg2==2.6.1
 ptyprocess==0.5
 python-dateutil==2.2
 requests==2.8.1
