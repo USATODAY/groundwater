@@ -3,7 +3,7 @@
  */
 
 var GRAPHICINFO = require("../data/GRAPHICINFO.json");
-var id = '#slider-1';
+var id = '#gig-slider';
 var duration = 400;
 var WIDTH;
 var HEIGHT;
@@ -15,12 +15,13 @@ function setup() {
   WIDTH = window.innerWidth;
   HEIGHT = window.innerHeight;
 
-  // $(id).height(HEIGHT);
-  $('#gig-slider').height(HEIGHT);
+  // set container height to full screen
+  $(id).height(HEIGHT);
 
-  // set framework container to height of viewport
-  if ( $(id).parents('.story-asset') ) {
-    $(id).parents('.story-asset').height(HEIGHT + duration);
+  // set framework wrapper container to height of viewport
+  if ( $(id).parents('.story-oembed') ) {
+    $(id).parents('.story-oembed').height(HEIGHT + duration);
+    console.log('setting story-oembed height.');
   }
 
   // create a scene
