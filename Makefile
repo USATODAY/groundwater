@@ -2,7 +2,21 @@ DBNAME=gwater # the name of the database you're using. you can name this whateve
 
 topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json map/app/data/ogallala.topojson.json map/app/data/india.topo.json map/app/data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json
 
-graphics/india-map/app/data/india.topo.json: data/shapefiles/IND_adm/IND_adm3.shp data/output_data/india_levels.csv
+data/output_data/california_wells.topo.json: data/output_data/california_wells_w_fips.csv data/shapefiles/CA/CA.shp
+	topojson \
+	-o $@ \
+	--no-pre-quantization \
+	--post-quantization=1e6 \
+	--simplify=7e-7 \
+	-e $< \
+	-p FIPS,county,reported_outages \
+	--id-property=+fips,+FIPS \
+	-- data/shapefiles/CA/CA.shp
+
+graphics/india-map/app/data/india.topo.json: data/output_data/india.topo.json
+	cp $< $@
+
+data/output_data/india.topo.json: data/shapefiles/IND_adm/IND_adm3.shp data/output_data/india_levels.csv
 	topojson \
 	-o $@ \
 	--no-pre-quantization \
@@ -13,7 +27,10 @@ graphics/india-map/app/data/india.topo.json: data/shapefiles/IND_adm/IND_adm3.sh
 	--id-property=District,NAME_2 \
 	-- $<
 
-map/app/data/county_usage_change.topojson.json: data/output_data/county_usage_change.csv data/shapefiles/counties/counties.shp
+map/app/data/county_usage_change.topojson.json: data/output_data/county_usage_change.topojson.json
+	cp $< $@
+
+data/output_data/county_usage_change.topojson.json: data/output_data/county_usage_change.csv data/shapefiles/counties/counties.shp
 	topojson \
 	-o $@ \
 	--no-pre-quantization \
@@ -150,7 +167,7 @@ data/psql/sites.sql: data/output_data/sites.csv data/psql
 	csvsql -i postgresql --tables sites $< > $@
 
 data/output_data/sites.csv:
-	python data/convert.py data/input_data/USGS_data_for_map_1020.csv
+	python data/scripts/convert.py data/input_data/USGS_data_for_map_1020.csv
 
 data/output_data/india_levels.csv:
 	in2csv data/input_data/India_district-level_groundwater_data.xlsx > $@
@@ -215,6 +232,37 @@ data/psql/counties.sql: data/shapefiles/counties/counties.shp data/psql
 
 data/psql/states.sql: data/shapefiles/states/states.shp data/psql
 	shp2pgsql -I -s 4269 $< > $@
+
+#create california_wells csv with fips column
+data/output_data/california_wells_w_fips.csv: data/dbtables/california_wells_w_fips
+	psql -d $(DBNAME) -c "COPY(SELECT california_wells.*, counties.fips FROM california_wells JOIN counties ON (california_wells.county_id = counties.gid)) TO '$(abspath $@)' DELIMITER ',' CSV HEADER;"
+
+
+#add fips column to dry wells table
+data/dbtables/california_wells_w_fips: data/dbtables/california_wells
+	psql -d $(DBNAME) -c "ALTER TABLE california_wells DROP COLUMN IF EXISTS county_id;"
+	psql -d $(DBNAME) -c "ALTER TABLE california_wells ADD COLUMN county_id INTEGER;"
+	psql -d $(DBNAME) -c "UPDATE california_wells SET county_id = countyquery.gid FROM (SELECT gid, state, county FROM counties) as countyquery WHERE countyquery.state = 'CA' AND countyquery.county ILIKE california_wells.county || '%'"	
+	touch $@
+
+#import dry wells into postgres
+data/dbtables/california_wells: data/output_data/california_dry_wells.csv data/dbtables data/dbtables/geotables
+	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS california_wells;"
+	csvsql --db postgresql:///$(DBNAME) --table california_wells --insert $<
+	touch $@
+
+#convert california wells data to csv
+data/output_data/california_dry_wells.csv: data/output_data/california_dry_wells_raw.json
+	python data/scripts/california_wells.py $< > $@
+
+#download raw California state data regarding failing wells from https://mydrywatersupply.water.ca.gov/report/publicpage
+data/output_data/california_dry_wells_raw.json:
+	wget https://mydrywatersupply.water.ca.gov/report/resources/json/tablePage.json
+	mv tablePage.json data/output_data/california_dry_wells_raw.json
+
+data/shapefiles/CA/CA.shp: data/shapefiles/counties/counties.shp
+	mkdir -p data/shapefiles/CA
+	ogr2ogr -f 'ESRI Shapefile' -where "FIPS LIKE '06%'" $@ $<
 
 data/shapefiles/IND_adm/IND_adm3.shp:
 	wget http://biogeo.ucdavis.edu/data/diva/adm/IND_adm.zip
