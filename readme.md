@@ -41,9 +41,9 @@ First up, you'll need Postgres running locally. If you don't have it, I reccomen
 brew install postgresql
 ```
 
-Because we are working with geographical data, you'll also need postgis installed
+Because we are working with geographical data, you'll also need gdal and postgis installed. We'll also need wget to download files.
 ```
-brew install postgis
+brew install gdal postgis wget
 ```
 
 Now the database is ready to go. Now set up a python environment and install python requirements
@@ -54,7 +54,7 @@ pip install -r requirements.txt
 
 And finally make sure you have topojson installed
 ```
-npm install topojson
+npm install -g topojson
 ```
 
 ##Analysis & data conversion steps
