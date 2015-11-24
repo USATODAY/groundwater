@@ -6,16 +6,12 @@
     "FULL_WIDTH": true,
     "SLIDER_IMAGES": [
       {
-        "title:": "SLIDE ONE TITLE",
-        "url": "https://unsplash.it/600/400/?random"
+        "title": "SLIDE ONE TITLE",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-1.jpg"
       },
       {
-        "title:": "",
-        "url": "https://unsplash.it/600/400/?random"
-      },
-      {
-        "title:": "SLIDE TWO HAS NO TITLE",
-        "url": "https://unsplash.it/600/400/?random"
+        "title": "SLIDE TWO TITLE",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
       }
     ]
 }
