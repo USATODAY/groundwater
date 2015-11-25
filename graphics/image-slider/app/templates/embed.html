@@ -1,5 +1,10 @@
-<div id="{{GRAPHICINFO.GRAPHIC_SLUG}}" class="gig-embed">
-  <div id="gig-slider-panel-1" class="gig-slider-panel">
-    <div class="stuff">SECTION 1</div>
+<div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}" class="gig-embed">
+  {% for item in GRAPHICINFO.SLIDER_IMAGES %}
+  <div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}-panel-{{ loop.index }}"
+       class="gig-slider-panel"
+       style="background-image: url({{ item.img }});">
+    <div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}-panel-text-container-{{ loop.index }}"
+         class="gig-slider-panel-text-container">{{ item.title }}</div>
   </div>
+  {% endfor %}
 </div>

@@ -6,22 +6,33 @@ html, body {
   height: 100%;
 }
 
-.gig-slider-panel {
-  position: relative;
-  display: block;
-  height: 100%;
-  width: 100%;
-}
-
-#gig-slider-panel-1 {
-  background-image: url(../img/unsplash.jpg);
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
 #gig-slider {
   height: 100%;
   width: 100%;
-  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.gig-slider-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  &:first-child,
+  &.active {
+    top: 0;
+  }
+
+  &-text-container {
+    position: absolute;
+    top: 50%;
+    left: 15%;
+    color: #ffffff;
+    font-family: 'Futura Today Light', sans-serif;
+    font-size: 4em;
+    transform: translateY(-50%);
+  }
 }

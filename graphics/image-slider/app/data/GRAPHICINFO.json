@@ -6,12 +6,16 @@
     "FULL_WIDTH": true,
     "SLIDER_IMAGES": [
       {
-        "title": "SLIDE ONE TITLE",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-1.jpg"
+        "title": "Slide One Title",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/heheh.gif"
       },
       {
-        "title": "SLIDE TWO TITLE",
+        "title": "Why Am I So Cool?",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
+      },
+      {
+        "title": "Possibly a Third Slide",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-3.jpg"
       }
     ]
 }
