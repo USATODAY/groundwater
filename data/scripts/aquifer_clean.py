@@ -24,7 +24,7 @@ def clean_header(raw_header):
         date_header = datetime.date(int(year), int(month), int(day))
         clean_header = date_header.strftime("%b-%y")
     except:
-        clean_header = raw_header.replace(" ", "_").replace("[", "_").replace("]", "_").replace("/", "_per_").lower()
+        clean_header = raw_header.strip().replace(" ", "_").replace("[", "").replace("]", "").replace("/", "_per_").lower()
     return clean_header
 
 def main(filename):

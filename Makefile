@@ -8,8 +8,8 @@ data/output_data/world_aquifers.topo.json: data/output_data/aquifer_gw_anomolies
 	topojson \
 	-o data/output_data/world_aquifers_w_values.json \
 	-e $< \
-	-p aquifer_name,sub-surface_storage_trends__mm_per_yr_,stress_classification \
-	--id-property=aquifer_name,Aquifer_sy \
+	-p \
+	--id-property=aquifer_id,HYGEO \
 	-- data/input_data/world_aquifer_systems_nocoast/world_aquifer_systems_nocoast.shp
 
 	topojson \
@@ -17,7 +17,7 @@ data/output_data/world_aquifers.topo.json: data/output_data/aquifer_gw_anomolies
 	--no-pre-quantization \
 	--post-quantization=1e6 \
 	--simplify=7e-7 \
-	-p aquifer_name,sub-surface_storage_trends__mm_per_yr_,stress_classification \
+	-p \
 	-- data/shapefiles/ne_110m_land/ne_110m_land.shp data/output_data/world_aquifers_w_values.json
 
 data/output_data/aquifer_gw_anomolies.csv:
@@ -293,6 +293,11 @@ data/shapefiles/ne_110m_land/ne_110m_land.shp:
 data/shapefiles/CA/CA.shp: data/shapefiles/counties/counties.shp
 	mkdir -p data/shapefiles/CA
 	ogr2ogr -f 'ESRI Shapefile' -where "FIPS LIKE '06%'" $@ $<
+
+data/shapefiles/PER_adm/PER_adm3.shp:
+	wget http://biogeo.ucdavis.edu/data/diva/adm/PER_adm.zip
+	unzip PER_adm.zip -d data/shapefiles/PER_adm
+	rm PER_adm.zip
 
 data/shapefiles/IND_adm/IND_adm3.shp:
 	wget http://biogeo.ucdavis.edu/data/diva/adm/IND_adm.zip
