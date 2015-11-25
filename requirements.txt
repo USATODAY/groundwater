@@ -12,7 +12,7 @@ decorator==4.0.4
 gnureadline==6.3.3
 ipython==4.0.0
 ipython-genutils==0.1.0
-jdcal==1.0
+jdcal==1.2
 openpyxl==2.2.0-b1
 path.py==8.1.2
 pexpect==4.0.1

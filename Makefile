@@ -2,6 +2,30 @@ DBNAME=gwater # the name of the database you're using. you can name this whateve
 
 topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json map/app/data/ogallala.topojson.json map/app/data/india.topo.json map/app/data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json
 
+#world aquifers
+data/output_data/world_aquifers.topo.json: data/output_data/aquifer_gw_anomolies.csv data/shapefiles/ne_110m_land/ne_110m_land.shp
+	
+	topojson \
+	-o data/output_data/world_aquifers_w_values.json \
+	-e $< \
+	-p \
+	--id-property=aquifer_id,HYGEO \
+	-- data/input_data/world_aquifer_systems_nocoast/world_aquifer_systems_nocoast.shp
+
+	topojson \
+	-o $@ \
+	--no-pre-quantization \
+	--post-quantization=1e6 \
+	--simplify=7e-7 \
+	-p \
+	-- data/shapefiles/ne_110m_land/ne_110m_land.shp data/output_data/world_aquifers_w_values.json
+
+data/output_data/aquifer_gw_anomolies.csv:
+	in2csv data/input_data/aquifer_gw_anomalies.xlsx > data/output_data/aquifer_gw_tmp.csv
+	python data/scripts/aquifer_clean.py data/output_data/aquifer_gw_tmp.csv > $@
+	rm data/output_data/aquifer_gw_tmp.csv
+
+
 data/output_data/california_wells.topo.json: data/output_data/california_wells_w_fips.csv data/shapefiles/CA/CA.shp
 	topojson \
 	-o $@ \
@@ -260,9 +284,20 @@ data/output_data/california_dry_wells_raw.json:
 	wget https://mydrywatersupply.water.ca.gov/report/resources/json/tablePage.json
 	mv tablePage.json data/output_data/california_dry_wells_raw.json
 
+#download world land shapefiles
+data/shapefiles/ne_110m_land/ne_110m_land.shp:
+	wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/physical/ne_110m_land.zip
+	unzip ne_110m_land.zip -d data/shapefiles/ne_110m_land
+	rm ne_110m_land.zip
+
 data/shapefiles/CA/CA.shp: data/shapefiles/counties/counties.shp
 	mkdir -p data/shapefiles/CA
 	ogr2ogr -f 'ESRI Shapefile' -where "FIPS LIKE '06%'" $@ $<
+
+data/shapefiles/PER_adm/PER_adm3.shp:
+	wget http://biogeo.ucdavis.edu/data/diva/adm/PER_adm.zip
+	unzip PER_adm.zip -d data/shapefiles/PER_adm
+	rm PER_adm.zip
 
 data/shapefiles/IND_adm/IND_adm3.shp:
 	wget http://biogeo.ucdavis.edu/data/diva/adm/IND_adm.zip
