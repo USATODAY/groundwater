@@ -9,6 +9,8 @@ var VAL_COLUMN = "sub-surface_storage_trends_mm_per_yr";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
 var topojson_features_obj = "world_aquifer_systems_nocoast";
 var _ = require("lodash");
+var tooltip;
+var path;
 
 //bundle map data into file
 var GRAPHICDATA;
@@ -119,8 +121,8 @@ function ready(data) {
     .center(center)
     .translate([width/1.8, height / 2.8]);
 
-    var path = d3.geo.path()
-    .projection(projection);
+    path = d3.geo.path()
+      .projection(projection);
 
     var graticule = d3.geo.graticule();
 
@@ -162,17 +164,40 @@ svg.append("path")
       .data(geo.features)
     .enter().append("path")
       .attr("fill", function(d) { 
+              // console.log(path.centroid(d));
               if (d.properties[VAL_COLUMN]) {
                 return getColor(+d.properties[VAL_COLUMN]);
               } else {
                 return "none";
               }
       })
-      .attr("d", path);
+      .attr("d", path)
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseout", mouseout);
+
+     tooltip = d3.select("#" + GRAPHICINFO.GRAPHIC_SLUG).append("div")
+        .attr("class", "gig-tooltip")
+        .style("display", "none");
 
       addLegend();
       
 
+}
+
+function mouseover(d) {
+  tooltip.style("display", "block");
+  tooltip.text(d.properties.aquifer_name);
+}
+
+function mousemove() {
+  tooltip
+      .style("left", (d3.event.pageX) + "px")
+      .style("top", (d3.event.pageY - 12) + "px");
+}
+
+function mouseout(d) {
+  tooltip.style("display", "none");
 }
 
 function addEventListeners() {
