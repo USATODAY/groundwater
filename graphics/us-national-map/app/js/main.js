@@ -5,9 +5,9 @@ var $window;
 var $graphic;
 var $details;
 var GRAPHICINFO = require("../data/GRAPHICINFO.json");
-var VAL_COLUMN = "sub-surface_storage_trends_mm_per_yr";
+var VAL_COLUMN = "average_change";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
-var topojson_features_obj = "world_aquifer_systems_nocoast";
+var topojson_features_obj = "counties";
 var _ = require("lodash");
 var tooltip;
 var path;
@@ -21,8 +21,8 @@ var colorScale = d3.scale.linear()
    
 
 
-var COLORS2 = ['#feedaf','#fee27b','#fecb2e'].reverse();
-var COLORS = ['#addefd','#77cafd','#1b9efc'];
+var COLORS = ['#F9DE00','#F5AE1B','#D22333'];
+var COLORS2 = ['#000000', '#1A549C','#0095C4'];
 var scaleBreaks = [0, 5, 15];
 var scaleBreaks2 = [-15, -5, 0];
 
@@ -43,17 +43,18 @@ function getDataURL(dataURL) {
 
 function getColor(val) {
     if (val < 0) {
-        if (val < scaleBreaks2[0]) {
-          return COLORS2[0];
-        } else if (val < scaleBreaks2[1]) {
-          return COLORS2[1];
-        } else if (val < scaleBreaks2[2]) {
-          return COLORS2[2];
-        } else if (val < scaleBreaks2[3]) {
-          return COLORS2[3];
-        } else {
-          return COLORS2[4];
-        }
+        // if (val < scaleBreaks2[0]) {
+        //   return COLORS2[0];
+        // } else if (val < scaleBreaks2[1]) {
+        //   return COLORS2[1];
+        // } else if (val < scaleBreaks2[2]) {
+        //   return COLORS2[2];
+        // } else if (val < scaleBreaks2[3]) {
+        //   return COLORS2[3];
+        // } else {
+        //   return COLORS2[4];
+        // }
+        return COLORS2[2];
     } else {
         if (val > scaleBreaks[4]) {
           return COLORS[4];
@@ -116,10 +117,10 @@ function ready(data) {
 
     var center = d3.geo.centroid(geo);
 
-    var projection = d3.geo.naturalEarth()
-    .scale(width / 6)
-    .center(center)
-    .translate([width/1.8, height / 2.8]);
+    var projection = d3.geo.albersUsa()
+    .scale(width / 1.2)
+    // .center(center)
+    .translate([width/2, height / 2]);
 
     path = d3.geo.path()
       .projection(projection);
@@ -134,32 +135,32 @@ function ready(data) {
     .attr("fill", "rgba(255, 255, 255, 0.5)")
     .attr("style", "background: black");
 
-    svg.append("defs").append("path")
-    .datum({type: "Sphere"})
-    .attr("id", "sphere")
-    .attr("d", path);
+    // svg.append("defs").append("path")
+    // .datum({type: "Sphere"})
+    // .attr("id", "sphere")
+    // .attr("d", path);
 
-    svg.append("use")
-    .attr("class", "stroke")
-    .attr("xlink:href", "#sphere");
+//     svg.append("use")
+//     .attr("class", "stroke")
+//     .attr("xlink:href", "#sphere");
 
-svg.append("use")
-    .attr("class", "fill")
-    .attr("xlink:href", "#sphere");
+// svg.append("use")
+//     .attr("class", "fill")
+//     .attr("xlink:href", "#sphere");
 
-svg.append("path")
-    .datum(graticule)
-    .attr("class", "graticule")
-    .attr("d", path);
+// svg.append("path")
+//     .datum(graticule)
+//     .attr("class", "graticule")
+//     .attr("d", path);
 
 
     svg.append('path')
-      .datum(topojson.merge(data, data.objects["ne_110m_land"].geometries))
+      .datum(topojson.merge(data, data.objects["counties"].geometries))
       .attr("class", "country-shape")
       .attr("d", path);
 
     svg.append("g")
-      .attr("class", "india-states")
+      .attr("class", "counties")
     .selectAll("path")
       .data(geo.features)
     .enter().append("path")
@@ -168,7 +169,7 @@ svg.append("path")
               if (d.properties[VAL_COLUMN]) {
                 return getColor(+d.properties[VAL_COLUMN]);
               } else {
-                return "none";
+                return "#D4D4D4";
               }
       })
       .attr("d", path)
@@ -187,7 +188,7 @@ svg.append("path")
 
 function mouseover(d) {
   tooltip.style("display", "block");
-  tooltip.text(d.properties.aquifer_name);
+  tooltip.html("<h4>" + d.properties.county + "</h4>" + "Value: " + d.properties[VAL_COLUMN]);
 }
 
 function mousemove() {

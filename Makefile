@@ -1,6 +1,6 @@
 DBNAME=gwater # the name of the database you're using. you can name this whatever you want.
 
-topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json map/app/data/ogallala.topojson.json map/app/data/india.topo.json map/app/data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json
+topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json map/app/data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json
 
 #world aquifers
 data/output_data/world_aquifers.topo.json: data/output_data/aquifer_gw_anomolies.csv data/shapefiles/ne_110m_land/ne_110m_land.shp
@@ -93,7 +93,7 @@ map/app/data/aquifers_with_level_changes.json: data/shapefiles/aquifers_us/us_aq
 	-- $<
 
 # convert county shapefile to topojson and join with county level data
-map/app/data/counties_with_level_changes.json: data/shapefiles/counties/counties.shp data/output_data/county_levels.csv
+data/output_data/counties_with_level_changes.json: data/shapefiles/counties/counties.shp data/output_data/county_levels.csv
 	topojson \
 	-o $@ \
 	--no-pre-quantization \
@@ -101,7 +101,7 @@ map/app/data/counties_with_level_changes.json: data/shapefiles/counties/counties
 	--simplify=7e-7 \
 	-e data/output_data/county_levels.csv \
 	--id-property=+fips,+FIPS \
-	-p average_change,state_fips \
+	-p average_change,state_fips,county=COUNTY \
 	-- $<
 
 # convert county shapefile to topojson and join with 2010 county usage data
