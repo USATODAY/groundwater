@@ -93,16 +93,30 @@ map/app/data/aquifers_with_level_changes.json: data/shapefiles/aquifers_us/us_aq
 	-- $<
 
 # convert county shapefile to topojson and join with county level data
-data/output_data/counties_with_level_changes.json: data/shapefiles/counties/counties.shp data/output_data/county_levels.csv
+data/output_data/counties_with_level_changes.json: data/shapefiles/counties/counties.shp data/output_data/county_averages_with_ogallala.csv
 	topojson \
 	-o $@ \
 	--no-pre-quantization \
 	--post-quantization=1e6 \
 	--simplify=7e-7 \
-	-e data/output_data/county_levels.csv \
+	-e data/output_data/county_averages_with_ogallala.csv \
 	--id-property=+fips,+FIPS \
-	-p average_change,state_fips,county=COUNTY \
+	-p name,average_of_change,ogallala_overlap,fips,count_of_change \
 	-- $<
+
+data/output_data/county_averages_with_ogallala.csv: data/dbtables/county_averages
+	psql -d $(DBNAME) -c "COPY(SELECT geoid as fips,name,ogallala_overlap,count_of_change,average_of_change FROM county_averages) TO '$(abspath $@)' DELIMITER ',' CSV HEADER;"	
+
+data/dbtables/county_averages: data/output_data/clean_county_averages.csv data/dbtables/geotables
+	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS county_averages;"
+	csvsql --db postgresql:///$(DBNAME) --table county_averages --insert $< 
+	psql -d $(DBNAME) -c "ALTER TABLE county_averages ADD COLUMN ogallala_overlap BOOLEAN DEFAULT FALSE;"
+	psql -d $(DBNAME) -c "UPDATE county_averages SET ogallala_overlap = TRUE FROM (SELECT aq_code,geom FROM us_aquifers WHERE aq_code = 107) AS aquifer_query, (SELECT geom,fips FROM counties) as county_geo WHERE ST_Intersects(county_geo.geom,aquifer_query.geom) AND county_averages.geoid = county_geo.fips;"
+	touch $@
+
+# county averages data
+data/output_data/clean_county_averages.csv:
+	python data/scripts/counties_clean.py data/input_data/USGS_county_level_map.csv > $@
 
 # convert county shapefile to topojson and join with 2010 county usage data
 map/app/data/county_usage_2010.json: data/shapefiles/counties/counties.shp county_usage_csvs_simplified

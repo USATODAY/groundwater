@@ -1,14 +1,22 @@
 .counties {
   fill: none;
-  // opacity: 0.25;
   // stroke: #fff;
   // stroke-width: 0.5px;
   path {
 
+    // opacity: 0.25;
     // stroke: black;
     // stroke-width: 0.5px;
   }
 }
+
+.ogallala-highlight {
+  .counties path {opacity: 0.25}
+  .counties .us-county-ogallala {
+    opacity: 1; 
+  }
+}
+
 
 .map-legend {
   margin-left: 2em;
@@ -54,7 +62,7 @@ svg {
 }
 
 .country-shape {
-  fill: none;
+  fill: rgba(255, 255, 255, 0.21);
   stroke: white;
   stroke-width: 1px;
 }
@@ -71,13 +79,17 @@ svg {
 }
 
 .gig-tooltip {
-  background: white;
+  background: rgba(0, 0, 0, 1);
   border-radius: 8px;
-  color: black;
+  border: solid 1px white;
+  color: white;
   padding: 0.5em;
   position: absolute;
   transform: translate(-50%, -100%);
   // width: 200px;
+  p { 
+    margin: 0;
+  }
 }
 
 .q0-9 { fill:#d73027; }
