@@ -245,7 +245,7 @@ function mousemove() {
   var top = (d3.event.pageY - 12) - $graphic.parents('.oembed-asset').offset().top;
   tooltip
       .style("left", (d3.event.pageX) + "px")
-      .style("top", (d3.event.pageY - 12) + "px");
+      .style("top", top + "px");
 }
 
 function mouseout(d) {
