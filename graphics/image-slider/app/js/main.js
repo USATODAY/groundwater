@@ -131,6 +131,11 @@ function updatePosition(e) {
        $el.find('.gig-slider-background').eq(i+1).css({
          'opacity': targetValue
        });
+       if ( $el.find('.gig-slider-background').eq(i+2) ) {
+         $el.find('.gig-slider-background').eq(i+2).css({
+           opacity: 0
+         });
+       }
 
        /* END PER SLIDE CODE */
     }
@@ -141,7 +146,14 @@ function updatePosition(e) {
    * use [progress] to get progress of current slide 0-1
    */
 
-
+   if ( pos < offsetTop ) {
+     $el.find('.gig-slider-background').css({
+       opacity: 0
+     });
+     $el.find('.gig-slider-background').eq(0).css({
+       opacity: 1
+     });
+   }
 
    /* END SLIDE CODE */
 }
