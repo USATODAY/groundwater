@@ -26,9 +26,6 @@ var colorScale = d3.scale.quantile()
   .domain([-15, -5, 0])
   .range(['#D22333','#F5AE1B', '#F9DE00']);
 
-   
-
-
 var COLORS2 = ['#D22333','#F5AE1B', '#F9DE00'];
 var COLORS = ['papayawhip', '#0095C4','#0095C4'];
 var scaleBreaks = [0, 5, 15];
@@ -52,28 +49,18 @@ function getDataURL(dataURL) {
 function getColor(val) {
     if (val < 0) {
         return colorScale(val);
-    } else {
-        if (val === 0) {
+    } else if (val === 0) {
           return "none";
-        } else {
+    } else {
           return '#0095C4';
-        }
     }
 }
 
-
-
-
-
-  
-
 function start() {
-    
-    
     $window = $(window);
     $graphic = $('#' + GRAPHICINFO.GRAPHIC_SLUG);
     $details = $graphic.find('#details');
-    $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset');
+    $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
     d3.json(DATA_URL, ready);
     addEventListeners();
 }
@@ -150,10 +137,6 @@ function ready(data) {
             return "none";
           }
       })
-      .attr("stroke", function(d) {
-          return "#D4D4D4";
-      })
-      .attr("stroke-width", 0.25)
       .attr("class", function(d) {
               if (d.properties.ogallala == "t") {
                 return "us-county-highlight";
