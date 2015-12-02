@@ -1,6 +1,6 @@
 DBNAME=gwater # the name of the database you're using. you can name this whatever you want.
 
-topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json map/app/data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json
+topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json
 
 #world aquifers
 data/output_data/world_aquifers.topo.json: data/output_data/aquifer_gw_anomolies.csv data/shapefiles/ne_110m_land/ne_110m_land.shp
@@ -101,7 +101,7 @@ data/output_data/counties_with_level_changes.json: data/shapefiles/counties/coun
 	--simplify=7e-7 \
 	-e data/output_data/county_averages_with_ogallala.csv \
 	--id-property=+fips,+FIPS \
-	-p name,average_of_change,ogallala_overlap,fips,count_of_change \
+	-p n=name,avg_chg=average_of_change,ogallala=ogallala_overlap,fips,st=STATE \
 	-- $<
 
 data/output_data/county_averages_with_ogallala.csv: data/dbtables/county_averages
@@ -130,7 +130,7 @@ map/app/data/county_usage_2010.json: data/shapefiles/counties/counties.shp count
 	-p \
 	-- $<
 
-map/app/data/ogallala.topojson.json: data/shapefiles/ogallala/ogallala.shp
+data/output_data/ogallala.topojson.json: data/shapefiles/ogallala/ogallala.shp
 	topojson \
 	-o $@ \
 	--no-pre-quantization \

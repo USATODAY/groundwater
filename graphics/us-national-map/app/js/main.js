@@ -1,11 +1,13 @@
 //Global Variables
+var queue = require("queue-async");
 var width = 960;
 var height = 600;
 var $window;
 var $graphic;
 var $details;
+var $embedModule;
 var GRAPHICINFO = require("../data/GRAPHICINFO.json");
-var VAL_COLUMN = "average_of_change";
+var VAL_COLUMN = "avg_chg";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
 var topojson_features_obj = "counties";
 var _ = require("lodash");
@@ -20,14 +22,15 @@ var projection;
 //bundle map data into file
 var GRAPHICDATA;
 
-var colorScale = d3.scale.linear()
-  .range(['#deebf7', '#3182bd']);
+var colorScale = d3.scale.quantile()
+  .domain([-15, -5, 0])
+  .range(['#D22333','#F5AE1B', '#F9DE00']);
 
    
 
 
-var COLORS2 = ['#F9DE00','#F5AE1B','#D22333'].reverse();
-var COLORS = ['#000000', '#1A549C','#0095C4'];
+var COLORS2 = ['#D22333','#F5AE1B', '#F9DE00'];
+var COLORS = ['papayawhip', '#0095C4','#0095C4'];
 var scaleBreaks = [0, 5, 15];
 var scaleBreaks2 = [-15, -5, 0];
 
@@ -48,35 +51,12 @@ function getDataURL(dataURL) {
 
 function getColor(val) {
     if (val < 0) {
-        if (val < scaleBreaks2[0]) {
-          return COLORS2[0];
-        } else if (val < scaleBreaks2[1]) {
-          return COLORS2[1];
-        } else if (val < scaleBreaks2[2]) {
-          return COLORS2[2];
-        } else if (val < scaleBreaks2[3]) {
-          return COLORS2[3];
-        } else {
-          return COLORS2[4];
-        }
+        return colorScale(val);
     } else {
-        // if (val > scaleBreaks[4]) {
-        //   return COLORS[4];
-        // } else if (val > scaleBreaks[3]) {
-        //   return COLORS[3];
-        // } else if (val > scaleBreaks[2]) {
-        //   return COLORS[2];
-        // } else if (val > scaleBreaks[1]) {
-        //   return COLORS[1];
-        // } else if (val === 0) {
-        //   return "none";
-        // } else {
-        //   return COLORS[0];
-        // }
         if (val === 0) {
           return "none";
         } else {
-          return COLORS[2];
+          return '#0095C4';
         }
     }
 }
@@ -93,6 +73,7 @@ function start() {
     $window = $(window);
     $graphic = $('#' + GRAPHICINFO.GRAPHIC_SLUG);
     $details = $graphic.find('#details');
+    $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset');
     d3.json(DATA_URL, ready);
     addEventListeners();
 }
@@ -110,14 +91,20 @@ function addLegend() {
     $('#legend').html(html);
 }
 
+var reDraw = _.throttle(ready, 500, {
+  leading: false,
+  trailing: true
+});
+
 function ready(data) {
   console.log(data);
     width = $(window).width();
     height = width * (9/16);
     scale = width/1.2;
     $graphic.empty();
+
     if (GRAPHICINFO.FULL_WIDTH) {
-      $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.story-asset').height(height);
+      $embedModule.height(height);
     }
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
@@ -127,8 +114,6 @@ function ready(data) {
       features: topojson.feature(data, data.objects[topojson_features_obj]).features
     };
 
-    var center = d3.geo.centroid(geo);
-
     projection = d3.geo.albersUsa()
     .scale(scale)
     .translate([width/2, height / 2]);
@@ -136,14 +121,10 @@ function ready(data) {
     path = d3.geo.path()
       .projection(projection);
 
-    var graticule = d3.geo.graticule();
-
-
 
     svg = d3.select("#" + GRAPHICINFO.GRAPHIC_SLUG).append("svg")
     .attr("width", width)
     .attr("height", height)
-    .attr("fill", "rgba(255, 255, 255, 0.5)")
     .attr("style", "background: black")
     .on("click", nextStep);
 
@@ -163,16 +144,19 @@ function ready(data) {
       .data(geo.features)
     .enter().append("path")
       .attr("fill", function(d) { 
-              // console.log(path.centroid(d));
-              if (d.properties[VAL_COLUMN]) {
-                return getColor(+d.properties[VAL_COLUMN]);
-              } else {
-                return "#D4D4D4";
-              }
+          if (d.properties[VAL_COLUMN]) {
+            return getColor(parseFloat(d.properties[VAL_COLUMN]));
+          } else {
+            return "none";
+          }
       })
+      .attr("stroke", function(d) {
+          return "#D4D4D4";
+      })
+      .attr("stroke-width", 0.25)
       .attr("class", function(d) {
-              if (d.properties.ogallala_overlap == "t") {
-                return "us-county-ogallala";
+              if (d.properties.ogallala == "t") {
+                return "us-county-highlight";
               } else {
                 return "";
               }
@@ -187,12 +171,9 @@ function ready(data) {
         .style("display", "none");
 
       addLegend();
-      
-
 }
 
 function nextStep() {
-  console.log("next");
   if (currentStep === 0) {
     addOgallalaHighlight();
     currentStep++;
@@ -204,30 +185,20 @@ function nextStep() {
 
 function addOgallalaHighlight() {
   zoomIn([-100.851404, 37.482529]);
-  map.classed("ogallala-highlight", true);
+  map.classed("gig-county-highlight", true);
 }
 
 function removeOgallalaHighlight() {
   zoomOut();
-  map.classed("ogallala-highlight", false);
+  map.classed("gig-county-highlight", false);
 }
 
 function zoomIn(center) {
-  // var center = ;
-  // var center = [-122.437609, 37.742687];
-  // var center = [-73.991744, 40.748235];
   var coordinates = projection(center);
   var zoomLevel = 2;
   map.transition()
       .duration(500)
       .attr("transform", "translate(" + ((width/2) - (coordinates[0] * zoomLevel)) + ", " + ((height/2) - coordinates[1] * zoomLevel) + ")scale(" + zoomLevel + ")");
-
-      
-}
-
-function zoomed() {
-  console.log(d3.event.scale);
-  svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 }
 
 function zoomOut() {
@@ -238,11 +209,14 @@ function zoomOut() {
 
 function mouseover(d) {
   tooltip.style("display", "block");
-  tooltip.html("<p>" + d.properties.name + "</p>" + "average water level change: " + d.properties[VAL_COLUMN]);
+  tooltip.html("<p>" + d.properties.n + "</p>" + "average water level change: " + d.properties[VAL_COLUMN] + " ft.");
 }
 
 function mousemove() {
-  var top = (d3.event.pageY - 12) - $graphic.parents('.oembed-asset').offset().top;
+  var top = (d3.event.pageY - 12);
+  if ($embedModule.length > 0) {
+    top = top - $embedModule.offset().top;
+  }
   tooltip
       .style("left", (d3.event.pageX) + "px")
       .style("top", top + "px");
@@ -254,23 +228,8 @@ function mouseout(d) {
 
 function addEventListeners() {
   $window.on("resize", function(e) {
-    _.throttle(ready, 200)(GRAPHICDATA);
+    reDraw(GRAPHICDATA);
   });
 }
 
-function getGraphicLocation() {
-  var windowScroll = $window.scrollTop();
-  var graphicTop = $graphic.offset().top;
-  return graphicTop - windowScroll;
-}
-
-function onScroll(e) {
-  var graphicLocation = getGraphicLocation();
-  if (graphicLocation <= 0) {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log("top!");
-  }
-  console.log(graphicLocation);
-}
 document.addEventListener("DOMContentLoaded", start);
