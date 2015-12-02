@@ -1,8 +1,6 @@
 /**
  * TODO
- * - re-set container sizes when user resizes window
- * - do not set height on mobile
- * - integrate canvid for videos
+ * - xx
  */
 
  // TODO - Canvid
@@ -24,102 +22,136 @@ if (typeof window.mobileCheck != "function") {
 }
 
 /**
- * Scroll stop detection
- */
-
-// create an event that triggers when scrolling stops
- var timer = null;
- window.addEventListener('scroll', function() {
-   if(timer !== null) {
-     clearTimeout(timer);
-   }
-   timer = setTimeout(function() {
-     $(window).trigger('scrollStop');
-   }, 150);
- }, false);
-
-/**
  * Setup Slider Interactive
  */
 
 var GRAPHICINFO = require("../data/GRAPHICINFO.json");
 var id = '#' + GRAPHICINFO.GRAPHIC_SLUG;
-var duration = 1000;
-var sliderIndex = 0;
-var progress = 0;
 var WIDTH;
 var HEIGHT;
 
-// figure out a better way for this
-var panelAnimation_Two;
+var $el;                    // jquery saved reference to element
+var offsetTop;              // offsetTop of id
+var elHeight;               // total height of id
+var progress;               // progress of scroll through entire element from 0 - 1
+var progressPerSlide;       // progress of the scroll through specific slide
+var progressWeight = 1.5;   // weighted factor to move animation progress faster (to finish animation before slide is out of view)
+var targetValue;            // ending value for animation property
+var pos;                    // position of scrollTop
 
-// init controller
-var controller = new ScrollMagic.Controller();
+var slidesLength;           // length of total slides in GRAPHICINFO.SLIDER_IMAGES
+var sliderPosArray = [];    // array to store offset().top positions internally
+
+var debugMode = false;      // set [true] to enable box to output stuff
+var $debug;                 // jquery saved reference to debug element
 
 function prepareContainers() {
   // set app container to height of viewport
-  $(id).height(HEIGHT);
+  // $el.height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
+  $el.find('.gig-slider-panel').height(HEIGHT);
+  $el.find('.gig-slider-background').height(HEIGHT);
+  // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
-  if ( $(id).parents('.story-oembed') ) {
-    $(id).parents('.story-oembed').height(HEIGHT + duration);
-  }
-}
-
-function setActivePanel() {
-  var slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
-
-  // determine ranges for index based on total number of slides
-  // example for 3 slides:
-  // 0 to 0.33
-  // 0.33 to 0.66
-  // 0.66 to 1
-
-  // set sliderIndex based on the range index falls under
-  for ( var i = 1; i < slidesLength + 1; i++) {
-    if ((progress > (i-1)/slidesLength) && (progress <= i/slidesLength)) {
-      sliderIndex = i - 1;
-    }
-  }
-
-  $(id).find('.gig-slider-panel')
-    .removeClass("active")
-    .eq(sliderIndex).addClass("active");
+  // if ( $(id).parents('.story-oembed') ) {
+  //   $(id).parents('.story-oembed').height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
+  // }
 }
 
 function setup() {
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight;
+  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
 
-  // set container height to full screen
-  $(id).height(HEIGHT);
+  slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
 
-  // set app and framework container sizes
+  document.addEventListener('scroll', updatePosition);
+  document.addEventListener('touchmove', updatePosition);
+
+  $el = $(id);
+
+  if (debugMode) {
+    $('body').append('<div id="debug"></div>');
+    $('#debug').css({
+        'position': 'fixed',
+        'bottom': '20px',
+        'right': '20px',
+        'padding': '20px',
+        'background-color': 'orange',
+        'z-index': '99999',
+        'font-size': '2em'
+    });
+  }
+  $debug = $('#debug');
+
   prepareContainers();
 
-  // create a scene
-  new ScrollMagic.Scene({
-    triggerElement: id,
-    duration: duration,
-    triggerHook: 0
-  })
-  .setPin(id) // pins the element for the the scene's duration
-  .on('progress', function(ev) {
-    // save progress
-    progress = ev.progress;
-  })
-  .on('leave', function(ev) {
-    // catch fast outbound scrolls that might not set sliderIndex
-    if (ev.scrollDirection == "REVERSE") {
-      sliderIndex = 0;
-    } else {
-      sliderIndex = GRAPHICINFO.SLIDER_IMAGES.length - 1;
-    }
-  })
-  .addTo(controller); // assign the scene to the controller
+  offsetTop = $el.offset().top;
+  elHeight  = $el.height();
 
-  // listen to scroll stops
-  $(window).on('scrollStop', setActivePanel);
+  setDataPosition();
+}
+
+/**
+ * [setDataPosition]
+ * sets data attribute with offset().top position of each slide
+ * also stores values in an array for internal use
+ */
+function setDataPosition() {
+  $el.find('.gig-slider-panel').each(function(i, val) {
+    $(val).attr('data-pos', $(val).offset().top);
+    sliderPosArray.push( $(val).offset().top );
+  });
+  sliderPosArray.push( sliderPosArray[sliderPosArray.length-1] + HEIGHT );
+}
+
+function updatePosition(e) {
+  pos = $(document).scrollTop();
+  progress = (pos - offsetTop)/elHeight;
+  if (debugMode) $debug.html(pos);
+
+  for (var i = 0; i < sliderPosArray.length + 1; i++) {
+    if ( pos > sliderPosArray[i] && pos <= sliderPosArray[i+1] ) {
+      progressPerSlide = (pos - sliderPosArray[i]) / HEIGHT;
+
+      /**
+       * PER SLIDE CODE GOES HERE
+       * use [progressPerSlide] to get progress of current slide 0-1
+       */
+
+       if ( (progressPerSlide * progressWeight) < 0 ) {
+         targetValue = 0;
+       }
+       else if ( (progressPerSlide * progressWeight) < 1 ) {
+         targetValue = (progressPerSlide * progressWeight);
+       }
+       else {
+         targetValue = 1;
+       }
+
+       $el.find('.gig-slider-background').eq(i+1).css({
+         'opacity': targetValue
+       });
+
+       /* END PER SLIDE CODE */
+    }
+  }
+
+  /**
+   * ENTIRE ELEMENT PROGRESS ANIMATION GOES HERE
+   * use [progress] to get progress of current slide 0-1
+   */
+
+
+
+   /* END SLIDE CODE */
 }
 
 document.addEventListener('DOMContentLoaded', setup);
+window.addEventListener('resize', function() {
+  console.log('resizing');
+  WIDTH = window.innerWidth;
+  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  prepareContainers();
+  elHeight = $el.height();
+  setDataPosition();
+});
