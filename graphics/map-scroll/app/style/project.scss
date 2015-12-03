@@ -117,7 +117,11 @@ html, body {
 
 
 .map-legend {
-  margin-left: 2em;
+  bottom: 0;
+  color: white;
+  position: absolute;
+  right: 0;
+  // margin-left: 2em;
 }
 
 svg {
