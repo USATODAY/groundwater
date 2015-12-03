@@ -207,9 +207,9 @@ function updatePosition(e) {
 /*
 * Begin map code
 */
-
+var scaleBreaks = [-15, -5, 0];
 var colorScale = d3.scale.quantile()
-  .domain([-15, -5, 0])
+  .domain(scaleBreaks)
   .range(['#A56600','#F5AE1B', '#F6EB16']);
 
 function getDataURL(dataURL) {
@@ -247,15 +247,15 @@ function start() {
 
 
 function addLegend() {
-    var html = "<div class='map-legend'>change in water level in feet<div>";
-    scaleBreaks.reverse().forEach(function(breakpoint, i) {
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + COLORS.reverse()[i] +"'></span><span>>" + breakpoint + "</span>";
+    var html = "<div class='map-legend'>decrease in water level<div>";
+    scaleBreaks.forEach(function(breakpoint, i) {
+        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + colorScale(breakpoint) +"'></span><span>>" + Math.abs(breakpoint) + " ft.</span>";
     });
-    scaleBreaks2.reverse().forEach(function(breakpoint, i) {
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + COLORS2.reverse()[i] +"'></span><span><" + breakpoint + "</span>";
-    });
+    
+        html += "<span style='display: inline-block;width:20px; height:20px;background-color:#0095C4'></span><span>no decrease</span>";
+   
     html += "</div>"
-    $('#legend').html(html);
+    $graphic.append(html);
 }
 
 var reDraw = _.throttle(ready, 500, {
@@ -332,7 +332,7 @@ function ready(data) {
         .attr("class", "gig-tooltip")
         .style("display", "none");
 
-      // addLegend();
+      addLegend();
 }
 
 function nextStep() {
