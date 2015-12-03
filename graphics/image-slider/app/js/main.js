@@ -159,7 +159,8 @@ function updatePosition(e) {
      });
    } else {
      $el.find('.gig-slider-background-container').css({
-       position: 'absolute'
+       position: 'absolute',
+       top: 0
      });
    }
 
