@@ -101,7 +101,7 @@ data/output_data/counties_with_level_changes.json: data/shapefiles/counties/coun
 	--simplify=7e-7 \
 	-e data/output_data/county_averages_with_ogallala.csv \
 	--id-property=+fips,+FIPS \
-	-p n=name,avg_chg=average_of_change,ogallala=ogallala_overlap,fips,st=STATE \
+	-p n=name,avg_chg=average_of_change,ogallala=ogallala_overlap,n=NAME \
 	-- $<
 
 data/output_data/county_averages_with_ogallala.csv: data/dbtables/county_averages

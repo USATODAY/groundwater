@@ -42,8 +42,12 @@ html, body {
       top: 50%;
       left: 15%;
       color: #ffffff;
-      font-family: 'Futura Today Light', sans-serif;
-      font-size: 4em;
+      font-family: 'Futura Today Normal', sans-serif;
+      font-size: 1.2em;
+      text-align: left;
+      margin-top: 1em;
+      margin-left: 1em;
+      max-width: 28em;
       transform: translateY(-50%);
       z-index: 800;
     }
@@ -104,7 +108,7 @@ html, body {
 }
 
 .gig-county-highlight {
-  .counties path {opacity: 0.25}
+  .counties path {opacity: 0.1}
   .counties .us-county-highlight {
     opacity: 1; 
   }

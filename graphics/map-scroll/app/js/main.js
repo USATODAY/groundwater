@@ -55,16 +55,19 @@ var VAL_COLUMN = "avg_chg";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
 var topojson_features_obj = "counties";
 var _ = require("lodash");
+var queue = require("queue-async");
 var tooltip;
 var path;
 var svg;
 var map;
 var scale;
-var currentStep = 0;
+var currentStep = 1;
 var projection;
 var width = 960;
 var height = 600;
 var GRAPHICDATA;
+var GRAPHICDATA2;
+var ogallalaDataURL = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/map-scroll/data/ogallala.topojson.json");
 
 
 function prepareContainers() {
@@ -93,9 +96,8 @@ function setup() {
   document.addEventListener('touchmove', updatePosition);
 
   $el = $(id);
-
-  start();
-
+  getNewStep();
+  
   if (debugMode) {
     $('body').append('<div id="debug"></div>');
     $('#debug').css({
@@ -116,6 +118,7 @@ function setup() {
   elHeight  = $el.height();
 
   setDataPosition();
+  start();
 }
 
 /**
@@ -184,11 +187,17 @@ function updatePosition(e) {
     $graphic.removeClass("fixed");
   }
 
-  if (progress > .4) {
-    nextStep();
-  } else {
-    previousStep();
+  var newStep = getNewStep(progressBottom);
+  console.log(progressBottom);
+  if (newStep != currentStep) {
+    currentStep = newStep;
+    stepMap[newStep]();
   }
+  // if (progress > .3 ) {
+    // nextStep();
+  // } else {
+    // previousStep();
+  // }
    if (progressBottom >= 1) {
      $graphic.addClass("bottom");
    } else {
@@ -207,7 +216,7 @@ function updatePosition(e) {
 /*
 * Begin map code
 */
-var scaleBreaks = [-15, -10, 0];
+var scaleBreaks = [-15, -5, 0];
 var scaleColors = ['#A56600','#F5AE1B', '#F6EB16'];
 
 var colorScale = function(input) {
@@ -236,6 +245,7 @@ function getDataURL(dataURL) {
   } else {
     dataURL = "http://" + hostname + "/services/webproxy/?url=" + dataURL;
   }
+  console.log(dataURL);
   return dataURL;
 }
 
@@ -255,7 +265,10 @@ function start() {
     $graphic = $el.find(".gig-map");
     $details = $graphic.find('#details');
     $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
-    d3.json(DATA_URL, ready);
+    queue()
+      .defer(d3.json, DATA_URL)
+      .defer(d3.json, ogallalaDataURL)
+      .await(ready);
 }
 
 
@@ -276,17 +289,22 @@ var reDraw = _.throttle(ready, 500, {
   trailing: true
 });
 
-function ready(data) {
+function ready(err, data, data2) {
     width = $(window).width();
     height = width * (9/16);
     scale = width/1.2;
     $graphic.empty();
+    console.log(data);
+    console.log(data2);
 
     if (GRAPHICINFO.FULL_WIDTH) {
       $embedModule.height(HEIGHT * slidesLength);
     }
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
+    }
+    if(!GRAPHICDATA2) {
+      GRAPHICDATA2 = data2;
     }
     var geo = {
       type: "FeatureCollection",
@@ -319,9 +337,9 @@ function ready(data) {
 
     map.append("g")
       .attr("class", "counties")
-    .selectAll("path")
+      .selectAll("path")
       .data(geo.features)
-    .enter().append("path")
+      .enter().append("path")
       .attr("fill", function(d) { 
           if (d.properties[VAL_COLUMN]) {
             return getColor(parseFloat(d.properties[VAL_COLUMN]));
@@ -341,6 +359,16 @@ function ready(data) {
       .on("mousemove", mousemove)
       .on("mouseout", mouseout);
 
+      var ogallala_data = topojson.feature(data2, data2.objects.ogallala).features;
+      map.append("path")
+        .data(ogallala_data)
+        .attr("class", "ogallala-shape")
+        .attr("stroke", "white")
+        .attr("stroke-width", 1)
+        .attr("fill", "#1B9CFA")
+        .attr("opacity", 0)
+        .attr("d", path);
+
      tooltip = d3.select($graphic[0]).append("div")
         .attr("class", "gig-tooltip")
         .style("display", "none");
@@ -348,21 +376,72 @@ function ready(data) {
       addLegend();
 }
 
+//returns the correct step based on progress
+function getNewStep(progress) {
+  var padding = 0.05;
+  progress = progress - padding;
+  var breaks = [] //store each progress break point in this array
+  _.each(d3.range(1,slidesLength), function(slideIndex) {
+    var stepBreak = (1/slidesLength) * slideIndex;
+    breaks.push(stepBreak);
+  });
+  if (progress > breaks[1]) {
+    return 3;
+  } else if (progress > breaks[0]) {
+    return 2;
+  } else {
+    return 1;
+  }
+}
+
+//maps each step to a function
+var stepMap = {
+  1: removeOgallalaOutline,
+  2: addOgallalaOutline,
+  3: addOgallalaHighlight
+}
+
 function nextStep() {
   if (currentStep === 0) {
+    addOgallalaOutline();
+    currentStep++;
+  } else if (currentStep == 1) {
+    removeOgallalaOutline()
     addOgallalaHighlight();
     currentStep++;
-  } 
+  } else {
+    previousStep();
+  }
 }
 
 function previousStep() {
   if (currentStep == 1) {
+    removeOgallalaOutline();
+    currentStep--;
+  } else if (currentStep == 2) {
     removeOgallalaHighlight();
     currentStep--;
   }
 }
 
+function removeOgallalaOutline() {
+  map.select('.ogallala-shape')
+    .transition()
+    .duration(500)
+    .attr('opacity', 0);
+}
+
+function addOgallalaOutline() {
+  removeOgallalaHighlight();
+  map.select('.ogallala-shape')
+    .transition()
+    .duration(500)
+    .attr('opacity', 0.8);
+
+}
+
 function addOgallalaHighlight() {
+  removeOgallalaOutline();
   zoomIn([-100.851404, 37.482529]);
   map.classed("gig-county-highlight", true);
 }
@@ -418,5 +497,5 @@ window.addEventListener('resize', function() {
   elHeight = $el.height();
   offsetTop = $el.offset().top;
   setDataPosition();
-  reDraw(GRAPHICDATA);
+  reDraw(null, GRAPHICDATA, GRAPHICDATA2);
 });

@@ -6,11 +6,15 @@
     "FULL_WIDTH": true,
     "SLIDER_IMAGES": [
       {
-        "title": "US Water level changes",
+        "title": "In many counties across the US, water levels have been dropping.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/heheh.gif"
       },
       {
-        "title": "Counties that overlap Ogallala",
+        "title": "The problem is very apparent in the region that draws on the Ogallala aquifer.",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
+      },
+      {
+        "title": "The problem is very apparent in the region that draws on the Ogallala aquifer.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
       }
      
