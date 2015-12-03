@@ -15,19 +15,22 @@ html, body {
 }
 
 .gig-slider {
+  // background: blue;
+  position: relative;
   &-panel {
     position: relative;
     width: 100%;
     //background-color: blue;
-    z-index: 3;
+    z-index: 6;
     &-text-container {
-      position: absolute;
-      top: 50%;
+      // position: absolute;
+      // top: 50%;
       left: 15%;
       color: #ffffff;
       font-family: 'Futura Today Light', sans-serif;
       font-size: 4em;
-      transform: translateY(-50%);
+      // transform: translateY(-50%);
+      z-index: 800;
     }
   }
   &-background {
@@ -41,7 +44,7 @@ html, body {
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover !important;
-    z-index: -1;
+    z-index: 5;
     opacity: 0;
     &:first-child {
       opacity: 1;
@@ -53,12 +56,35 @@ html, body {
 }
 
 .gig-slider-panel {
-  height: 800px;
+  // height: 800px;
   width: 100%;
 }
 
 
 /* map */
+
+.gig-map {
+  position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    // height: 100%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover !important;
+    z-index: 5;
+    &:first-child {
+      opacity: 1;
+    }
+    &.fixed {
+      position: fixed;
+    }
+    &.bottom {
+      top: auto;
+    }
+  }
 
 .counties {
   fill: none;
