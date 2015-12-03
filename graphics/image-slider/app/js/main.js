@@ -47,15 +47,15 @@ var $debug;                 // jquery saved reference to debug element
 
 function prepareContainers() {
   // set app container to height of viewport
-  // $el.height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
+  $el.height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
   $el.find('.gig-slider-panel').height(HEIGHT);
-  $el.find('.gig-slider-background').height(HEIGHT);
+  $el.find('.gig-slider-background-container').height(HEIGHT);
   // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
-  // if ( $(id).parents('.story-oembed') ) {
-  //   $(id).parents('.story-oembed').height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
-  // }
+  if ( $(id).parents('.story-oembed') ) {
+    $(id).parents('.story-oembed').height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
+  }
 }
 
 function setup() {
@@ -107,7 +107,7 @@ function setDataPosition() {
 function updatePosition(e) {
   pos = $(document).scrollTop();
   progress = (pos - offsetTop)/elHeight;
-  if (debugMode) $debug.html(pos);
+  // if (debugMode) $debug.html(pos);
 
   for (var i = 0; i < sliderPosArray.length + 1; i++) {
     if ( pos > sliderPosArray[i] && pos <= sliderPosArray[i+1] ) {
@@ -117,6 +117,8 @@ function updatePosition(e) {
        * PER SLIDE CODE GOES HERE
        * use [progressPerSlide] to get progress of current slide 0-1
        */
+
+       if (debugMode) $debug.html(progressPerSlide);
 
        if ( (progressPerSlide * progressWeight) < 0 ) {
          targetValue = 0;
@@ -141,10 +143,28 @@ function updatePosition(e) {
     }
   }
 
+
+   if ( progress > 0 && pos < elHeight + offsetTop - (elHeight / GRAPHICINFO.SLIDER_IMAGES.length) ) {
+     $el.find('.gig-slider-background-container').css({
+       position: 'fixed'
+     });
+   } else if ( progress > 0 && pos < elHeight + offsetTop ) {
+     $el.find('.gig-slider-background-container').css({
+       position: 'absolute',
+       top: 'auto'
+     });
+   } else {
+     $el.find('.gig-slider-background-container').css({
+       position: 'absolute',
+       top: 0
+     });
+   }
+
   /**
    * ENTIRE ELEMENT PROGRESS ANIMATION GOES HERE
    * use [progress] to get progress of current slide 0-1
    */
+
 
    if ( pos < offsetTop ) {
      $el.find('.gig-slider-background').css({
