@@ -207,10 +207,23 @@ function updatePosition(e) {
 /*
 * Begin map code
 */
-var scaleBreaks = [-15, -5, 0];
-var colorScale = d3.scale.quantile()
-  .domain(scaleBreaks)
-  .range(['#A56600','#F5AE1B', '#F6EB16']);
+var scaleBreaks = [-15, -10, 0];
+var scaleColors = ['#A56600','#F5AE1B', '#F6EB16'];
+
+var colorScale = function(input) {
+  var r;
+  if (input <= scaleBreaks[0]) {
+    r = scaleColors[0];
+  } else if (input <= scaleBreaks[1]) {
+    r = scaleColors[1];
+  } else {
+    r = scaleColors[2];
+  }
+  return r;
+}
+// var colorScale = d3.scale.quantize()
+//   .domain(scaleBreaks)
+//   .range(scaleColors);
 
 function getDataURL(dataURL) {
   var hostname = window.location.hostname;
