@@ -380,9 +380,9 @@ function mouseover(d) {
 
 function mousemove() {
   var top = (d3.event.pageY - 12) - $window.scrollTop();
-  if (!$graphic.hasClass("fixed")) {
-    top = top - $graphic.offset().top;
-  }
+  // if (!$graphic.hasClass("fixed")) {
+  //   top = top - $graphic.offset().top;
+  // }
   // if ($embedModule.length > 0) {
   //   top = top - $embedModule.offset().top;
   // }
