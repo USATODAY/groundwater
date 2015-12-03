@@ -189,6 +189,7 @@
 	
 	function updatePosition(e) {
 	  pos = $(document).scrollTop();
+	  offsetTop = $el.offset().top;
 	  progress = (pos - offsetTop) / elHeight;
 	  progressBottom = (pos + window.innerHeight) / (elHeight + offsetTop);
 	  if (debugMode) $debug.html(progressBottom);
@@ -287,7 +288,6 @@
 	}
 	
 	function start() {
-	  console.log("start");
 	  $window = $(window);
 	  $graphic = $el.find(".gig-map");
 	  $details = $graphic.find('#details');
@@ -313,14 +313,13 @@
 	});
 	
 	function ready(data) {
-	  console.log(data);
 	  width = $(window).width();
 	  height = width * (9 / 16);
 	  scale = width / 1.2;
 	  $graphic.empty();
 	
 	  if (GRAPHICINFO.FULL_WIDTH) {
-	    $embedModule.height(HEIGHT);
+	    $embedModule.height(HEIGHT * slidesLength);
 	  }
 	  if (!GRAPHICDATA) {
 	    GRAPHICDATA = data;
@@ -415,7 +414,6 @@
 	
 	document.addEventListener('DOMContentLoaded', setup);
 	window.addEventListener('resize', function () {
-	  console.log('resizing');
 	  WIDTH = window.innerWidth;
 	  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
 	  prepareContainers();

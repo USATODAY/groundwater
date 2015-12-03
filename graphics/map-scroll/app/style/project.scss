@@ -14,22 +14,32 @@ html, body {
 	overflow: hidden;
 }
 
+.gig-slider.gig-map-slider {
+    position: absolute;
+    width: 100%;
+    .gig-slider-panel-text-container {
+      position: static;
+      top: auto;
+      left: auto;
+      transform: none;
+    }
+}
+
 .gig-slider {
-  // background: blue;
-  position: relative;
+
   &-panel {
     position: relative;
     width: 100%;
     //background-color: blue;
     z-index: 6;
     &-text-container {
-      // position: absolute;
-      // top: 50%;
+      position: absolute;
+      top: 50%;
       left: 15%;
       color: #ffffff;
       font-family: 'Futura Today Light', sans-serif;
       font-size: 4em;
-      // transform: translateY(-50%);
+      transform: translateY(-50%);
       z-index: 800;
     }
   }
