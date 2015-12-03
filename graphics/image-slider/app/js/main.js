@@ -143,10 +143,6 @@ function updatePosition(e) {
     }
   }
 
-  /**
-   * ENTIRE ELEMENT PROGRESS ANIMATION GOES HERE
-   * use [progress] to get progress of current slide 0-1
-   */
 
    if ( progress > 0 && pos < elHeight + offsetTop - (elHeight / GRAPHICINFO.SLIDER_IMAGES.length) ) {
      $el.find('.gig-slider-background-container').css({
@@ -163,6 +159,12 @@ function updatePosition(e) {
        top: 0
      });
    }
+
+  /**
+   * ENTIRE ELEMENT PROGRESS ANIMATION GOES HERE
+   * use [progress] to get progress of current slide 0-1
+   */
+
 
    if ( pos < offsetTop ) {
      $el.find('.gig-slider-background').css({
