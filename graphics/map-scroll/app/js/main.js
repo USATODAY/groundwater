@@ -34,6 +34,7 @@ var $el;                    // jquery saved reference to element
 var offsetTop;              // offsetTop of id
 var elHeight;               // total height of id
 var progress;               // progress of scroll through entire element from 0 - 1
+var progressBottom;               // progress of scroll compared to bottom of container
 var progressPerSlide;       // progress of the scroll through specific slide
 var progressWeight = 1.5;   // weighted factor to move animation progress faster (to finish animation before slide is out of view)
 var targetValue;            // ending value for animation property
@@ -65,11 +66,14 @@ var width = 960;
 var height = 600;
 var GRAPHICDATA;
 
+
 function prepareContainers() {
   // set app container to height of viewport
   // $el.height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
-  $el.find('.gig-slider-panel').height(HEIGHT);
+  // $el.find('.gig-slider-panel').height(HEIGHT);
+  $el.find('.gig-slider-panel-text-container').css({"margin-bottom": HEIGHT - 75});
   $el.find('.gig-slider-background').height(HEIGHT);
+  $el.height(HEIGHT * slidesLength);
   // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
@@ -129,14 +133,55 @@ function setDataPosition() {
 
 function updatePosition(e) {
   pos = $(document).scrollTop();
+  offsetTop = $el.offset().top;
   progress = (pos - offsetTop)/elHeight;
-  if (debugMode) $debug.html(progress);
+  progressBottom = (pos + window.innerHeight)/(elHeight + offsetTop);
+  if (debugMode) $debug.html(progressBottom);
 
-  //fix bg 
-  if (progress > 0 && progress < 0.8) {
-    $sliderBG.addClass("fixed");
+  
+
+  // for (var i = 0; i < sliderPosArray.length + 1; i++) {
+  //   if ( pos > sliderPosArray[i] && pos <= sliderPosArray[i+1] ) {
+  //     progressPerSlide = (pos - sliderPosArray[i]) / HEIGHT;
+
+      /**
+       * PER SLIDE CODE GOES HERE
+       * use [progressPerSlide] to get progress of current slide 0-1
+       */
+
+       // if ( (progressPerSlide * progressWeight) < 0 ) {
+       //   targetValue = 0;
+       // }
+       // else if ( (progressPerSlide * progressWeight) < 1 ) {
+       //   targetValue = (progressPerSlide * progressWeight);
+       // }
+       // else {
+       //   targetValue = 1;
+       // }
+
+       // $el.find('.gig-slider-background').eq(i+1).css({
+       //   'opacity': targetValue
+       // });
+       // if ( $el.find('.gig-slider-background').eq(i+2) ) {
+       //   $el.find('.gig-slider-background').eq(i+2).css({
+       //     opacity: 0
+       //   });
+       // }
+
+       /* END PER SLIDE CODE */
+  //   }
+  // }
+
+  /**
+   * ENTIRE ELEMENT PROGRESS ANIMATION GOES HERE
+   * use [progress] to get progress of current slide 0-1
+   */
+
+   //fix bg 
+  if (progress > 0 && progressBottom < 1) {
+    $graphic.addClass("fixed");
   } else {
-    $sliderBG.removeClass("fixed");
+    $graphic.removeClass("fixed");
   }
 
   if (progress > .4) {
@@ -144,48 +189,12 @@ function updatePosition(e) {
   } else {
     previousStep();
   }
-
-  for (var i = 0; i < sliderPosArray.length + 1; i++) {
-    if ( pos > sliderPosArray[i] && pos <= sliderPosArray[i+1] ) {
-      progressPerSlide = (pos - sliderPosArray[i]) / HEIGHT;
-
-      /**
-       * PER SLIDE CODE GOES HERE
-       * use [progressPerSlide] to get progress of current slide 0-1
-       */
-
-       if ( (progressPerSlide * progressWeight) < 0 ) {
-         targetValue = 0;
-       }
-       else if ( (progressPerSlide * progressWeight) < 1 ) {
-         targetValue = (progressPerSlide * progressWeight);
-       }
-       else {
-         targetValue = 1;
-       }
-
-       $el.find('.gig-slider-background').eq(i+1).css({
-         'opacity': targetValue
-       });
-       if ( $el.find('.gig-slider-background').eq(i+2) ) {
-         $el.find('.gig-slider-background').eq(i+2).css({
-           opacity: 0
-         });
-       }
-
-       /* END PER SLIDE CODE */
-    }
-  }
-
-  /**
-   * ENTIRE ELEMENT PROGRESS ANIMATION GOES HERE
-   * use [progress] to get progress of current slide 0-1
-   */
-
+   if (progressBottom >= 1) {
+     $graphic.addClass("bottom");
+   } else {
+     $graphic.removeClass("bottom");
+   }
    if ( pos < offsetTop ) {
-     $el.find('.gig-slider-background').css({
-       opacity: 0
-     });
      $el.find('.gig-slider-background').eq(0).css({
        opacity: 1
      });
@@ -229,9 +238,8 @@ function getColor(val) {
 }
 
 function start() {
-    console.log("start");
     $window = $(window);
-    $graphic = $el.find("#gig-slider-background-1");
+    $graphic = $el.find(".gig-map");
     $details = $graphic.find('#details');
     $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
     d3.json(DATA_URL, ready);
@@ -256,14 +264,13 @@ var reDraw = _.throttle(ready, 500, {
 });
 
 function ready(data) {
-  console.log(data);
     width = $(window).width();
     height = width * (9/16);
     scale = width/1.2;
     $graphic.empty();
 
     if (GRAPHICINFO.FULL_WIDTH) {
-      $embedModule.height(HEIGHT);
+      $embedModule.height(HEIGHT * slidesLength);
     }
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
@@ -281,7 +288,7 @@ function ready(data) {
       .projection(projection);
 
 
-    svg = d3.select("#gig-slider-background-1").append("svg")
+    svg = d3.select($graphic[0]).append("svg")
     .attr("width", WIDTH)
     .attr("height", HEIGHT)
     .attr("style", "background: black")
@@ -321,7 +328,7 @@ function ready(data) {
       .on("mousemove", mousemove)
       .on("mouseout", mouseout);
 
-     tooltip = d3.select("#" + GRAPHICINFO.GRAPHIC_SLUG).append("div")
+     tooltip = d3.select($graphic[0]).append("div")
         .attr("class", "gig-tooltip")
         .style("display", "none");
 
@@ -372,10 +379,13 @@ function mouseover(d) {
 }
 
 function mousemove() {
-  var top = (d3.event.pageY - 12);
-  if ($embedModule.length > 0) {
-    top = top - $embedModule.offset().top;
+  var top = (d3.event.pageY - 12) - $window.scrollTop();
+  if (!$graphic.hasClass("fixed")) {
+    top = top - $graphic.offset().top;
   }
+  // if ($embedModule.length > 0) {
+  //   top = top - $embedModule.offset().top;
+  // }
   tooltip
       .style("left", (d3.event.pageX) + "px")
       .style("top", top + "px");
@@ -389,11 +399,11 @@ function mouseout(d) {
 
 document.addEventListener('DOMContentLoaded', setup);
 window.addEventListener('resize', function() {
-  console.log('resizing');
   WIDTH = window.innerWidth;
   HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
   prepareContainers();
   elHeight = $el.height();
+  offsetTop = $el.offset().top;
   setDataPosition();
   reDraw(GRAPHICDATA);
 });

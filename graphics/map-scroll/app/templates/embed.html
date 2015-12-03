@@ -1,4 +1,4 @@
-<div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}" class="gig-slider gig-embed">
+<div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}" class="gig-slider gig-map-slider gig-embed">
   {% for item in GRAPHICINFO.SLIDER_IMAGES %}
   <div id="gig-slider-background-{{ loop.index }}"
        class="gig-slider-background"
@@ -10,6 +10,7 @@
          class="gig-slider-panel-text-container">{{ item.title }}</div>
   </div>
   {% endfor %}
+  <div class="gig-map"></div>
 </div>
 
 <!--
