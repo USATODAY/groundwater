@@ -138,7 +138,11 @@ function updatePosition(e) {
   pos = $(document).scrollTop();
   offsetTop = $el.offset().top;
   progress = (pos - offsetTop)/elHeight;
-  progressBottom = (pos + window.innerHeight)/(elHeight + offsetTop);
+  if (pos + window.innerHeight > offsetTop) {
+    progressBottom = ((pos + window.innerHeight) - offsetTop)/(elHeight);
+  } else {
+    progressBottom = 0;
+  }
   if (debugMode) $debug.html(progressBottom);
 
   
@@ -188,7 +192,6 @@ function updatePosition(e) {
   }
 
   var newStep = getNewStep(progressBottom);
-  console.log(progressBottom);
   if (newStep != currentStep) {
     currentStep = newStep;
     stepMap[newStep]();
@@ -322,8 +325,7 @@ function ready(err, data, data2) {
     svg = d3.select($graphic[0]).append("svg")
     .attr("width", WIDTH)
     .attr("height", HEIGHT)
-    .attr("style", "background: black")
-    .on("click", nextStep);
+    .attr("style", "background: black");
 
     map = svg.append('g')
         .attr('class', 'gig-map')
@@ -348,26 +350,21 @@ function ready(err, data, data2) {
           }
       })
       .attr("class", function(d) {
-              if (d.properties.ogallala == "t") {
-                return "us-county-highlight";
-              } else {
-                return "";
-              }
+          var classname = "";
+          if (d.properties.ogallala == "t") {
+            classname += " us-county-highlight";
+          } 
+          if (d.properties.fips == 20081) {
+            classname += " haskell-highlight";
+          }
+          return classname;
       })
       .attr("d", path)
       .on("mouseover", mouseover)
       .on("mousemove", mousemove)
       .on("mouseout", mouseout);
 
-      var ogallala_data = topojson.feature(data2, data2.objects.ogallala).features;
-      map.append("path")
-        .data(ogallala_data)
-        .attr("class", "ogallala-shape")
-        .attr("stroke", "white")
-        .attr("stroke-width", 1)
-        .attr("fill", "#1B9CFA")
-        .attr("opacity", 0)
-        .attr("d", path);
+      
 
      tooltip = d3.select($graphic[0]).append("div")
         .attr("class", "gig-tooltip")
@@ -385,7 +382,9 @@ function getNewStep(progress) {
     var stepBreak = (1/slidesLength) * slideIndex;
     breaks.push(stepBreak);
   });
-  if (progress > breaks[1]) {
+  if (progress > breaks[2]) {
+    return 4;
+  } else if (progress > breaks[1]) {
     return 3;
   } else if (progress > breaks[0]) {
     return 2;
@@ -398,42 +397,31 @@ function getNewStep(progress) {
 var stepMap = {
   1: removeOgallalaOutline,
   2: addOgallalaOutline,
-  3: addOgallalaHighlight
-}
-
-function nextStep() {
-  if (currentStep === 0) {
-    addOgallalaOutline();
-    currentStep++;
-  } else if (currentStep == 1) {
-    removeOgallalaOutline()
-    addOgallalaHighlight();
-    currentStep++;
-  } else {
-    previousStep();
-  }
-}
-
-function previousStep() {
-  if (currentStep == 1) {
-    removeOgallalaOutline();
-    currentStep--;
-  } else if (currentStep == 2) {
-    removeOgallalaHighlight();
-    currentStep--;
-  }
+  3: addOgallalaHighlight,
+  4: showHaskell
 }
 
 function removeOgallalaOutline() {
-  map.select('.ogallala-shape')
+  var shape = map.select('.ogallala-shape')
     .transition()
     .duration(500)
     .attr('opacity', 0);
+
+  shape.remove();
 }
 
 function addOgallalaOutline() {
   removeOgallalaHighlight();
-  map.select('.ogallala-shape')
+  var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
+  var shape = map.append("path")
+        .data(ogallala_data)
+        .attr("class", "ogallala-shape")
+        .attr("stroke", "white")
+        .attr("stroke-width", 1)
+        .attr("fill", "#1B9CFA")
+        .attr("opacity", 0)
+        .attr("d", path);
+ shape
     .transition()
     .duration(500)
     .attr('opacity', 0.8);
@@ -442,8 +430,11 @@ function addOgallalaOutline() {
 
 function addOgallalaHighlight() {
   removeOgallalaOutline();
-  zoomIn([-100.851404, 37.482529]);
+  map.classed("gig-haskell-highlight", false);
+  zoomIn([-100.851404, 37.482529], 2);
+  map.classed("gig-haskell-highlight", false);
   map.classed("gig-county-highlight", true);
+  map.select('.county-detail-text').remove();
 }
 
 function removeOgallalaHighlight() {
@@ -451,9 +442,21 @@ function removeOgallalaHighlight() {
   map.classed("gig-county-highlight", false);
 }
 
-function zoomIn(center) {
+function showHaskell() {
+  zoomIn([-100.851404, 37.482529], 6);
+  map.append('g')
+    .attr('class', 'county-detail-text')
+    .attr('transform', 'translate(' + projection([-100.851404, 37.482529]) + ')')
+    .append('text')
+    .attr("fill", "white")
+    .attr('transform', 'translate(10, 0)')
+    .text('Haskell, KS');
+  map.classed("gig-county-highlight", false);
+  map.classed("gig-haskell-highlight", true);
+}
+
+function zoomIn(center, zoomLevel) {
   var coordinates = projection(center);
-  var zoomLevel = 2;
   map.transition()
       .duration(500)
       .attr("transform", "translate(" + ((width/2) - (coordinates[0] * zoomLevel)) + ", " + ((HEIGHT/2) - coordinates[1] * zoomLevel) + ")scale(" + zoomLevel + ")");
@@ -472,9 +475,9 @@ function mouseover(d) {
 
 function mousemove() {
   var top = (d3.event.pageY - 12) - $window.scrollTop();
-  // if (!$graphic.hasClass("fixed")) {
-  //   top = top - $graphic.offset().top;
-  // }
+  if (progress <= 0) {
+    top = top - (offsetTop - $(document).scrollTop());
+  }
   // if ($embedModule.length > 0) {
   //   top = top - $embedModule.offset().top;
   // }

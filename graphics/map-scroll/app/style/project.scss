@@ -114,6 +114,15 @@ html, body {
   }
 }
 
+.gig-haskell-highlight {
+  .counties path {opacity: 0.1}
+  .counties .haskell-highlight {
+    stroke: white;
+    stroke-width: 0.5px;
+    opacity: 1; 
+  }
+}
+
 
 .map-legend {
   bottom: 0;
