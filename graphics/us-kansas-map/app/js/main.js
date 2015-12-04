@@ -51,9 +51,9 @@ var $graphic;
 var $details;
 var $sliderBG;
 var $embedModule;
-var VAL_COLUMN = "differece";
+var VAL_COLUMN = "avg_chg";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
-var topojson_features_obj = "IND_adm3";
+var topojson_features_obj = "counties";
 var _ = require("lodash");
 var queue = require("queue-async");
 var tooltip;
@@ -220,7 +220,7 @@ function updatePosition(e) {
 * Begin map code
 */
 var scaleBreaks = [-15, -5, 0];
-var scaleColors = ['#de862e','#F5AE1B', '#F6EB16'];
+var scaleColors = ['#A56600','#F5AE1B', '#F6EB16'];
 
 var colorScale = function(input) {
   var r;
@@ -269,11 +269,10 @@ function start() {
     $details = $graphic.find('#details');
     $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
     $embedModule.height(HEIGHT * slidesLength + 30);
-    // queue()
-    //   .defer(d3.json, DATA_URL)
-    //   .defer(d3.json, ogallalaDataURL)
-    //   .await(ready);
-    d3.json(DATA_URL, ready);
+    queue()
+      .defer(d3.json, DATA_URL)
+      .defer(d3.json, ogallalaDataURL)
+      .await(ready);
 }
 
 
@@ -295,30 +294,28 @@ var reDraw = _.throttle(ready, 500, {
   trailing: true
 });
 
-function ready(err, data, ) {
+function ready(err, data, data2) {
     width = $(window).width();
     height = width * (9/16);
     scale = width/1.2;
     $graphic.empty();
     console.log(data);
+    console.log(data2);
 
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
-    // if(!GRAPHICDATA2) {
-    //   GRAPHICDATA2 = data2;
-    // }
+    if(!GRAPHICDATA2) {
+      GRAPHICDATA2 = data2;
+    }
     var geo = {
       type: "FeatureCollection",
       features: topojson.feature(data, data.objects[topojson_features_obj]).features
     };
 
-    var center = d3.geo.centroid(geo);
-
-    projection = d3.geo.mercator()
-    .scale(width/1.5)
-    .center(center)
-    .translate([width / 2, height / 2]);
+    projection = d3.geo.albersUsa()
+    .scale(scale)
+    .translate([WIDTH/2, HEIGHT / 2]);
 
     path = d3.geo.path()
       .projection(projection);
@@ -335,7 +332,7 @@ function ready(err, data, ) {
         .attr("width", width);
 
     map.append('path')
-      .datum(topojson.merge(data, data.objects[topojson_features_obj].geometries))
+      .datum(topojson.merge(data, data.objects["counties"].geometries))
       .attr("class", "country-shape")
       .attr("d", path);
 
@@ -353,12 +350,12 @@ function ready(err, data, ) {
       })
       .attr("class", function(d) {
           var classname = "";
-          if (d.properties.st == "Punjab") {
+          if (d.properties.ogallala == "t") {
             classname += " us-county-highlight";
           } 
-          // if (d.properties.fips == 20081) {
-          //   classname += " haskell-highlight";
-          // }
+          if (d.properties.fips == 20081) {
+            classname += " haskell-highlight";
+          }
           return classname;
       })
       .attr("d", path)
@@ -397,43 +394,40 @@ function getNewStep(progress) {
 
 //maps each step to a function
 var stepMap = {
-  1: stepOne,
-  2: stepTwo,
-  3: stepThree
+  1: removeOgallalaOutline,
+  2: addOgallalaOutline,
+  3: addOgallalaHighlight,
+  4: showHaskell
 }
 
-function stepOne() {
-  zoomOut();
-  map.classed("gig-county-highlight", false);
-  // var shape = map.select('.ogallala-shape')
-  //   .transition()
-  //   .duration(500)
-  //   .attr('opacity', 0);
+function removeOgallalaOutline() {
+  var shape = map.select('.ogallala-shape')
+    .transition()
+    .duration(500)
+    .attr('opacity', 0);
 
-  // shape.remove();
+  shape.remove();
 }
 
-function stepTwo() {
-  zoomIn([75.394651, 30.889173], 2);
-  map.classed("gig-county-highlight", true);
-  // removeOgallalaHighlight();
-  // var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
-  // var shape = map.append("path")
-  //       .data(ogallala_data)
-  //       .attr("class", "ogallala-shape")
-  //       .attr("stroke", "white")
-  //       .attr("stroke-width", 1)
-  //       .attr("fill", "#1B9CFA")
-  //       .attr("opacity", 0)
-  //       .attr("d", path);
- // shape
- //    .transition()
- //    .duration(500)
- //    .attr('opacity', 0.8);
+function addOgallalaOutline() {
+  removeOgallalaHighlight();
+  var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
+  var shape = map.append("path")
+        .data(ogallala_data)
+        .attr("class", "ogallala-shape")
+        .attr("stroke", "white")
+        .attr("stroke-width", 1)
+        .attr("fill", "#1B9CFA")
+        .attr("opacity", 0)
+        .attr("d", path);
+ shape
+    .transition()
+    .duration(500)
+    .attr('opacity', 0.8);
 
 }
 
-function stepThree() {
+function addOgallalaHighlight() {
   removeOgallalaOutline();
   map.classed("gig-haskell-highlight", false);
   zoomIn([-100.851404, 37.482529], 2);
@@ -474,9 +468,8 @@ function zoomOut() {
 }
 
 function mouseover(d) {
-  console.log(d);
   tooltip.style("display", "block");
-  tooltip.html("<p>" + d.properties.district + "</p>" + "average water level change: " + d.properties[VAL_COLUMN] + " ft.");
+  tooltip.html("<p>" + d.properties.n + "</p>" + "average water level change: " + d.properties[VAL_COLUMN] + " ft.");
 }
 
 function mousemove() {
@@ -506,5 +499,5 @@ window.addEventListener('resize', function() {
   elHeight = $el.height();
   offsetTop = $el.offset().top;
   setDataPosition();
-  reDraw(null, GRAPHICDATA);
+  reDraw(null, GRAPHICDATA, GRAPHICDATA2);
 });
