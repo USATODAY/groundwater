@@ -282,6 +282,7 @@ function addLegend() {
     });
     
         html += "<span style='display: inline-block;width:20px; height:20px;background-color:#0095C4'></span><span>no decrease</span>";
+        html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
    
     html += "</div>"
     $graphic.append(html);
@@ -300,9 +301,7 @@ function ready(err, data, data2) {
     console.log(data);
     console.log(data2);
 
-    if (GRAPHICINFO.FULL_WIDTH) {
-      $embedModule.height(HEIGHT * slidesLength);
-    }
+    $embedModule.height(HEIGHT * slidesLength + 30);
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
@@ -443,13 +442,13 @@ function removeOgallalaHighlight() {
 }
 
 function showHaskell() {
-  zoomIn([-100.851404, 37.482529], 6);
+  // zoomIn([-100.851404, 37.482529], 3);
   map.append('g')
     .attr('class', 'county-detail-text')
     .attr('transform', 'translate(' + projection([-100.851404, 37.482529]) + ')')
     .append('text')
     .attr("fill", "white")
-    .attr('transform', 'translate(10, 0)')
+    .attr('transform', 'translate(10, 5)')
     .text('Haskell, KS');
   map.classed("gig-county-highlight", false);
   map.classed("gig-haskell-highlight", true);

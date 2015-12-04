@@ -6,6 +6,10 @@ html, body {
   height: 100%;
 }
 
+.gig-embed {
+  left:0;
+}
+
 #gig-slider {
 	position: relative;
 	z-index: 1;
@@ -187,6 +191,8 @@ svg {
   stroke-width: .5px;
   stroke-opacity: 1;
 }
+
+
 
 .gig-tooltip {
   background: rgba(0, 0, 0, 1);
