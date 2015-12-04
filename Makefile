@@ -1,6 +1,6 @@
 DBNAME=gwater # the name of the database you're using. you can name this whatever you want.
 
-topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json
+topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json data/output_data/california_wells.topo.json
 
 #world aquifers
 data/output_data/world_aquifers.topo.json: data/output_data/aquifer_gw_anomolies.csv data/shapefiles/ne_110m_land/ne_110m_land.shp
@@ -33,7 +33,7 @@ data/output_data/california_wells.topo.json: data/output_data/california_wells_w
 	--post-quantization=1e6 \
 	--simplify=7e-7 \
 	-e $< \
-	-p FIPS,county,reported_outages \
+	-p FIPS,county,reported_outages,cv=central_valley \
 	--id-property=+fips,+FIPS \
 	-- data/shapefiles/CA/CA.shp
 
@@ -277,10 +277,12 @@ data/output_data/california_wells_w_fips.csv: data/dbtables/california_wells_w_f
 
 
 #add fips column to dry wells table
-data/dbtables/california_wells_w_fips: data/dbtables/california_wells
+data/dbtables/california_wells_w_fips: data/dbtables/california_wells data/shapefiles/aquifers_us/us_aquifers.shp
 	psql -d $(DBNAME) -c "ALTER TABLE california_wells DROP COLUMN IF EXISTS county_id;"
 	psql -d $(DBNAME) -c "ALTER TABLE california_wells ADD COLUMN county_id INTEGER;"
 	psql -d $(DBNAME) -c "UPDATE california_wells SET county_id = countyquery.gid FROM (SELECT gid, state, county FROM counties) as countyquery WHERE countyquery.state = 'CA' AND countyquery.county ILIKE california_wells.county || '%'"	
+	psql -d $(DBNAME) -c "ALTER TABLE california_wells ADD COLUMN central_valley BOOLEAN DEFAULT FALSE;"
+	psql -d $(DBNAME) -c "UPDATE california_wells SET central_valley = TRUE FROM (SELECT aq_code,geom FROM us_aquifers WHERE aq_code = 106) AS aquifer_query, (SELECT geom,gid,fips FROM counties) as county_geo WHERE ST_Intersects(county_geo.geom,aquifer_query.geom) AND california_wells.county_id = county_geo.gid;"
 	touch $@
 
 #import dry wells into postgres
