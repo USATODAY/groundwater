@@ -9,6 +9,7 @@ var VAL_COLUMN = "sub-surface_storage_trends_mm_per_yr";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
 var topojson_features_obj = "world_aquifer_systems_nocoast";
 var _ = require("lodash");
+var queue = require("queue-async");
 var tooltip;
 var path;
 
@@ -69,18 +70,14 @@ function getColor(val) {
     }
 }
 
-
-
-
-
-  
-
 function start() {
-    
-    
     $window = $(window);
     $graphic = $('#' + GRAPHICINFO.GRAPHIC_SLUG);
     $details = $graphic.find('#details');
+    // queue()
+    //   .defer(d3.json, DATA_URL)
+    //   .defer(d3.json, "data/test.topo.json")
+    //   .await(ready);
     d3.json(DATA_URL, ready);
     addEventListeners();
 }
@@ -98,8 +95,9 @@ function addLegend() {
     $('#legend').html(html);
 }
 
-function ready(data) {
+function ready(err, data, data2) {
   console.log(data);
+  console.log(data2);
     width = $(window).width();
     height = width * (9/16);
     $graphic.empty();
@@ -175,6 +173,22 @@ svg.append("path")
       .on("mouseover", mouseover)
       .on("mousemove", mousemove)
       .on("mouseout", mouseout);
+
+      // svg.append("g")
+      //   .selectAll("path")
+      //   .data(topojson.feature(data2, data2.objects.test).features)
+      //   .enter()
+      //   .append("path")
+      //   .attr("fill", function(d) {
+      //     if (d.properties.DN !== 0) {
+      //       return "steelblue";
+      //     } else {
+      //       console.log(d.properties.DN);
+      //       return "none";
+      //     }
+      //   })
+      //   .attr("opacity", 0.5)
+      //   .attr("d", path);
 
      tooltip = d3.select("#" + GRAPHICINFO.GRAPHIC_SLUG).append("div")
         .attr("class", "gig-tooltip")

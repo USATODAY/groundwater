@@ -64,6 +64,7 @@
 	var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
 	var topojson_features_obj = "world_aquifer_systems_nocoast";
 	var _ = __webpack_require__(3);
+	var queue = __webpack_require__(5);
 	var tooltip;
 	var path;
 	
@@ -124,7 +125,8 @@
 	  $window = $(window);
 	  $graphic = $('#' + GRAPHICINFO.GRAPHIC_SLUG);
 	  $details = $graphic.find('#details');
-	  d3.json(DATA_URL, ready);
+	  queue().defer(d3.json, DATA_URL).defer(d3.json, "data/test.topo.json").await(ready);
+	  // d3.json(DATA_URL, ready);
 	  addEventListeners();
 	}
 	
@@ -140,8 +142,9 @@
 	  $('#legend').html(html);
 	}
 	
-	function ready(data) {
+	function ready(err, data, data2) {
 	  console.log(data);
+	  console.log(data2);
 	  width = $(window).width();
 	  height = width * (9 / 16);
 	  $graphic.empty();
@@ -184,6 +187,15 @@
 	      return "none";
 	    }
 	  }).attr("d", path).on("mouseover", mouseover).on("mousemove", mousemove).on("mouseout", mouseout);
+	
+	  svg.append("g").selectAll("path").data(topojson.feature(data2, data2.objects.test).features).enter().append("path").attr("fill", function (d) {
+	    if (d.properties.DN !== 0) {
+	      return "steelblue";
+	    } else {
+	      console.log(d.properties.DN);
+	      return "none";
+	    }
+	  }).attr("opacity", 0.5).attr("d", path);
 	
 	  tooltip = d3.select("#" + GRAPHICINFO.GRAPHIC_SLUG).append("div").attr("class", "gig-tooltip").style("display", "none");
 	
@@ -12610,6 +12622,92 @@
 		}
 		return module;
 	}
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;(function() {
+	  var slice = [].slice;
+	
+	  function queue(parallelism) {
+	    var q,
+	        tasks = [],
+	        started = 0, // number of tasks that have been started (and perhaps finished)
+	        active = 0, // number of tasks currently being executed (started but not finished)
+	        remaining = 0, // number of tasks not yet finished
+	        popping, // inside a synchronous task callback?
+	        error = null,
+	        await = noop,
+	        all;
+	
+	    if (!parallelism) parallelism = Infinity;
+	
+	    function pop() {
+	      while (popping = started < tasks.length && active < parallelism) {
+	        var i = started++,
+	            t = tasks[i],
+	            a = slice.call(t, 1);
+	        a.push(callback(i));
+	        ++active;
+	        t[0].apply(null, a);
+	      }
+	    }
+	
+	    function callback(i) {
+	      return function(e, r) {
+	        --active;
+	        if (error != null) return;
+	        if (e != null) {
+	          error = e; // ignore new tasks and squelch active callbacks
+	          started = remaining = NaN; // stop queued tasks from starting
+	          notify();
+	        } else {
+	          tasks[i] = r;
+	          if (--remaining) popping || pop();
+	          else notify();
+	        }
+	      };
+	    }
+	
+	    function notify() {
+	      if (error != null) await(error);
+	      else if (all) await(error, tasks);
+	      else await.apply(null, [error].concat(tasks));
+	    }
+	
+	    return q = {
+	      defer: function() {
+	        if (!error) {
+	          tasks.push(arguments);
+	          ++remaining;
+	          pop();
+	        }
+	        return q;
+	      },
+	      await: function(f) {
+	        await = f;
+	        all = false;
+	        if (!remaining) notify();
+	        return q;
+	      },
+	      awaitAll: function(f) {
+	        await = f;
+	        all = true;
+	        if (!remaining) notify();
+	        return q;
+	      }
+	    };
+	  }
+	
+	  function noop() {}
+	
+	  queue.version = "1.0.7";
+	  if (true) !(__WEBPACK_AMD_DEFINE_RESULT__ = function() { return queue; }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	  else if (typeof module === "object" && module.exports) module.exports = queue;
+	  else this.queue = queue;
+	})();
 
 
 /***/ }
