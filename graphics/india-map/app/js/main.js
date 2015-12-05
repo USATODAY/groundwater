@@ -476,7 +476,7 @@ function zoomOut() {
 function mouseover(d) {
   console.log(d);
   tooltip.style("display", "block");
-  tooltip.html("<p>" + d.properties.district + "</p>" + "average water level change: " + d.properties[VAL_COLUMN] + " ft.");
+  tooltip.html("<p>" + d.properties.district + "</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
 }
 
 function mousemove() {
