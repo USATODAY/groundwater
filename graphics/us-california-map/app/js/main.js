@@ -52,14 +52,18 @@ var $details;
 var $sliderBG;
 var $embedModule;
 var VAL_COLUMN = "avg_chg";
+var VAL_COLUMN_2 = "reported_outages";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
+var DATA_URL_2 = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/map-scroll/data/counties_with_level_changes.json");
 var topojson_features_obj = "counties";
+var topojson_features_obj_2 = "CA";
 var _ = require("lodash");
 var queue = require("queue-async");
 var tooltip;
 var path;
 var svg;
 var map;
+var map2;
 var scale;
 var currentStep = 1;
 var projection;
@@ -67,7 +71,6 @@ var width = 960;
 var height = 600;
 var GRAPHICDATA;
 var GRAPHICDATA2;
-var ogallalaDataURL = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/map-scroll/data/ogallala.topojson.json");
 
 
 function prepareContainers() {
@@ -219,8 +222,8 @@ function updatePosition(e) {
 /*
 * Begin map code
 */
-var scaleBreaks = [-15, -5, 0];
-var scaleColors = ['#A56600','#F5AE1B', '#F6EB16'];
+var scaleBreaks = [9, 99, 999];
+var scaleColors = ['#F6EB16','#F5AE1B', '#A56600'];
 
 var colorScale = function(input) {
   var r;
@@ -268,20 +271,21 @@ function start() {
     $graphic = $el.find(".gig-map");
     $details = $graphic.find('#details');
     $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
+    $embedModule.height(HEIGHT * slidesLength + 30);
     queue()
+      // .defer(d3.json, DATA_URL_2)
       .defer(d3.json, DATA_URL)
-      .defer(d3.json, ogallalaDataURL)
       .await(ready);
 }
 
 
 function addLegend() {
-    var html = "<div class='map-legend'>decrease in water level<div>";
+    var html = "<div class='map-legend'>Household Water Supply Shortages Reported<div>";
     scaleBreaks.forEach(function(breakpoint, i) {
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + colorScale(breakpoint) +"'></span><span>>" + Math.abs(breakpoint) + " ft.</span>";
+        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + colorScale(breakpoint) +"'></span><span>>" + Math.abs(breakpoint) + "</span>";
     });
     
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:#0095C4'></span><span>no decrease</span>";
+        html += "<span style='display: inline-block;width:20px; height:20px;background-color:#0095C4'></span><span>no reports</span>";
         html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
    
     html += "</div>"
@@ -293,29 +297,33 @@ var reDraw = _.throttle(ready, 500, {
   trailing: true
 });
 
-function ready(err, data, data2) {
+function ready(err, data) {
     width = $(window).width();
     height = width * (9/16);
-    scale = width/1.2;
+    scale = width * 1.5;
     $graphic.empty();
     console.log(data);
-    console.log(data2);
+    // console.log(data2);
 
-    $embedModule.height(HEIGHT * slidesLength + 30);
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
-    if(!GRAPHICDATA2) {
-      GRAPHICDATA2 = data2;
-    }
+    // if(!GRAPHICDATA2) {
+    //   GRAPHICDATA2 = data2;
+    // }
     var geo = {
       type: "FeatureCollection",
-      features: topojson.feature(data, data.objects[topojson_features_obj]).features
+      features: topojson.feature(data, data.objects[topojson_features_obj_2]).features
     };
 
-    projection = d3.geo.albersUsa()
-    .scale(scale)
-    .translate([WIDTH/2, HEIGHT / 2]);
+    var center = d3.geo.centroid(geo);
+    console.log(center);
+
+    projection = d3.geo.mercator()
+      .center(center)
+      .scale(scale)
+      .translate([WIDTH/2, HEIGHT / 2.8]);
+
 
     path = d3.geo.path()
       .projection(projection);
@@ -331,40 +339,68 @@ function ready(err, data, data2) {
         .attr("height", height)
         .attr("width", width);
 
-    map.append('path')
-      .datum(topojson.merge(data, data.objects["counties"].geometries))
-      .attr("class", "country-shape")
+    // map.append('path')
+    //   .datum(topojson.merge(data, data.objects["counties"].geometries))
+    //   .attr("class", "country-shape")
+    //   .attr("d", path);
+
+    // map.append("g")
+    //   .attr("class", "counties")
+    //   .selectAll("path")
+    //   .data(geo.features)
+    //   .enter().append("path")
+    //   .attr("fill", function(d) { 
+    //       if (d.properties[VAL_COLUMN]) {
+    //         return getColor(parseFloat(d.properties[VAL_COLUMN]));
+    //       } else {
+    //         return "none";
+    //       }
+    //   })
+    //   .attr("class", function(d) {
+    //       var classname = "";
+    //       if (d.properties.ogallala == "t") {
+    //         classname += " us-county-highlight";
+    //       } 
+    //       if (d.properties.fips == 20081) {
+    //         classname += " haskell-highlight";
+    //       }
+    //       return classname;
+    //   })
+    //   .attr("d", path)
+    //   .on("mouseover", mouseover)
+    //   .on("mousemove", mousemove)
+    //   .on("mouseout", mouseout);
+
+      map2 = map.append('g')
+        .attr('class', 'gig-step-2')
+        .attr('opacity', 1);
+
+      map2.append('path')
+      .datum(topojson.merge(data, data.objects[topojson_features_obj_2].geometries))
+      .attr("class", "state-focus-shape")
+      .attr('stroke', 'white')
+      .attr('fill', 'none')
       .attr("d", path);
 
-    map.append("g")
-      .attr("class", "counties")
-      .selectAll("path")
-      .data(geo.features)
-      .enter().append("path")
-      .attr("fill", function(d) { 
-          if (d.properties[VAL_COLUMN]) {
-            return getColor(parseFloat(d.properties[VAL_COLUMN]));
+      map2.append('g')
+        .selectAll('path')
+        .data(topojson.feature(data, data.objects[topojson_features_obj_2]).features)
+        .enter()
+        .append('path')
+        .attr('fill', function(d) {
+          var val = +d.properties[VAL_COLUMN_2]
+          console.log(val);
+          if ( val !== 0) {
+            return colorScale(val);
           } else {
-            return "none";
+            return '#0095C4';
           }
-      })
-      .attr("class", function(d) {
-          var classname = "";
-          if (d.properties.ogallala == "t") {
-            classname += " us-county-highlight";
-          } 
-          if (d.properties.fips == 20081) {
-            classname += " haskell-highlight";
-          }
-          return classname;
-      })
-      .attr("d", path)
-      .on("mouseover", mouseover)
-      .on("mousemove", mousemove)
-      .on("mouseout", mouseout);
+        })
+        .attr('d', path);
 
       
 
+    // zoomIn(center, 2);
      tooltip = d3.select($graphic[0]).append("div")
         .attr("class", "gig-tooltip")
         .style("display", "none");
@@ -394,36 +430,36 @@ function getNewStep(progress) {
 
 //maps each step to a function
 var stepMap = {
-  1: removeOgallalaOutline,
-  2: addOgallalaOutline,
-  3: addOgallalaHighlight,
-  4: showHaskell
+  1: stepOne,
+  2: stepTwo
 }
 
-function removeOgallalaOutline() {
-  var shape = map.select('.ogallala-shape')
-    .transition()
-    .duration(500)
+function stepOne() {
+  // map.select('.counties')
+  //   .attr('opacity', 1);
+
+  // map2
+  //   .transition()
+  //   .duration(500)
+  //   .attr('opacity', 0);
+
+  zoomOut();
+  // var shape = map.select('.ogallala-shape')
+  //   .transition()
+  //   .duration(500)
+  //   .attr('opacity', 0);
+
+  // shape.remove();
+}
+
+function stepTwo() {
+  map.select('.counties')
     .attr('opacity', 0);
-
-  shape.remove();
-}
-
-function addOgallalaOutline() {
-  removeOgallalaHighlight();
-  var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
-  var shape = map.append("path")
-        .data(ogallala_data)
-        .attr("class", "ogallala-shape")
-        .attr("stroke", "white")
-        .attr("stroke-width", 1)
-        .attr("fill", "#1B9CFA")
-        .attr("opacity", 0)
-        .attr("d", path);
- shape
+ zoomIn([-119.327555, 36.143740], 2); 
+ map2
     .transition()
     .duration(500)
-    .attr('opacity', 0.8);
+    .attr('opacity', 1);
 
 }
 

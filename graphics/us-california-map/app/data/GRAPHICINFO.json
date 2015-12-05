@@ -2,26 +2,19 @@
     "HEADLINE": "Ground Water Slider",
     "GRAPHIC_SLUG": "gig-slider-kansas-map",
     "CHATTER": "ABOUT THIS GRAPHIC",
-    "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-kansas-map/data/counties_with_level_changes.json",
+    "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-californai-map/data/california_wells.topo.json",
     "FULL_WIDTH": true,
-    "SOURCE": "USGS",
+    "SOURCE": "State of California",
     "SLIDER_IMAGES": [
       {
         "title": "In many counties across the US, water levels have been dropping.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/heheh.gif"
       },
       {
-        "title": "The problem is very apparent in the region that draws on the Ogallala aquifer.",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
-      },
-      {
-        "title": "The problem is very apparent in the region that draws on the Ogallala aquifer.",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
-      },
-      {
-        "title": "Haskell County in Western Kansas is at the epicenter of the crisis.",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
+        "title": "In many counties across the US, water levels have been dropping.",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/heheh.gif"
       }
+     
      
     ]
 }
