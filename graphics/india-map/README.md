@@ -1,4 +1,4 @@
-USAT-APP-KIT
+Interactive Graphic Template
 ============
 
 # What this kit does
@@ -28,8 +28,3 @@ Start editing assets and views from the `gulp/assets` and `gulp/views` folder. F
 gulp build:production
 gulp server
 ```
-
-
-## Inspired By
-https://github.com/texastribune/newsapps-app-kit, https://github.com/nprapps/app-template/, https://github.com/greypants/gulp-starter/tree/2.0, and https://github.com/wuaiwuai/gulp-webpack-template
-

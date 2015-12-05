@@ -1,7 +1,19 @@
 {
-    "HEADLINE": "India",
-    "GRAPHIC_SLUG": "india-map",
-    "CHATTER": "Map of changing water levels in India",
+    "HEADLINE": "Ground Water Slider",
+    "GRAPHIC_SLUG": "gig-slider-india-map",
+    "CHATTER": "ABOUT THIS GRAPHIC",
     "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/india-map/data/india.topo.json",
-    "FULL_WIDTH": true
+    "FULL_WIDTH": true,
+    "SOURCE": "",
+    "SLIDER_IMAGES": [
+      {
+        "title": "India is also experiences the effecs of the groundwater situation",
+        "img": ""
+      },
+      {
+        "title": "We visited the region of Punjab",
+        "img": ""
+      }
+     
+    ]
 }

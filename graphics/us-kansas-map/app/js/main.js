@@ -277,7 +277,7 @@ function start() {
 
 
 function addLegend() {
-    var html = "<div class='map-legend'>decrease in water level<div>";
+    var html = "<div class='map-legend'>average decrease in water levels<div>";
     scaleBreaks.forEach(function(breakpoint, i) {
         html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + colorScale(breakpoint) +"'></span><span>>" + Math.abs(breakpoint) + " ft.</span>";
     });
@@ -449,7 +449,7 @@ function showHaskell() {
     .append('text')
     .attr("fill", "white")
     .attr('transform', 'translate(10, 5)')
-    .text('Haskell, KS');
+    .text('Haskell County, KS');
   map.classed("gig-county-highlight", false);
   map.classed("gig-haskell-highlight", true);
 }
