@@ -25,6 +25,7 @@ html, body {
       position: static;
       top: auto;
       left: auto;
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
       transform: none;
     }
   .gig-slider-panel {
@@ -121,10 +122,16 @@ html, body {
 
 .gig-haskell-highlight {
   .counties path {opacity: 0.1}
+  .counties .us-county-highlight {
+    opacity: 0.5; 
+  }
   .counties .haskell-highlight {
     stroke: white;
     stroke-width: 0.5px;
     opacity: 1; 
+  }
+  text {
+     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5); 
   }
 }
 

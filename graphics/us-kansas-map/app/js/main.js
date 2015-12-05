@@ -416,8 +416,8 @@ function addOgallalaOutline() {
         .data(ogallala_data)
         .attr("class", "ogallala-shape")
         .attr("stroke", "white")
-        .attr("stroke-width", 1)
-        .attr("fill", "#1B9CFA")
+        .attr("stroke-width", 2)
+        .attr("fill", "rgba(100, 100, 100, 0.9)")
         .attr("opacity", 0)
         .attr("d", path);
  shape
@@ -450,6 +450,8 @@ function showHaskell() {
     .attr("fill", "white")
     .attr('transform', 'translate(10, 5)')
     .text('Haskell County, KS');
+
+
   map.classed("gig-county-highlight", false);
   map.classed("gig-haskell-highlight", true);
 }
