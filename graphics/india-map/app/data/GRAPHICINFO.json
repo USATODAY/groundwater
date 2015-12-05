@@ -4,10 +4,10 @@
     "CHATTER": "ABOUT THIS GRAPHIC",
     "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/india-map/data/india.topo.json",
     "FULL_WIDTH": true,
-    "SOURCE": "",
+    "SOURCE": "Central Ground Water Board",
     "SLIDER_IMAGES": [
       {
-        "title": "India is also experiences the effecs of the groundwater situation",
+        "title": "Government data show declines in average groundwater levels in many parts of the country since 2005.",
         "img": ""
       },
       {
