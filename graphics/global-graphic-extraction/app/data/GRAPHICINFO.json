@@ -1,21 +1,33 @@
 {
     "HEADLINE": "Ground Water Slider",
     "GRAPHIC_SLUG": "gig-slider",
-    "CHATTER": "ABOUT THIS GRAPHIC",
+    "CHATTER": "Global Extraction",
     "DATA_URL": "",
     "FULL_WIDTH": true,
     "SLIDER_IMAGES": [
       {
-        "title": "Slide One Title",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/heheh.gif"
+        "title": "How much water have we pumped from the ground?",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-1.jpg"
       },
       {
-        "title": "Why Am I So Cool?",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
+        "title": "Place more than 1 million 1-liter bottles on a football field ...",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-2.jpg"
       },
       {
-        "title": "Possibly a Third Slide",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-3.jpg"
+        "title": "Stack those together nearly a million times - that’s a cubic kilometer",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-3.jpg"
+      },
+      {
+        "title": "California’s Central Valley pumped nearly 5 times that amount in 2013",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-4.jpg"
+      },
+      {
+        "title": "And that’s a fraction of what the U.S. pumps annually",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-5.jpg"
+      },
+      {
+        "title": "But we’re not the biggest users of groundwater",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-6.jpg"
       }
     ]
 }
