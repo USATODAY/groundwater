@@ -1,0 +1,28 @@
+<div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}" class="gig-slider gig-embed">
+  <div class="gig-slider-background-container">
+    {% for item in GRAPHICINFO.SLIDER_IMAGES %}
+    <div id="gig-slider-background-{{ loop.index }}"
+         class="gig-slider-background"
+         style="background-image: url({{ item.img }})"></div>
+    {% endfor %}
+  </div>
+  {% for item in GRAPHICINFO.SLIDER_IMAGES %}
+  <div class="gig-slider-panel">
+    <div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}-panel-text-container-{{ loop.index }}"
+         class="gig-slider-panel-text-container">{{ item.title }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<!--
+
+{# for item in GRAPHICINFO.SLIDER_IMAGES #}
+  <li id="{{ GRAPHICINFO.GRAPHIC_SLUG }}-panel-{{ loop.index }}"
+       class="gig-slider-panel"
+       style="background-image: url({{ item.img }});">
+    <div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}-panel-text-container-{{ loop.index }}"
+         class="gig-slider-panel-text-container">{{ item.title }}</div>
+  </li>
+{# endfor #}
+
+-->
