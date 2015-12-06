@@ -80,6 +80,7 @@ function prepareContainers() {
   $el.find('.gig-slider-panel-text-container').css({"margin-bottom": HEIGHT - 75});
   $el.find('.gig-slider-background').height(HEIGHT);
   $el.height(HEIGHT * slidesLength);
+  $embedModule.height(HEIGHT * slidesLength + 30);
   // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
@@ -99,6 +100,7 @@ function setup() {
   document.addEventListener('touchmove', updatePosition);
 
   $el = $(id);
+  $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
   getNewStep();
   
   if (debugMode) {
@@ -270,8 +272,7 @@ function start() {
     $window = $(window);
     $graphic = $el.find(".gig-map");
     $details = $graphic.find('#details');
-    $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
-    $embedModule.height(HEIGHT * slidesLength + 30);
+    
     queue()
       // .defer(d3.json, DATA_URL_2)
       .defer(d3.json, DATA_URL)
@@ -508,7 +509,7 @@ function mouseout(d) {
 document.addEventListener('DOMContentLoaded', setup);
 window.addEventListener('resize', function() {
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  HEIGHT = window.innerHeight; 
   prepareContainers();
   elHeight = $el.height();
   offsetTop = $el.offset().top;

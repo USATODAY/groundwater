@@ -65,6 +65,7 @@ var currentStep = 1;
 var projection;
 var width = 960;
 var height = 600;
+var transisitonDuration;
 var GRAPHICDATA;
 var GRAPHICDATA2;
 var ogallalaDataURL = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/map-scroll/data/ogallala.topojson.json");
@@ -76,7 +77,11 @@ function prepareContainers() {
   // $el.find('.gig-slider-panel').height(HEIGHT);
   $el.find('.gig-slider-panel-text-container').css({"margin-bottom": HEIGHT - 75});
   $el.find('.gig-slider-background').height(HEIGHT);
+  $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
+  $embedModule.height(HEIGHT * slidesLength + 30);
   $el.height(HEIGHT * slidesLength);
+  console.log($el.height());
+  console.log("embed", $embedModule.height());
   // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
@@ -87,8 +92,12 @@ function prepareContainers() {
 
 function setup() {
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  // HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  // if (window.mobileCheck()) {
+    window.HEIGHT = HEIGHT = window.innerHeight;
+  // }
   $sliderBG = $('#gig-slider-background-1');
+  transisitonDuration = window.mobileCheck() ? 0 : 500;
 
   slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
 
@@ -267,12 +276,10 @@ function start() {
     $window = $(window);
     $graphic = $el.find(".gig-map");
     $details = $graphic.find('#details');
-    $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
-    $embedModule.height(HEIGHT * slidesLength + 30);
     queue()
       .defer(d3.json, DATA_URL)
       .defer(d3.json, ogallalaDataURL)
-      .await(ready);
+      .await(draw);
 }
 
 
@@ -289,15 +296,20 @@ function addLegend() {
     $graphic.append(html);
 }
 
-var reDraw = _.throttle(ready, 500, {
-  leading: false,
+var reDraw = _.throttle(draw, 500, {
+  leading: true,
   trailing: true
 });
 
-function ready(err, data, data2) {
+function draw(err, data, data2) {
+  console.log("draw");
     width = $(window).width();
     height = width * (9/16);
     scale = width/1.2;
+    if (width < 800) {
+      scale = width;
+    }
+    console.log(scale);
     $graphic.empty();
     console.log(data);
     console.log(data2);
@@ -358,10 +370,10 @@ function ready(err, data, data2) {
           }
           return classname;
       })
-      .attr("d", path)
-      .on("mouseover", mouseover)
-      .on("mousemove", mousemove)
-      .on("mouseout", mouseout);
+      .attr("d", path);
+      // .on("mouseover", mouseover)
+      // .on("mousemove", mousemove)
+      // .on("mouseout", mouseout);
 
       
 
@@ -401,9 +413,10 @@ var stepMap = {
 }
 
 function removeOgallalaOutline() {
+  map.classed('gig-step-2', false);
   var shape = map.select('.ogallala-shape')
     .transition()
-    .duration(500)
+    .duration(transisitonDuration)
     .attr('opacity', 0);
 
   shape.remove();
@@ -411,18 +424,19 @@ function removeOgallalaOutline() {
 
 function addOgallalaOutline() {
   removeOgallalaHighlight();
+  map.classed('gig-step-2', true);
   var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
   var shape = map.append("path")
         .data(ogallala_data)
         .attr("class", "ogallala-shape")
         .attr("stroke", "white")
-        .attr("stroke-width", 2)
+        .attr("stroke-width", 1)
         .attr("fill", "rgba(100, 100, 100, 0.9)")
         .attr("opacity", 0)
         .attr("d", path);
  shape
     .transition()
-    .duration(500)
+    .duration(transisitonDuration)
     .attr('opacity', 0.8);
 
 }
@@ -449,7 +463,8 @@ function showHaskell() {
     .append('text')
     .attr("fill", "white")
     .attr('transform', 'translate(10, 5)')
-    .text('Haskell County, KS');
+    .text('Haskell County, KS')
+    .attr('font-size', 10);
 
 
   map.classed("gig-county-highlight", false);
@@ -459,13 +474,13 @@ function showHaskell() {
 function zoomIn(center, zoomLevel) {
   var coordinates = projection(center);
   map.transition()
-      .duration(500)
+      .duration(transisitonDuration)
       .attr("transform", "translate(" + ((width/2) - (coordinates[0] * zoomLevel)) + ", " + ((HEIGHT/2) - coordinates[1] * zoomLevel) + ")scale(" + zoomLevel + ")");
 }
 
 function zoomOut() {
   map.transition()
-      .duration(500)
+      .duration(transisitonDuration)
       .attr("transform", "");
 }
 
@@ -496,7 +511,7 @@ function mouseout(d) {
 document.addEventListener('DOMContentLoaded', setup);
 window.addEventListener('resize', function() {
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  HEIGHT = window.innerHeight;
   prepareContainers();
   elHeight = $el.height();
   offsetTop = $el.offset().top;
