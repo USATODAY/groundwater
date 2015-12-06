@@ -140,6 +140,25 @@ html, body {
   }
 }
 
+.gig-progress-indicator-wrap {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.gig-progress-entry {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  margin: 5px 0;
+  height: 10px;
+  width: 10px;
+
+  &.gig-progress-current {
+    background: rgba(255, 255, 255, 1);
+  }
+}
+
 svg {
   display: block;
   margin: 0 auto;
