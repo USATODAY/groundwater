@@ -1,0 +1,65 @@
+//@import "base/fonts";
+
+html, body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+#gig-slider {
+  position: absolute;
+  left: 0;
+	z-index: 1;
+  height: 100%;
+	width: 100%;
+	background: #ccc;
+	overflow: hidden;
+}
+
+.gig-slider {
+  &-panel {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    &-text-container {
+      position: absolute;
+      top: 50%;
+      left: 15%;
+      color: #ffffff;
+      font-family: 'Futura Today Light', sans-serif;
+      font-size: 4em;
+      transform: translateY(-50%);
+    }
+  }
+  &-background-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+  }
+  &-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover !important;
+    z-index: -1;
+    opacity: 0;
+    &:first-child {
+      opacity: 1;
+    }
+  }
+}
+
+.gig-slider-panel {
+  height: 800px;
+  width: 100%;
+}
