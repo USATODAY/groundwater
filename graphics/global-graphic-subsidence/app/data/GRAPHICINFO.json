@@ -1,0 +1,21 @@
+{
+    "HEADLINE": "Ground Water Slider",
+    "GRAPHIC_SLUG": "gig-slider",
+    "CHATTER": "ABOUT THIS GRAPHIC",
+    "DATA_URL": "",
+    "FULL_WIDTH": true,
+    "SLIDER_IMAGES": [
+      {
+        "title": "Slide One Title",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/heheh.gif"
+      },
+      {
+        "title": "Why Am I So Cool?",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
+      },
+      {
+        "title": "Possibly a Third Slide",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-3.jpg"
+      }
+    ]
+}
