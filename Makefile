@@ -271,12 +271,17 @@ data/psql/counties.sql: data/shapefiles/counties/counties.shp data/psql
 data/psql/states.sql: data/shapefiles/states/states.shp data/psql
 	shp2pgsql -I -s 4269 $< > $@
 
+data/output_data/central_valley_storage.csv:
+	in2csv data/input_data/CA_Central_Valley_storage_change_USGS.xlsx > central_valley_temp.csv
+	python data/scripts/central_valley.py central_valley_temp.csv > $@
+	rm central_valley_temp.csv
+
 #create california_wells csv with fips column
 data/output_data/california_wells_w_fips.csv: data/dbtables/california_wells_w_fips
 	psql -d $(DBNAME) -c "COPY(SELECT california_wells.*, counties.fips FROM california_wells JOIN counties ON (california_wells.county_id = counties.gid)) TO '$(abspath $@)' DELIMITER ',' CSV HEADER;"
 
 
-#add fips column to dry wells table
+#add fips column and central_valley boolean to dry wells table
 data/dbtables/california_wells_w_fips: data/dbtables/california_wells data/shapefiles/aquifers_us/us_aquifers.shp
 	psql -d $(DBNAME) -c "ALTER TABLE california_wells DROP COLUMN IF EXISTS county_id;"
 	psql -d $(DBNAME) -c "ALTER TABLE california_wells ADD COLUMN county_id INTEGER;"
