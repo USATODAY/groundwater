@@ -305,6 +305,13 @@ function ready(err, data) {
     console.log(data);
     // console.log(data2);
 
+    _.each(data.objects[topojson_features_obj_2].geometries, function(d) {
+      if (d.properties[VAL_COLUMN_2] == "No private wells in the county") {
+        console.log(d.properties[VAL_COLUMN_2]);
+        d.properties[VAL_COLUMN_2] = "0";
+      }
+    });
+
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
@@ -317,7 +324,6 @@ function ready(err, data) {
     };
 
     var center = d3.geo.centroid(geo);
-    console.log(center);
 
     projection = d3.geo.mercator()
       .center(center)
@@ -339,38 +345,6 @@ function ready(err, data) {
         .attr("height", height)
         .attr("width", width);
 
-    // map.append('path')
-    //   .datum(topojson.merge(data, data.objects["counties"].geometries))
-    //   .attr("class", "country-shape")
-    //   .attr("d", path);
-
-    // map.append("g")
-    //   .attr("class", "counties")
-    //   .selectAll("path")
-    //   .data(geo.features)
-    //   .enter().append("path")
-    //   .attr("fill", function(d) { 
-    //       if (d.properties[VAL_COLUMN]) {
-    //         return getColor(parseFloat(d.properties[VAL_COLUMN]));
-    //       } else {
-    //         return "none";
-    //       }
-    //   })
-    //   .attr("class", function(d) {
-    //       var classname = "";
-    //       if (d.properties.ogallala == "t") {
-    //         classname += " us-county-highlight";
-    //       } 
-    //       if (d.properties.fips == 20081) {
-    //         classname += " haskell-highlight";
-    //       }
-    //       return classname;
-    //   })
-    //   .attr("d", path)
-    //   .on("mouseover", mouseover)
-    //   .on("mousemove", mousemove)
-    //   .on("mouseout", mouseout);
-
       map2 = map.append('g')
         .attr('class', 'gig-step-2')
         .attr('opacity', 1);
@@ -387,16 +361,25 @@ function ready(err, data) {
         .data(topojson.feature(data, data.objects[topojson_features_obj_2]).features)
         .enter()
         .append('path')
+        .attr('class', function(d) {
+          var classname = '';
+          if (d.properties.cv == 't') {
+            classname += 'us-county-highlight';
+          }
+          return classname;
+        })
         .attr('fill', function(d) {
           var val = +d.properties[VAL_COLUMN_2]
-          console.log(val);
           if ( val !== 0) {
             return colorScale(val);
           } else {
             return '#0095C4';
           }
         })
-        .attr('d', path);
+        .attr('d', path)
+        .on("mouseover", mouseover)
+        .on("mousemove", mousemove)
+        .on("mouseout", mouseout);
 
       
 
@@ -443,6 +426,7 @@ function stepOne() {
   //   .duration(500)
   //   .attr('opacity', 0);
 
+  map.classed("gig-county-highlight", false);
   zoomOut();
   // var shape = map.select('.ogallala-shape')
   //   .transition()
@@ -453,14 +437,8 @@ function stepOne() {
 }
 
 function stepTwo() {
-  map.select('.counties')
-    .attr('opacity', 0);
- zoomIn([-119.327555, 36.143740], 2); 
- map2
-    .transition()
-    .duration(500)
-    .attr('opacity', 1);
-
+  zoomIn([-119.327555, 36.143740], 2); 
+  map.classed("gig-county-highlight", true);
 }
 
 function addOgallalaHighlight() {
@@ -505,7 +483,7 @@ function zoomOut() {
 
 function mouseover(d) {
   tooltip.style("display", "block");
-  tooltip.html("<p>" + d.properties.n + "</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
+  tooltip.html("<p>" + d.properties.county + " county</p>" + "number of reported shortages: " + Math.round(d.properties[VAL_COLUMN_2] * 100) / 100 + "");
 }
 
 function mousemove() {
