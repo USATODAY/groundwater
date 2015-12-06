@@ -198,8 +198,7 @@ function updatePosition(e) {
 
   var newStep = getNewStep(progressBottom);
   if (newStep != currentStep) {
-    currentStep = newStep;
-    stepMap[newStep]();
+    setSlide(newStep);
   }
   // if (progress > .3 ) {
     // nextStep();
@@ -291,6 +290,16 @@ function addLegend() {
    
     html += "</div>"
     $graphic.append(html);
+}
+
+function addProgressIndicator() {
+  var html = '<div class="gig-progress-indicator-wrap">'
+  _.each(GRAPHICINFO.SLIDER_IMAGES, function(image, i) {
+    html += '<div class="gig-progress-entry"></div>';
+  });
+  
+  html += '</div>'
+  $graphic.append(html);
 }
 
 var reDraw = _.throttle(ready, 500, {
@@ -390,6 +399,7 @@ function ready(err, data) {
         .style("display", "none");
 
       addLegend();
+      addProgressIndicator();
 }
 
 //returns the correct step based on progress
@@ -410,6 +420,14 @@ function getNewStep(progress) {
   } else {
     return 1;
   }
+}
+
+function setSlide(newSlide) {
+  currentStep = newSlide;
+  stepMap[newSlide]();
+  var progressEntries = $el.find('.gig-progress-entry');
+  progressEntries.removeClass('gig-progress-current');
+  progressEntries.eq(newSlide - 1).addClass('gig-progress-current');
 }
 
 //maps each step to a function
