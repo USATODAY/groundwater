@@ -35,7 +35,7 @@ var offsetTop;              // offsetTop of id
 var elHeight;               // total height of id
 var progress;               // progress of scroll through entire element from 0 - 1
 var progressPerSlide;       // progress of the scroll through specific slide
-var progressWeight = 1.5;   // weighted factor to move animation progress faster (to finish animation before slide is out of view)
+var progressWeight = 1;   // weighted factor to move animation progress faster (to finish animation before slide is out of view)
 var targetValue;            // ending value for animation property
 var pos;                    // position of scrollTop
 
@@ -44,12 +44,15 @@ var sliderPosArray = [];    // array to store offset().top positions internally
 
 var debugMode = false;      // set [true] to enable box to output stuff
 var $debug;                 // jquery saved reference to debug element
+var $embedModule;       //jquery reference to parent embed container
+var currentStep = 0;    //start current step at 1
 
 function prepareContainers() {
   // set app container to height of viewport
   $el.height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
   $el.find('.gig-slider-panel').height(HEIGHT);
   $el.find('.gig-slider-background-container').height(HEIGHT);
+  $embedModule.height(HEIGHT * slidesLength + 30);
   // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
@@ -60,7 +63,7 @@ function prepareContainers() {
 
 function setup() {
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  HEIGHT = window.innerHeight;
 
   slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
 
@@ -68,6 +71,7 @@ function setup() {
   document.addEventListener('touchmove', updatePosition);
 
   $el = $(id);
+  $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
 
   if (debugMode) {
     $('body').append('<div id="debug"></div>');
@@ -120,6 +124,11 @@ function updatePosition(e) {
 
        if (debugMode) $debug.html(progressPerSlide);
 
+       var newStep = getNewStep(progress);
+       if (newStep !== currentStep) {
+        setStep(newStep);
+       }
+
        if ( (progressPerSlide * progressWeight) < 0 ) {
          targetValue = 0;
        }
@@ -130,14 +139,14 @@ function updatePosition(e) {
          targetValue = 1;
        }
 
-       $el.find('.gig-slider-background').eq(i+1).css({
-         'opacity': targetValue
-       });
-       if ( $el.find('.gig-slider-background').eq(i+2) ) {
-         $el.find('.gig-slider-background').eq(i+2).css({
-           opacity: 0
-         });
-       }
+       // $el.find('.gig-slider-background').eq(i+1).css({
+       //   'opacity': targetValue
+       // });
+       // if ( $el.find('.gig-slider-background').eq(i+2) ) {
+       //   $el.find('.gig-slider-background').eq(i+2).css({
+       //     opacity: 0
+       //   });
+       // }
 
        /* END PER SLIDE CODE */
     }
@@ -166,23 +175,61 @@ function updatePosition(e) {
    */
 
 
-   if ( pos < offsetTop ) {
-     $el.find('.gig-slider-background').css({
-       opacity: 0
-     });
-     $el.find('.gig-slider-background').eq(0).css({
-       opacity: 1
-     });
-   }
+   // if ( pos < offsetTop ) {
+   //   $el.find('.gig-slider-background').css({
+   //     opacity: 0
+   //   });
+   //   $el.find('.gig-slider-background').eq(0).css({
+   //     opacity: 1
+   //   });
+   // }
 
    /* END SLIDE CODE */
 }
 
+//returns the correct step based on progress
+function getNewStep(progress) {
+  var padding = 0.1;
+  progress = progress + padding;
+  var breaks = [] //store each progress break point in this array
+  range(slidesLength).forEach(function(slideIndex) {
+    var stepBreak = (1/slidesLength) * slideIndex;
+    breaks.push(stepBreak);
+  });
+  //default new step is 0
+  var result = 0;
+
+  //loop through each break point
+  breaks.forEach(function(breakpoint, i) {
+    //if progress is past a break point, update result
+    if (progress > breakpoint) {
+      result = i;
+    }
+  });
+
+  return result;
+}
+
+function setStep(newStep) {
+  //takes a new step value and sets it as the current step
+
+  //first remove active class from current slide
+  $el.find('.gig-slider-background').eq(currentStep).removeClass('gig-slider-active-background');
+
+  //next set currentStep to new value
+  currentStep = newStep;
+  //add active class to new slide
+  $el.find('.gig-slider-background').eq(currentStep).addClass('gig-slider-active-background');
+}
+
+function range(num) {
+  return Array.apply(null, Array(num)).map(function (_, i) {return i;});
+}
+
 document.addEventListener('DOMContentLoaded', setup);
 window.addEventListener('resize', function() {
-  console.log('resizing');
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  HEIGHT = window.innerHeight;
   prepareContainers();
   elHeight = $el.height();
   setDataPosition();

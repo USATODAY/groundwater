@@ -45,6 +45,7 @@ var sliderPosArray = [];    // array to store offset().top positions internally
 var debugMode = false;      // set [true] to enable box to output stuff
 var $debug;                 // jquery saved reference to debug element
 var $embedModule;       //jquery reference to parent embed container
+var currentStep = 0;    //start current step at 1
 
 function prepareContainers() {
   // set app container to height of viewport
@@ -123,6 +124,11 @@ function updatePosition(e) {
 
        if (debugMode) $debug.html(progressPerSlide);
 
+       var newStep = getNewStep(progress);
+       if (newStep !== currentStep) {
+        setStep(newStep);
+       }
+
        if ( (progressPerSlide * progressWeight) < 0 ) {
          targetValue = 0;
        }
@@ -133,14 +139,14 @@ function updatePosition(e) {
          targetValue = 1;
        }
 
-       $el.find('.gig-slider-background').eq(i+1).css({
-         'opacity': targetValue
-       });
-       if ( $el.find('.gig-slider-background').eq(i+2) ) {
-         $el.find('.gig-slider-background').eq(i+2).css({
-           opacity: 0
-         });
-       }
+       // $el.find('.gig-slider-background').eq(i+1).css({
+       //   'opacity': targetValue
+       // });
+       // if ( $el.find('.gig-slider-background').eq(i+2) ) {
+       //   $el.find('.gig-slider-background').eq(i+2).css({
+       //     opacity: 0
+       //   });
+       // }
 
        /* END PER SLIDE CODE */
     }
@@ -169,21 +175,59 @@ function updatePosition(e) {
    */
 
 
-   if ( pos < offsetTop ) {
-     $el.find('.gig-slider-background').css({
-       opacity: 0
-     });
-     $el.find('.gig-slider-background').eq(0).css({
-       opacity: 1
-     });
-   }
+   // if ( pos < offsetTop ) {
+   //   $el.find('.gig-slider-background').css({
+   //     opacity: 0
+   //   });
+   //   $el.find('.gig-slider-background').eq(0).css({
+   //     opacity: 1
+   //   });
+   // }
 
    /* END SLIDE CODE */
 }
 
+//returns the correct step based on progress
+function getNewStep(progress) {
+  var padding = 0.1;
+  progress = progress + padding;
+  var breaks = [] //store each progress break point in this array
+  range(slidesLength).forEach(function(slideIndex) {
+    var stepBreak = (1/slidesLength) * slideIndex;
+    breaks.push(stepBreak);
+  });
+  //default new step is 0
+  var result = 0;
+
+  //loop through each break point
+  breaks.forEach(function(breakpoint, i) {
+    //if progress is past a break point, update result
+    if (progress > breakpoint) {
+      result = i;
+    }
+  });
+
+  return result;
+}
+
+function setStep(newStep) {
+  //takes a new step value and sets it as the current step
+
+  //first remove active class from current slide
+  $el.find('.gig-slider-background').eq(currentStep).removeClass('gig-slider-active-background');
+
+  //next set currentStep to new value
+  currentStep = newStep;
+  //add active class to new slide
+  $el.find('.gig-slider-background').eq(currentStep).addClass('gig-slider-active-background');
+}
+
+function range(num) {
+  return Array.apply(null, Array(num)).map(function (_, i) {return i;});
+}
+
 document.addEventListener('DOMContentLoaded', setup);
 window.addEventListener('resize', function() {
-  console.log('resizing');
   WIDTH = window.innerWidth;
   HEIGHT = window.innerHeight;
   prepareContainers();

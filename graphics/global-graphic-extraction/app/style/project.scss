@@ -25,13 +25,12 @@ html, body {
     height: 100%;
     width: 100%;
     &-text-container {
-      // position: absolute;
-      // top: 50%;
-      // left: 15%;
       color: #ffffff;
       font-family: 'Futura Today Light', sans-serif;
       font-size: 2.2em;
-      // transform: translateY(-50%);
+      @media(max-width: 800px) {
+        font-size: 1.5em;
+      }
     }
   }
   &-background-container {
@@ -58,7 +57,7 @@ html, body {
     z-index: -1;
     opacity: 0;
     &:first-child {
-      opacity: 1;
+      // opacity: 1;
     }
   }
 }
@@ -73,6 +72,14 @@ html, body {
     // max-width: 1200px;
   }
 
+  .gig-slider-background {
+    opacity: 0;
+    transition: opacity 500ms ease;
+    &.gig-slider-active-background {
+      opacity: 1;
+    }
+  }
+
   .gig-slider-background-image {
     display: block;
     background-position: center center;
@@ -85,9 +92,13 @@ html, body {
 
   .gig-slider-panel-text-container {
     font-family: "Futura Today DemiBold", Arial, sans-serif;
+    left: 50%;
     margin: 0 auto;
     max-width: 600px;
+    position: absolute;
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8); 
+    top: 25%;
+    transform: translate(-50%, -50%);
     &.gig-slider-dark-text {
       color: black;
       text-shadow: 1px 1px 5px rgba(255, 255, 255, 0.8); 
