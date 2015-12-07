@@ -5,17 +5,21 @@
     "DATA_URL": "",
     "FULL_WIDTH": true,
     "SLIDER_IMAGES": [
-      {
-        "title": "Slide One Title",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/heheh.gif"
+     {
+        "title": "About 2 billion people depend on water that is drawn from wells that tap aquifers.",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-1.jpg"
       },
       {
-        "title": "Why Am I So Cool?",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
+        "title": "Aquifers store water like sponges, holding it in the spaces between rocks, sand and clay.",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-2.jpg"
       },
       {
-        "title": "Possibly a Third Slide",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-3.jpg"
+        "title": "In places, it's water that seeped into the aquifers over tens of thousands of years.",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-3.jpg"
+      },
+      {
+        "title": "As the water is depleted, tapping wells becomes more difficult and expensive.",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-4.jpg"
       }
     ]
 }
