@@ -4,6 +4,8 @@
     "CHATTER": "Global Extraction",
     "DATA_URL": "",
     "FULL_WIDTH": true,
+    "GRAPHIC_SOURCE": "Source Goes Here",
+    "sourceColor": "white",
     "SLIDER_IMAGES": [
       {
         "title": "How much water have we pumped from the ground?",

@@ -131,3 +131,10 @@ html, body {
     opacity: 1;
   }
 }
+
+.gig-slider-source {
+  margin: 0 auto;
+  max-width: 600px;
+  transform: translateY(-100%);
+  width: 90%;
+}

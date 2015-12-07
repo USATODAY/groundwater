@@ -6,9 +6,15 @@
 {% extends 'layouts/application.html' %}
 
 {% block content %}
-<!--<h2>{{GRAPHICINFO.HEADLINE}}</h2>-->
-{% include "embed.html" %}
-<p>FIRST LINE AFTER SLIDER Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui
+<!--{<h2>{{GRAPHICINFO.HEADLINE}}</h2>-->
+<p>FIRST LINE BEFORE SLIDER Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui</p>
+<div class="oembed">{% include "embed.html" %}</div>
+<p>FIRST LINE AFTER SLIDER Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores accusantium assumenda velit et, nulla id vel placeat hic consectetur dolore reprehenderit a praesentium perferendis perspiciatis harum quidem tempora, alias quibusdam!</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores accusantium assumenda velit et, nulla id vel placeat hic consectetur dolore reprehenderit a praesentium perferendis perspiciatis harum quidem tempora, alias quibusdam!</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores accusantium assumenda velit et, nulla id vel placeat hic consectetur dolore reprehenderit a praesentium perferendis perspiciatis harum quidem tempora, alias quibusdam!</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores accusantium assumenda velit et, nulla id vel placeat hic consectetur dolore reprehenderit a praesentium perferendis perspiciatis harum quidem tempora, alias quibusdam!</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores accusantium assumenda velit et, nulla id vel placeat hic consectetur dolore reprehenderit a praesentium perferendis perspiciatis harum quidem tempora, alias quibusdam!</p>
 {% endblock %}
 
 {% block javascript %}
@@ -19,4 +25,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/iScroll/5.1.3/iscroll-probe.js"></script>
 <script src="http://www.gannett-cdn.com/experiments/usatoday/_common/_scripts/canvid/1.4.0/canvid.js">&amp;nbsp;</script>
 <script src='js/main.js'></script>
+<link rel="stylesheet" href="http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/css/gig-styles.css">
 {% endblock %}
