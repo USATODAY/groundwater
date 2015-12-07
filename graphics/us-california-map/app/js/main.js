@@ -54,7 +54,7 @@ var $embedModule;
 var VAL_COLUMN = "avg_chg";
 var VAL_COLUMN_2 = "reported_outages";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
-var DATA_URL_2 = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/map-scroll/data/central_valley_storage.csv");
+var DATA_URL_2 = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-california-map/data/central_valley_storage.csv");
 var topojson_features_obj = "counties";
 var topojson_features_obj_2 = "CA";
 var _ = require("lodash");
@@ -92,7 +92,7 @@ function prepareContainers() {
 
 function setup() {
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  HEIGHT = window.innerHeight;
   $sliderBG = $('#gig-slider-background-1');
 
   slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
