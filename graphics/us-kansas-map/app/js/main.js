@@ -431,11 +431,17 @@ var stepMap = {
 
 function removeOgallalaOutline() {
   map.classed('gig-step-2', false);
+  var label = map.select('.gig-aquifer-label')
+    .transition()
+    .duration(transisitonDuration)
+    .attr('opacity', 0);
+
   var shape = map.select('.ogallala-shape')
     .transition()
     .duration(transisitonDuration)
     .attr('opacity', 0);
 
+  label.remove()
   shape.remove();
 }
 
@@ -443,6 +449,16 @@ function addOgallalaOutline() {
   removeOgallalaHighlight();
   map.classed('gig-step-2', true);
   var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
+
+  var textLabel = map.append('g')
+    .attr('class', 'gig-aquifer-label')
+    .attr('transform', 'translate(' + projection([-95.295983, 39.464040]) + ')')
+    .append('text')
+    .attr('transform', 'translate(-10, 0)')
+    .attr('fill', 'white')
+    .attr('font-size', 10)
+    .text("Ogallala Aquifer");
+
   var shape = map.append("path")
         .data(ogallala_data)
         .attr("class", "ogallala-shape")
