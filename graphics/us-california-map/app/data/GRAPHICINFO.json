@@ -1,6 +1,6 @@
 {
     "HEADLINE": "Ground Water Slider",
-    "GRAPHIC_SLUG": "gig-slider-kansas-map",
+    "GRAPHIC_SLUG": "gig-slider-california-map",
     "CHATTER": "ABOUT THIS GRAPHIC",
     "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-california-map/data/california_wells.topo.json",
     "FULL_WIDTH": true,

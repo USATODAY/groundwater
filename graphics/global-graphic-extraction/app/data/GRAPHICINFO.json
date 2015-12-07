@@ -1,33 +1,45 @@
 {
     "HEADLINE": "Ground Water Slider",
-    "GRAPHIC_SLUG": "gig-slider",
+    "GRAPHIC_SLUG": "gig-extraction-slider",
     "CHATTER": "Global Extraction",
     "DATA_URL": "",
     "FULL_WIDTH": true,
     "SLIDER_IMAGES": [
       {
         "title": "How much water have we pumped from the ground?",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-1.jpg"
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-1.jpg",
+        "backgroundColor": "white",
+        "textColor": "black"
       },
       {
         "title": "Place more than 1 million 1-liter bottles on a football field ...",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-2.jpg"
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-2.jpg",
+        "backgroundColor": "black",
+        "textColor": "white"
       },
       {
         "title": "Stack those together nearly a million times - that’s a cubic kilometer",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-3.jpg"
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-3.jpg",
+        "backgroundColor": "white",
+        "textColor": "black"
       },
       {
         "title": "California’s Central Valley pumped nearly 5 times that amount in 2013",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-4.jpg"
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-4.jpg",
+        "backgroundColor": "black",
+        "textColor": "white"
       },
       {
         "title": "And that’s a fraction of what the U.S. pumps annually",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-5.jpg"
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-5.jpg",
+        "backgroundColor": "white",
+        "textColor": "black"
       },
       {
         "title": "But we’re not the biggest users of groundwater",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-6.jpg"
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-6.jpg",
+        "backgroundColor": "black",
+        "textColor": "white"
       }
     ]
 }

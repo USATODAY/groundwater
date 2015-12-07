@@ -15,6 +15,9 @@ html, body {
 	background: #ccc;
 	overflow: hidden;
 }
+.gig-embed {
+  width: 100%;
+}
 
 .gig-slider {
   &-panel {
@@ -22,13 +25,13 @@ html, body {
     height: 100%;
     width: 100%;
     &-text-container {
-      position: absolute;
-      top: 50%;
-      left: 15%;
+      // position: absolute;
+      // top: 50%;
+      // left: 15%;
       color: #ffffff;
       font-family: 'Futura Today Light', sans-serif;
-      font-size: 4em;
-      transform: translateY(-50%);
+      font-size: 2.2em;
+      // transform: translateY(-50%);
     }
   }
   &-background-container {
@@ -48,9 +51,10 @@ html, body {
     bottom: 0;
     height: 100%;
     width: 100%;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover !important;
+    // background-repeat: no-repeat;
+    // background-position: center center;
+    // background-size: cover !important;
+    background-size: 100%;
     z-index: -1;
     opacity: 0;
     &:first-child {
@@ -59,7 +63,60 @@ html, body {
   }
 }
 
+.gig-image-slider {
+  margin: 0 auto;
+  // max-width: 600px;
+  position: relative;
+
+  .gig-slider-background-container {
+    margin: 0 auto;
+    // max-width: 1200px;
+  }
+
+  .gig-slider-background-image {
+    display: block;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 100%;
+    margin: 0 auto;
+    max-width: 1200px;
+  }
+
+  .gig-slider-panel-text-container {
+    font-family: "Futura Today DemiBold", Arial, sans-serif;
+    margin: 0 auto;
+    max-width: 600px;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8); 
+    &.gig-slider-dark-text {
+      color: black;
+      text-shadow: 1px 1px 5px rgba(255, 255, 255, 0.8); 
+    }
+  }
+}
+
 .gig-slider-panel {
   height: 800px;
   width: 100%;
+}
+
+.gig-progress-indicator-wrap {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.gig-progress-entry {
+  background: rgba(255, 255, 255, 1);
+  border-radius: 50%;
+  margin: 5px 0;
+  height: 10px;
+  opacity: 0.25;
+  width: 10px;
+
+  &.gig-progress-current {
+    background: rgba(255, 255, 255, 1);
+    opacity: 1;
+  }
 }

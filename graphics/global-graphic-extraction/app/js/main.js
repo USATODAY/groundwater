@@ -35,7 +35,7 @@ var offsetTop;              // offsetTop of id
 var elHeight;               // total height of id
 var progress;               // progress of scroll through entire element from 0 - 1
 var progressPerSlide;       // progress of the scroll through specific slide
-var progressWeight = 1.5;   // weighted factor to move animation progress faster (to finish animation before slide is out of view)
+var progressWeight = 1;   // weighted factor to move animation progress faster (to finish animation before slide is out of view)
 var targetValue;            // ending value for animation property
 var pos;                    // position of scrollTop
 
@@ -44,12 +44,14 @@ var sliderPosArray = [];    // array to store offset().top positions internally
 
 var debugMode = false;      // set [true] to enable box to output stuff
 var $debug;                 // jquery saved reference to debug element
+var $embedModule;       //jquery reference to parent embed container
 
 function prepareContainers() {
   // set app container to height of viewport
   $el.height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
   $el.find('.gig-slider-panel').height(HEIGHT);
   $el.find('.gig-slider-background-container').height(HEIGHT);
+  $embedModule.height(HEIGHT * slidesLength + 30);
   // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
@@ -60,7 +62,7 @@ function prepareContainers() {
 
 function setup() {
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  HEIGHT = window.innerHeight;
 
   slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
 
@@ -68,6 +70,7 @@ function setup() {
   document.addEventListener('touchmove', updatePosition);
 
   $el = $(id);
+  $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
 
   if (debugMode) {
     $('body').append('<div id="debug"></div>');
@@ -182,7 +185,7 @@ document.addEventListener('DOMContentLoaded', setup);
 window.addEventListener('resize', function() {
   console.log('resizing');
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  HEIGHT = window.innerHeight;
   prepareContainers();
   elHeight = $el.height();
   setDataPosition();

@@ -1,15 +1,25 @@
-<div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}" class="gig-slider gig-embed">
+<div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}" class="gig-slider gig-embed gig-image-slider">
   <div class="gig-slider-background-container">
     {% for item in GRAPHICINFO.SLIDER_IMAGES %}
     <div id="gig-slider-background-{{ loop.index }}"
          class="gig-slider-background"
-         style="background-image: url({{ item.img }})"></div>
+         style="background: {{item.backgroundColor}}">
+         <div class="gig-slider-background-image" style="background-image: url({{ item.img }})"></div>
+         <div class="gig-progress-indicator-wrap">
+         {% set currentSlide = loop.index %}
+         {% for subitem in GRAPHICINFO.SLIDER_IMAGES %}
+           <div class="gig-progress-entry {% if loop.index == currentSlide %}gig-progress-current{% endif %}"
+                 style="background: {{item.textColor}}"></div>
+         {% endfor %}
+         </div>
+    </div>
     {% endfor %}
   </div>
   {% for item in GRAPHICINFO.SLIDER_IMAGES %}
   <div class="gig-slider-panel">
     <div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}-panel-text-container-{{ loop.index }}"
-         class="gig-slider-panel-text-container">{{ item.title }}</div>
+         class="gig-slider-panel-text-container"
+         style="color:{{item.textColor}}">{{ item.title }}</div>
   </div>
   {% endfor %}
 </div>
