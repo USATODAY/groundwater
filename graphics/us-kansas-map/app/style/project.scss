@@ -34,6 +34,20 @@ html, body {
   }
 }
 
+.triangle {
+  &:after {
+    border-top: solid 10px white;
+    border-left: solid 20px transparent;
+    border-right: solid 20px transparent;
+    content:'';
+    height: 0;
+    left: 50%;
+    position: absolute;
+    top: 100%;
+    transform: translate(-50%, 0);
+    width: 0;
+  }
+}
 
 
 .gig-slider {
@@ -232,18 +246,21 @@ svg {
 
 
 .gig-tooltip {
-  background: rgba(0, 0, 0, 1);
-  border-radius: 8px;
+  background: white;
+  // border-radius: 8px;
   border: solid 1px white;
-  color: white;
+  color: black;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.12));
+  font-family: "Futura Today Light", Arial, sans-serif;
   padding: 0.5em;
   position: absolute;
   transform: translate(-50%, -100%);
   // width: 200px;
   p { 
-    color: white;
+    color: black;
     margin: 0;
   }
+  @extend .triangle;
 }
 
 .q0-9 { fill:#d73027; }

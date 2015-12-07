@@ -307,10 +307,7 @@ function draw(err, data, data2) {
     if (width < 800) {
       scale = width;
     }
-    console.log(scale);
     $graphic.empty();
-    console.log(data);
-    console.log(data2);
 
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
@@ -368,10 +365,10 @@ function draw(err, data, data2) {
           }
           return classname;
       })
-      .attr("d", path);
-      // .on("mouseover", mouseover)
-      // .on("mousemove", mousemove)
-      // .on("mouseout", mouseout);
+      .attr("d", path)
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseout", mouseout);
 
       
 
