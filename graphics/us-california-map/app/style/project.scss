@@ -36,7 +36,7 @@ html, body {
 
 
 .gig-slider {
-
+  background: black;
   &-panel {
     position: relative;
     width: 100%;
@@ -83,7 +83,7 @@ html, body {
   // height: 800px;
   margin: 0 auto;
   max-width: 600px;
-  width: 100%;
+  width: 90%;
 }
 
 
@@ -135,12 +135,30 @@ html, body {
   }
 }
 
+.gig-step-3 {
+  .gig-line-chart {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .gig-county-highlight {
+    path {opacity: 0.1}
+    .us-county-highlight {
+      opacity: 0.5; 
+    }
+  }
+}
+
 
 .map-legend {
+  background: rgba(0, 0, 0, 0.75);
   bottom: 0;
   color: white;
+  left: 0;
+  padding: 10px;
   position: absolute;
-  right: 0;
   // margin-left: 2em;
 }
 
@@ -234,6 +252,21 @@ svg {
     color: white;
     margin: 0;
   }
+}
+
+/******
+
+line chart styles
+
+******/
+
+.axis {
+  path,
+    line {
+        fill: none;
+        stroke: #ccc;
+        shape-rendering: crispEdges;
+    }
 }
 
 .q0-9 { fill:#d73027; }

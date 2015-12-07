@@ -54,7 +54,7 @@ var $embedModule;
 var VAL_COLUMN = "avg_chg";
 var VAL_COLUMN_2 = "reported_outages";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
-var DATA_URL_2 = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/map-scroll/data/counties_with_level_changes.json");
+var DATA_URL_2 = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/map-scroll/data/central_valley_storage.csv");
 var topojson_features_obj = "counties";
 var topojson_features_obj_2 = "CA";
 var _ = require("lodash");
@@ -64,6 +64,7 @@ var path;
 var svg;
 var map;
 var map2;
+var chart;
 var scale;
 var currentStep = 1;
 var projection;
@@ -101,7 +102,6 @@ function setup() {
 
   $el = $(id);
   $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
-  getNewStep();
   
   if (debugMode) {
     $('body').append('<div id="debug"></div>');
@@ -275,6 +275,7 @@ function start() {
     queue()
       // .defer(d3.json, DATA_URL_2)
       .defer(d3.json, DATA_URL)
+      .defer(d3.csv, DATA_URL_2)
       .await(ready);
 }
 
@@ -307,13 +308,16 @@ var reDraw = _.throttle(ready, 500, {
   trailing: true
 });
 
-function ready(err, data) {
+function ready(err, data, data2) {
     width = $(window).width();
     height = width * (9/16);
     scale = width * 1.5;
+    if (width < 800) {
+      scale = width * 2.5;
+    }
     $graphic.empty();
     console.log(data);
-    // console.log(data2);
+    console.log(data2);
 
     _.each(data.objects[topojson_features_obj_2].geometries, function(d) {
       if (d.properties[VAL_COLUMN_2] == "No private wells in the county") {
@@ -325,9 +329,9 @@ function ready(err, data) {
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
-    // if(!GRAPHICDATA2) {
-    //   GRAPHICDATA2 = data2;
-    // }
+    if(!GRAPHICDATA2) {
+      GRAPHICDATA2 = data2;
+    }
     var geo = {
       type: "FeatureCollection",
       features: topojson.feature(data, data.objects[topojson_features_obj_2]).features
@@ -338,7 +342,7 @@ function ready(err, data) {
     projection = d3.geo.mercator()
       .center(center)
       .scale(scale)
-      .translate([WIDTH/2, HEIGHT / 2.8]);
+      .translate([WIDTH/2, HEIGHT / 2.7]);
 
 
     path = d3.geo.path()
@@ -391,6 +395,8 @@ function ready(err, data) {
         .on("mousemove", mousemove)
         .on("mouseout", mouseout);
 
+    drawLineChart(data2);
+
       
 
     // zoomIn(center, 2);
@@ -400,10 +406,110 @@ function ready(err, data) {
 
       addLegend();
       addProgressIndicator();
+      setSlide(getNewStep());
 }
 
-//returns the correct step based on progress
+function drawLineChart(linedata) {
+  /*
+  * Takes an array of data and draws a line chart.
+  */
+  var margin = {top: 20, right: 20, bottom: 30, left: 80},
+    width = 960 - margin.left - margin.right,
+    height = 540 - margin.top - margin.bottom
+    
+    if (width > WIDTH) {
+      width = WIDTH - margin.left - margin.right;
+      height = width / (16/9);
+    }
+    console.log(height);
+
+
+var parseDate = d3.time.format("%Y").parse;
+
+var x = d3.time.scale()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var ticksX = 10;
+var ticksY = 10;
+var roundTicksFactor = 5;
+
+// Mobile
+if (window.innerWidth < 800) {
+    ticksX = 5;
+    ticksY = 5;
+}
+
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .ticks(ticksX)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .ticks(ticksY)
+    .orient("left");
+
+var line = d3.svg.line()
+    .x(function(d) { return x(d.water_year); })
+    .y(function(d) { return y(d.change); });
+
+linedata = linedata.map(function(d) {
+  return {
+    water_year: parseDate(d.water_year),
+    change: +d["cumulative_change_in_storage_acre-feet"]
+  }
+});
+
+x.domain(d3.extent(linedata, function(d) { return d.water_year; }));
+y.domain(d3.extent(linedata, function(d) { return d.change; }));
+
+if (chart) {
+  chart.remove();
+}
+
+// svg.remove();
+
+chart = d3.select($graphic[0])
+  .append('svg')
+  .attr('class','gig-line-chart')
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  chart.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .attr('fill', 'white');
+
+  chart.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .attr('fill', 'white')
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("cumulative decrease in water storage (acre-feet)");
+
+  chart.append("path")
+      .datum(linedata)
+      .attr('fill', 'none')
+      .attr('stroke', 'white')
+      .attr("class", "line")
+      .attr("d", line);
+}
+
 function getNewStep(progress) {
+  /*
+  *returns the correct step based on progress
+  */
   var padding = 0.05;
   progress = progress - padding;
   var breaks = [] //store each progress break point in this array
@@ -433,7 +539,8 @@ function setSlide(newSlide) {
 //maps each step to a function
 var stepMap = {
   1: stepOne,
-  2: stepTwo
+  2: stepTwo,
+  3: stepThree
 }
 
 function stepOne() {
@@ -457,7 +564,12 @@ function stepOne() {
 
 function stepTwo() {
   zoomIn([-119.327555, 36.143740], 2); 
+  $graphic.removeClass('gig-step-3');
   map.classed("gig-county-highlight", true);
+}
+
+function stepThree() {
+  $graphic.addClass('gig-step-3');
 }
 
 function addOgallalaHighlight() {
