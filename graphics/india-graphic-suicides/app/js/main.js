@@ -65,6 +65,7 @@ function setup() {
   WIDTH = window.innerWidth;
   HEIGHT = window.innerHeight;
 
+
   slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
 
   document.addEventListener('scroll', updatePosition);
@@ -72,6 +73,7 @@ function setup() {
 
   $el = $(id);
   $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
+  setStep(currentStep);
 
   if (debugMode) {
     $('body').append('<div id="debug"></div>');
