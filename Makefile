@@ -1,6 +1,8 @@
 DBNAME=gwater # the name of the database you're using. you can name this whatever you want.
 
-topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json data/output_data/california_wells.topo.json data/output_data/peru.topo.json
+all: topojson_files data/output_data/tulare_dry_wells.csv
+
+topojson_files: data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json data/output_data/california_wells.topo.json data/output_data/peru.topo.json, data/output_data/world_aquifers.topo.json
 
 #peru/south american shapes
 data/output_data/peru.topo.json: data/shapefiles/PER_adm/PER_adm3.shp data/output_data/south_america.geo.json
@@ -42,6 +44,12 @@ data/output_data/aquifer_gw_anomolies.csv:
 	python data/scripts/aquifer_clean.py data/output_data/aquifer_gw_tmp.csv > $@
 	rm data/output_data/aquifer_gw_tmp.csv
 
+
+
+##California wells
+
+data/output_data/tulare_dry_wells.csv:
+	in2csv data/input_data/Export_Output_XYCoordinates_Dry_Wells.xlsx | csvcut -c 1,2 > $@	
 
 data/output_data/california_wells.topo.json: data/output_data/california_wells_w_fips.csv data/shapefiles/CA/CA.shp
 	topojson \
