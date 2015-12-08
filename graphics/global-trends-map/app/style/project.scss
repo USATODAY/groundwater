@@ -1,8 +1,273 @@
-@import "base/fonts";
-@import "base/colors";
-@import "base/shadows";
-@import "base/base";
-@import "base/typography";
-@import "base/buttons";
-@import "base/graphic";
-@import "base/fullWidth";
+html, body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+.gig-embed {
+  background: black;
+  left:0;
+}
+
+#gig-slider {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    background: #ccc;
+    overflow: hidden;
+}
+
+.gig-slider.gig-map-slider {
+    position: absolute;
+    width: 100%;
+    .gig-slider-panel-text-container {
+      position: static;
+      top: auto;
+      left: auto;
+      text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8); 
+      transform: none;
+    }
+  .gig-slider-panel {
+      height: auto;
+  }
+}
+
+.gig-embed h3.gig-title {
+  color: #FFCB00;
+  font-family: "Futura Today Light", Arial, sans-serif; 
+  font-size: 2.5em;
+  margin: 1em auto 0 auto;
+  text-align: center;
+
+  @media(max-width: 800px) {
+    font-size: 1.5em;
+  }
+
+  &:after {
+    content: "";
+    display: block;
+    border-bottom: solid 1px white;
+    margin: 10px auto;
+    width: 100px;
+  }
+}
+
+.gig-slider {
+
+  &-panel {
+    position: relative;
+    width: 100%;
+    //background-color: blue;
+    z-index: 6;
+    &-text-container {
+      position: absolute;
+      top: 50%;
+      left: 15%;
+      color: #ffffff;
+      font-family: 'Futura Today Light', sans-serif;
+      font-size: 1.75em;
+      text-align: center;
+      margin-top: 0;
+      max-width: 28em;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.75);
+      transform: translateY(-50%);
+      z-index: 800;
+       @media(max-width: 800px) {
+        font-size: 1.25em;
+      }
+    }
+  }
+  &-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover !important;
+    z-index: 5;
+    opacity: 0;
+    &:first-child {
+      opacity: 1;
+    }
+    &.fixed {
+      position: fixed;
+    }
+  }
+}
+
+.gig-slider-panel {
+  // height: 800px;
+  margin: 0 auto;
+  max-width: 800px;
+  width: 90%;
+}
+
+
+/* map */
+
+.gig-map {
+  position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 5;
+    backface-visibility: hidden;
+    &:first-child {
+      opacity: 1;
+    }
+    &.fixed {
+      position: fixed;
+    }
+    &.bottom {
+      top: auto;
+    }
+  }
+
+
+.map-legend {
+  bottom: 0;
+  color: white;
+  font-family: "Futura Today Light", Arial, sans-serif;
+  padding: 10px;
+  position: absolute;
+  text-align: center;
+  left: 50%;
+  transform: translate(-50%, 0);
+  p {
+    color: white;
+  }
+}
+
+.gig-legend-entry {
+  display: inline-block;
+  max-width: calc(25% - 2px);
+  text-align: center;
+}
+
+.gig-legend-entries {
+  margin-top: 10px;
+}
+
+.gig-legend-color {
+  display: block;
+  height: 12px;
+  margin: 5px 1px;
+  max-width: 100%;
+  width: 50px;
+}
+
+.gig-progress-indicator-wrap {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.gig-progress-entry {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  margin: 5px 0;
+  height: 10px;
+  width: 10px;
+
+  &.gig-progress-current {
+    background: rgba(255, 255, 255, 1);
+  }
+}
+
+svg {
+  display: block;
+  margin: 0 auto;
+}
+
+
+#sphere {
+  fill: none;
+}
+
+.counties path.county-active {
+  stroke: white;
+  stroke-width: 1px;
+  z-index: 100;
+}
+
+#details {
+  display: none;
+}
+
+.country-shape {
+  fill: rgba(255, 255, 255, 0.21);
+  stroke: white;
+  stroke-width: 1px;
+}
+
+#india-map {
+  background: black;
+}
+
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-width: .5px;
+  stroke-opacity: 1;
+}
+
+.triangle {
+  &:after {
+    border-top: solid 10px white;
+    border-left: solid 10px transparent;
+    border-right: solid 10px transparent;
+    content:'';
+    height: 0;
+    left: 50%;
+    position: absolute;
+    top: 100%;
+    transform: translate(-50%, 0);
+    width: 0;
+  }
+}
+
+.gig-tooltip {
+  background: white;
+  // border-radius: 8px;
+  border: solid 1px white;
+  color: black;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.22));
+  font-family: "Futura Today Light", Arial, sans-serif;
+  padding: 0.5em;
+  position: absolute;
+  transform: translate(-50%, -100%);
+  // width: 200px;
+  p { 
+    color: black;
+    margin: 0;
+  }
+  @extend .triangle;
+}
+
+#sphere {
+  fill: none;
+}
+
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-width: .5px;
+  stroke-opacity: 1;
+}
+
+.q0-9 { fill:#d73027; }
+.q1-9 { fill:#f46d43; }
+.q2-9 { fill:#fdae61; }
+.q3-9 { fill:#fee08b; }
+.q4-9 { fill:#ffffbf; }
+.q5-9 { fill:#d9ef8b; }
+.q6-9 { fill:#a6d96a; }
+.q7-9 { fill:#66bd63; }
+.q8-9 { fill:#1a9850; }

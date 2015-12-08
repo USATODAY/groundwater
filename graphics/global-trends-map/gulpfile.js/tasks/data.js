@@ -4,7 +4,7 @@ var config      = require('../config/data');
 var gulp        = require('gulp');
 
 gulp.task('data', function() {
-  return gulp.src(config.src + "*.json")
+  return gulp.src(config.src + "*")
     .pipe(changed(config.dest)) // Ignore unchanged files
     .pipe(gulp.dest(config.dest))
     .pipe(browserSync.reload({stream:true}));

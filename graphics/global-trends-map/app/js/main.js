@@ -1,42 +1,232 @@
-//Global Variables
-var width = 960;
-var height = 600;
+if (typeof window.mobileCheck != "function") {
+  window.mobileCheck = function() {
+    var check = false;
+    (function(a,b){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|ad|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+    return check;
+  };
+}
+
+/**
+ * Setup Slider Interactive
+ */
+
+var GRAPHICINFO = require("../data/GRAPHICINFO.json");
+var id = '#' + GRAPHICINFO.GRAPHIC_SLUG;
+var WIDTH;
+var HEIGHT;
+
+var $el;                    // jquery saved reference to element
+var offsetTop;              // offsetTop of id
+var elHeight;               // total height of id
+var progress;               // progress of scroll through entire element from 0 - 1
+var progressBottom;               // progress of scroll compared to bottom of container
+var progressPerSlide;       // progress of the scroll through specific slide
+var progressWeight = 1.5;   // weighted factor to move animation progress faster (to finish animation before slide is out of view)
+var targetValue;            // ending value for animation property
+var pos;                    // position of scrollTop
+
+var slidesLength;           // length of total slides in GRAPHICINFO.SLIDER_IMAGES
+var sliderPosArray = [];    // array to store offset().top positions internally
+
+var debugMode = false;      // set [true] to enable box to output stuff
+var $debug;                 // jquery saved reference to debug element
+
 var $window;
 var $graphic;
 var $details;
-var GRAPHICINFO = require("../data/GRAPHICINFO.json");
-var VAL_COLUMN = "sub-surface_storage_trends_mm_per_yr";
+var $sliderBG;
+var $embedModule;
+var VAL_COLUMN = "avg_chg";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
-var topojson_features_obj = "world_aquifer_systems_nocoast";
+var topojson_features_obj = "ne_110m_land";
 var _ = require("lodash");
 var queue = require("queue-async");
 var tooltip;
 var path;
-
-//bundle map data into file
+var svg;
+var map;
+var scale;
+var currentStep = 1;
+var projection;
+var width = 960;
+var height = 600;
+var transisitonDuration;
 var GRAPHICDATA;
+var GRAPHICDATA2;
 
-var scaleBreaks = [-10, -2];
-var scaleColors = ['#F6EB16','#F5AE1B', '#de862e'];
+function prepareContainers() {
+  // set app container to height of viewport
+  // $el.height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
+  // $el.find('.gig-slider-panel').height(HEIGHT);
+  $el.find('.gig-slider-panel-text-container').css({"margin-bottom": HEIGHT - 75});
+  $el.find('.gig-slider-background').height(HEIGHT);
+  $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
+  $embedModule.height(HEIGHT * slidesLength);
+  $el.height(HEIGHT * slidesLength);
+  console.log($el.height());
+  console.log("embed", $embedModule.height());
+  // $('.gig-slider-container').height(HEIGHT);
+
+  // set framework wrapper container to height of viewport plus length of scroll
+  // if ( $(id).parents('.story-oembed') ) {
+  //   $(id).parents('.story-oembed').height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
+  // }
+}
+
+function setup() {
+  WIDTH = window.innerWidth;
+  // HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  // if (window.mobileCheck()) {
+    window.HEIGHT = HEIGHT = window.innerHeight;
+  // }
+  $sliderBG = $('#gig-slider-background-1');
+  transisitonDuration = window.mobileCheck() ? 0 : 500;
+
+  slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
+
+  document.addEventListener('scroll', updatePosition);
+  document.addEventListener('touchmove', updatePosition);
+
+  $el = $(id);
+  getNewStep();
+  
+  if (debugMode) {
+    $('body').append('<div id="debug"></div>');
+    $('#debug').css({
+        'position': 'fixed',
+        'bottom': '20px',
+        'right': '20px',
+        'padding': '20px',
+        'background-color': 'orange',
+        'z-index': '99999',
+        'font-size': '2em'
+    });
+  }
+  $debug = $('#debug');
+
+  prepareContainers();
+
+  offsetTop = $el.offset().top;
+  elHeight  = $el.height();
+
+  setDataPosition();
+  start();
+}
+
+/**
+ * [setDataPosition]
+ * sets data attribute with offset().top position of each slide
+ * also stores values in an array for internal use
+ */
+function setDataPosition() {
+  $el.find('.gig-slider-panel').each(function(i, val) {
+    $(val).attr('data-pos', $(val).offset().top);
+    sliderPosArray.push( $(val).offset().top );
+  });
+  sliderPosArray.push( sliderPosArray[sliderPosArray.length-1] + HEIGHT );
+}
+
+function updatePosition(e) {
+  pos = $(document).scrollTop();
+  offsetTop = $el.offset().top;
+  progress = (pos - offsetTop)/elHeight;
+  if (pos + window.innerHeight > offsetTop) {
+    progressBottom = ((pos + window.innerHeight) - offsetTop)/(elHeight);
+  } else {
+    progressBottom = 0;
+  }
+  if (debugMode) $debug.html(progressBottom);
+
+  
+
+  // for (var i = 0; i < sliderPosArray.length + 1; i++) {
+  //   if ( pos > sliderPosArray[i] && pos <= sliderPosArray[i+1] ) {
+  //     progressPerSlide = (pos - sliderPosArray[i]) / HEIGHT;
+
+      /**
+       * PER SLIDE CODE GOES HERE
+       * use [progressPerSlide] to get progress of current slide 0-1
+       */
+
+       // if ( (progressPerSlide * progressWeight) < 0 ) {
+       //   targetValue = 0;
+       // }
+       // else if ( (progressPerSlide * progressWeight) < 1 ) {
+       //   targetValue = (progressPerSlide * progressWeight);
+       // }
+       // else {
+       //   targetValue = 1;
+       // }
+
+       // $el.find('.gig-slider-background').eq(i+1).css({
+       //   'opacity': targetValue
+       // });
+       // if ( $el.find('.gig-slider-background').eq(i+2) ) {
+       //   $el.find('.gig-slider-background').eq(i+2).css({
+       //     opacity: 0
+       //   });
+       // }
+
+       /* END PER SLIDE CODE */
+  //   }
+  // }
+
+  /**
+   * ENTIRE ELEMENT PROGRESS ANIMATION GOES HERE
+   * use [progress] to get progress of current slide 0-1
+   */
+
+   //fix bg 
+  if (progress > 0 && progressBottom < 1) {
+    $graphic.addClass("fixed");
+  } else {
+    $graphic.removeClass("fixed");
+  }
+
+  var newStep = getNewStep(progressBottom);
+  if (newStep != currentStep) {
+    setSlide(newStep);
+  }
+  // if (progress > .3 ) {
+    // nextStep();
+  // } else {
+    // previousStep();
+  // }
+   if (progressBottom >= 1) {
+     $graphic.addClass("bottom");
+   } else {
+     $graphic.removeClass("bottom");
+   }
+   if ( pos < offsetTop ) {
+     $el.find('.gig-slider-background').eq(0).css({
+       opacity: 1
+     });
+   }
+
+   /* END SLIDE CODE */
+}
+
+
+/*
+* Begin map code
+*/
+var scaleBreaks = [-15, -5, 0];
+var scaleColors = ['#de862e','#F5AE1B', '#F6EB16'];
 
 var colorScale = function(input) {
   var r;
   if (input <= scaleBreaks[0]) {
-  console.log(input);
-    r = scaleColors[2];
+    r = scaleColors[0];
   } else if (input <= scaleBreaks[1]) {
     r = scaleColors[1];
   } else {
-    r = scaleColors[0];
+    r = scaleColors[2];
   }
-  console.log(r);
   return r;
 }
-
-var COLORS2 = ['#feedaf','#fee27b','#fecb2e'].reverse();
-var COLORS = ['#addefd','#77cafd','#1b9efc'];
-// var scaleBreaks = [0, 5, 15];
-var scaleBreaks2 = [-15, -5, 0];
+// var colorScale = d3.scale.quantize()
+//   .domain(scaleBreaks)
+//   .range(scaleColors);
 
 function getDataURL(dataURL) {
   var hostname = window.location.hostname;
@@ -49,81 +239,75 @@ function getDataURL(dataURL) {
   } else {
     dataURL = "http://" + hostname + "/services/webproxy/?url=" + dataURL;
   }
+  console.log(dataURL);
   return dataURL;
 }
 
 
 function getColor(val) {
     if (val < 0) {
-        if (val < scaleBreaks2[0]) {
-          return COLORS2[0];
-        } else if (val < scaleBreaks2[1]) {
-          return COLORS2[1];
-        } else if (val < scaleBreaks2[2]) {
-          return COLORS2[2];
-        } else if (val < scaleBreaks2[3]) {
-          return COLORS2[3];
-        } else {
-          return COLORS2[4];
-        }
+        return colorScale(val);
+    } else if (val === 0) {
+          return "none";
     } else {
-        if (val > scaleBreaks[4]) {
-          return COLORS[4];
-        } else if (val > scaleBreaks[3]) {
-          return COLORS[3];
-        } else if (val > scaleBreaks[2]) {
-          return COLORS[2];
-        } else if (val > scaleBreaks[1]) {
-          return COLORS[1];
-        } else {
-          return COLORS[0];
-        }
+          return '#0095C4';
     }
 }
 
 function start() {
     $window = $(window);
-    $graphic = $('#' + GRAPHICINFO.GRAPHIC_SLUG);
+    $graphic = $el.find(".gig-map");
     $details = $graphic.find('#details');
     queue()
       .defer(d3.json, DATA_URL)
-      .defer(d3.json, "data/split.json")
-      .await(ready);
-    // d3.json(DATA_URL, ready);
-    addEventListeners();
+      // .defer(d3.json, ogallalaDataURL)
+      .await(draw);
 }
 
 
 function addLegend() {
-    var html = "<div class='map-legend'>change in water level in feet<div>";
-    scaleBreaks.reverse().forEach(function(breakpoint, i) {
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + COLORS.reverse()[i] +"'></span><span>>" + breakpoint + "</span>";
+    var html = "<div class='map-legend'>average decrease in water levels<div class='gig-legend-entries'>";
+    scaleBreaks.forEach(function(breakpoint, i) {
+        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + colorScale(breakpoint) +"'></span><span>" + Math.abs(breakpoint) + " ft.</span></div>";
     });
-    scaleBreaks2.reverse().forEach(function(breakpoint, i) {
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + COLORS2.reverse()[i] +"'></span><span><" + breakpoint + "</span>";
-    });
+    
+        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>none</span></div>";
+        html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
+   
     html += "</div>"
-    $('#legend').html(html);
+    $graphic.append(html);
 }
 
-function ready(err, data, data2) {
-  console.log(data);
-  console.log(data2);
+var reDraw = _.throttle(draw, 500, {
+  leading: true,
+  trailing: true
+});
+
+function draw(err, data) {
     width = $(window).width();
     height = width * (9/16);
-    $graphic.empty();
-    if (GRAPHICINFO.FULL_WIDTH) {
-      $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.story-asset').height(height);
+    scale = width/1.2;
+    if (width < 800) {
+      scale = width;
     }
+
+    if (scale > 1200) {
+      scale = 1200;
+    }
+    $graphic.empty();
+    console.log(data);
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
+    // if(!GRAPHICDATA2) {
+    //   GRAPHICDATA2 = data2;
+    // }
     var geo = {
       type: "FeatureCollection",
       features: topojson.feature(data, data.objects[topojson_features_obj]).features
     };
 
-    var center = d3.geo.centroid(geo);
+     var center = d3.geo.centroid(geo);
 
     var projection = d3.geo.naturalEarth()
     .scale(width / 6)
@@ -137,7 +321,7 @@ function ready(err, data, data2) {
 
 
 
-    var svg = d3.select("#" + GRAPHICINFO.GRAPHIC_SLUG).append("svg")
+    var svg = d3.select($graphic[0]).append("svg")
     .attr("width", width)
     .attr("height", height)
     .attr("fill", "rgba(255, 255, 255, 0.5)")
@@ -152,14 +336,14 @@ function ready(err, data, data2) {
     .attr("class", "stroke")
     .attr("xlink:href", "#sphere");
 
-svg.append("use")
-    .attr("class", "fill")
-    .attr("xlink:href", "#sphere");
+    svg.append("use")
+        .attr("class", "fill")
+        .attr("xlink:href", "#sphere");
 
-svg.append("path")
-    .datum(graticule)
-    .attr("class", "graticule")
-    .attr("d", path);
+    svg.append("path")
+        .datum(graticule)
+        .attr("class", "graticule")
+        .attr("d", path);
 
 
     svg.append('path')
@@ -167,83 +351,175 @@ svg.append("path")
       .attr("class", "country-shape")
       .attr('fill', 'rgba(255, 255, 255, 0.25)')
       .attr("d", path);
-
-    // svg.append("g")
-    //   .attr("class", "india-states")
-    // .selectAll("path")
-    //   .data(geo.features)
-    // .enter().append("path")
-    //   .attr("fill", function(d) { 
-    //           // console.log(path.centroid(d));
-    //           if (d.properties[VAL_COLUMN]) {
-    //             return getColor(+d.properties[VAL_COLUMN]);
-    //           } else {
-    //             return "none";
-    //           }
-    //   })
-    //   .attr("d", path)
-    //   .on("mouseover", mouseover)
-    //   .on("mousemove", mousemove)
-    //   .on("mouseout", mouseout);
-
-      svg.append("g")
-        .selectAll("path")
-        .data(data2.features)
-        .enter()
-        .append("path")
-        .attr("fill", function(d) {
-          if (d.properties.DN > 0) {
-            return "#1b9efc";
-          } else {
-            return colorScale(d.properties.DN);
-          }
-        })
-        // .attr("opacity", 0.5)
-        .attr("d", path);
-
-     tooltip = d3.select("#" + GRAPHICINFO.GRAPHIC_SLUG).append("div")
-        .attr("class", "gig-tooltip")
-        .style("display", "none");
-
       addLegend();
-      
+      addProgressIndicator();
+}
 
+function addProgressIndicator() {
+  var html = '<div class="gig-progress-indicator-wrap">'
+  _.each(GRAPHICINFO.SLIDER_IMAGES, function(image, i) {
+    html += '<div class="gig-progress-entry"></div>';
+  });
+  
+  html += '</div>'
+  $graphic.append(html);
+}
+
+//returns the correct step based on progress
+function getNewStep(progress) {
+  var padding = 0.05;
+  progress = progress - padding;
+  var breaks = [] //store each progress break point in this array
+  _.each(d3.range(1,slidesLength), function(slideIndex) {
+    var stepBreak = (1/slidesLength) * slideIndex;
+    breaks.push(stepBreak);
+  });
+  if (progress > breaks[2]) {
+    return 4;
+  } else if (progress > breaks[1]) {
+    return 3;
+  } else if (progress > breaks[0]) {
+    return 2;
+  } else {
+    return 1;
+  }
+}
+
+function setSlide(newSlide) {
+  currentStep = newSlide;
+  stepMap[newSlide]();
+  var progressEntries = $el.find('.gig-progress-entry');
+  progressEntries.removeClass('gig-progress-current');
+  progressEntries.eq(newSlide - 1).addClass('gig-progress-current');
+}
+
+//maps each step to a function
+var stepMap = {
+  1: removeOgallalaOutline,
+  2: addOgallalaOutline,
+  3: addOgallalaHighlight,
+  4: showHaskell
+}
+
+function removeOgallalaOutline() {
+  map.classed('gig-step-2', false);
+  var label = map.select('.gig-aquifer-label')
+    .transition()
+    .duration(transisitonDuration)
+    .attr('opacity', 0);
+
+  var shape = map.select('.ogallala-shape')
+    .transition()
+    .duration(transisitonDuration)
+    .attr('opacity', 0);
+
+  label.remove()
+  shape.remove();
+}
+
+function addOgallalaOutline() {
+  removeOgallalaHighlight();
+  map.classed('gig-step-2', true);
+  var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
+
+  var textLabel = map.append('g')
+    .attr('class', 'gig-aquifer-label')
+    .attr('transform', 'translate(' + projection([-95.295983, 39.464040]) + ')')
+    .append('text')
+    .attr('transform', 'translate(-10, 0)')
+    .attr('fill', 'white')
+    .attr('font-size', 14)
+    .text("Ogallala Aquifer");
+
+  var shape = map.append("path")
+        .data(ogallala_data)
+        .attr("class", "ogallala-shape")
+        .attr("stroke", "white")
+        .attr("stroke-width", 1)
+        .attr("fill", "rgba(255, 255, 255, 0.9)")
+        .attr("opacity", 0)
+        .attr("d", path);
+ shape
+    .transition()
+    .duration(transisitonDuration)
+    .attr('opacity', 0.8);
+
+}
+
+function addOgallalaHighlight() {
+  removeOgallalaOutline();
+  map.classed("gig-haskell-highlight", false);
+  zoomIn([-100.851404, 37.482529], 2);
+  map.classed("gig-haskell-highlight", false);
+  map.classed("gig-county-highlight", true);
+  map.select('.county-detail-text').remove();
+}
+
+function removeOgallalaHighlight() {
+  zoomOut();
+  map.classed("gig-county-highlight", false);
+}
+
+function showHaskell() {
+  // zoomIn([-100.851404, 37.482529], 3);
+  map.append('g')
+    .attr('class', 'county-detail-text')
+    .attr('transform', 'translate(' + projection([-100.851404, 37.482529]) + ')')
+    .append('text')
+    .attr("fill", "white")
+    .attr('transform', 'translate(10, 5)')
+    .text('Haskell County, KS')
+    .attr('font-size', 10);
+
+
+  map.classed("gig-county-highlight", false);
+  map.classed("gig-haskell-highlight", true);
+}
+
+function zoomIn(center, zoomLevel) {
+  var coordinates = projection(center);
+  map.transition()
+      .duration(transisitonDuration)
+      .attr("transform", "translate(" + ((width/2) - (coordinates[0] * zoomLevel)) + ", " + ((HEIGHT/2) - coordinates[1] * zoomLevel) + ")scale(" + zoomLevel + ")");
+}
+
+function zoomOut() {
+  map.transition()
+      .duration(transisitonDuration)
+      .attr("transform", "");
 }
 
 function mouseover(d) {
   tooltip.style("display", "block");
-  tooltip.text(d.properties.aquifer_name);
+  tooltip.html("<p>" + d.properties.n + " county</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
 }
 
 function mousemove() {
+  var top = (d3.event.pageY - 12) - $window.scrollTop();
+  if (progress <= 0) {
+    top = top - (offsetTop - $(document).scrollTop());
+  }
+  // if ($embedModule.length > 0) {
+  //   top = top - $embedModule.offset().top;
+  // }
   tooltip
       .style("left", (d3.event.pageX) + "px")
-      .style("top", (d3.event.pageY - 12) + "px");
+      .style("top", top + "px");
 }
 
 function mouseout(d) {
   tooltip.style("display", "none");
 }
 
-function addEventListeners() {
-  $window.on("resize", function(e) {
-    _.throttle(ready, 200)(GRAPHICDATA);
-  });
-}
 
-function getGraphicLocation() {
-  var windowScroll = $window.scrollTop();
-  var graphicTop = $graphic.offset().top;
-  return graphicTop - windowScroll;
-}
 
-function onScroll(e) {
-  var graphicLocation = getGraphicLocation();
-  if (graphicLocation <= 0) {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log("top!");
-  }
-  console.log(graphicLocation);
-}
-document.addEventListener("DOMContentLoaded", start);
+document.addEventListener('DOMContentLoaded', setup);
+window.addEventListener('resize', function() {
+  WIDTH = window.innerWidth;
+  HEIGHT = window.innerHeight;
+  prepareContainers();
+  elHeight = $el.height();
+  offsetTop = $el.offset().top;
+  setDataPosition();
+  reDraw(null, GRAPHICDATA, GRAPHICDATA2);
+});

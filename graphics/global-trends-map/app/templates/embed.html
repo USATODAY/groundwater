@@ -1,8 +1,30 @@
-{% extends 'layouts/embed.html' %}
+<div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}" class="gig-slider gig-map-slider gig-embed">
+  {% for item in GRAPHICINFO.SLIDER_IMAGES %}
+  <div id="gig-slider-background-{{ loop.index }}"
+       class="gig-slider-background"
+       style=""></div>
+  {% endfor %}
+  {% for item in GRAPHICINFO.SLIDER_IMAGES %}
+  <div class="gig-slider-panel">
+    {% if loop.index == 1 %}
+    <h3 class="gig-title">{{GRAPHICINFO.HEADLINE}}</h3>
+    {% endif %}
+    <div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}-panel-text-container-{{ loop.index }}"
+         class="gig-slider-panel-text-container">{{ item.title }}</div>
+  </div>
+  {% endfor %}
+  <div class="gig-map"></div>
+</div>
 
-{% block content %}
-{% endblock %}
+<!--
 
-{% block javascript %}
-<script src="js/main.js"></script>
-{% endblock %}
+{# for item in GRAPHICINFO.SLIDER_IMAGES #}
+  <li id="{{ GRAPHICINFO.GRAPHIC_SLUG }}-panel-{{ loop.index }}"
+       class="gig-slider-panel"
+       style="background-image: url({{ item.img }});">
+    <div id="{{ GRAPHICINFO.GRAPHIC_SLUG }}-panel-text-container-{{ loop.index }}"
+         class="gig-slider-panel-text-container">{{ item.title }}</div>
+  </li>
+{# endfor #}
+
+-->
