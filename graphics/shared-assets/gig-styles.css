@@ -97,6 +97,8 @@ html, body {
     top: auto;
     left: auto;
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+    -webkit-transform: none;
+    -ms-transform: none;
     transform: none; }
   .gig-slider.gig-map-slider .gig-slider-panel {
     height: auto; }
@@ -132,6 +134,8 @@ html, body {
     margin-top: 0;
     max-width: 28em;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.75);
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
     transform: translateY(-50%);
     z-index: 800; }
     @media (max-width: 800px) {
@@ -185,6 +189,8 @@ html, body {
   position: absolute;
   text-align: center;
   left: 50%;
+  -webkit-transform: translate(-50%, 0);
+  -ms-transform: translate(-50%, 0);
   transform: translate(-50%, 0); }
   .map-legend p {
     color: white; }
@@ -208,6 +214,8 @@ html, body {
   position: absolute;
   right: 10px;
   top: 50%;
+  -webkit-transform: translate(0, -50%);
+  -ms-transform: translate(0, -50%);
   transform: translate(0, -50%); }
 
 .gig-progress-entry {
@@ -232,6 +240,8 @@ svg {
   left: 50%;
   position: absolute;
   top: 100%;
+  -webkit-transform: translate(-50%, 0);
+  -ms-transform: translate(-50%, 0);
   transform: translate(-50%, 0);
   width: 0; }
 
@@ -243,6 +253,8 @@ svg {
   font-family: "Futura Today Light", Arial, sans-serif;
   padding: 0.5em;
   position: absolute;
+  -webkit-transform: translate(-50%, -100%);
+  -ms-transform: translate(-50%, -100%);
   transform: translate(-50%, -100%); }
   .gig-tooltip p {
     color: black;
