@@ -54,7 +54,7 @@ var $embedModule;
 var VAL_COLUMN = "avg_chg";
 var VAL_COLUMN_2 = "reported_outages";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
-var DATA_URL_2 = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-california-map/data/central_valley_storage.csv");
+var DATA_URL_2 = getDataURL(GRAPHICINFO.DATA_URL_2);
 var topojson_features_obj = "counties";
 var topojson_features_obj_2 = "CA";
 var _ = require("lodash");
@@ -75,19 +75,10 @@ var GRAPHICDATA2;
 
 
 function prepareContainers() {
-  // set app container to height of viewport
-  // $el.height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
-  // $el.find('.gig-slider-panel').height(HEIGHT);
   $el.find('.gig-slider-panel-text-container').css({"margin-bottom": HEIGHT - 75});
   $el.find('.gig-slider-background').height(HEIGHT);
   $el.height(HEIGHT * slidesLength);
   $embedModule.height(HEIGHT * slidesLength + 30);
-  // $('.gig-slider-container').height(HEIGHT);
-
-  // set framework wrapper container to height of viewport plus length of scroll
-  // if ( $(id).parents('.story-oembed') ) {
-  //   $(id).parents('.story-oembed').height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
-  // }
 }
 
 function setup() {
@@ -161,24 +152,7 @@ function updatePosition(e) {
        * use [progressPerSlide] to get progress of current slide 0-1
        */
 
-       // if ( (progressPerSlide * progressWeight) < 0 ) {
-       //   targetValue = 0;
-       // }
-       // else if ( (progressPerSlide * progressWeight) < 1 ) {
-       //   targetValue = (progressPerSlide * progressWeight);
-       // }
-       // else {
-       //   targetValue = 1;
-       // }
 
-       // $el.find('.gig-slider-background').eq(i+1).css({
-       //   'opacity': targetValue
-       // });
-       // if ( $el.find('.gig-slider-background').eq(i+2) ) {
-       //   $el.find('.gig-slider-background').eq(i+2).css({
-       //     opacity: 0
-       //   });
-       // }
 
        /* END PER SLIDE CODE */
   //   }
@@ -326,6 +300,11 @@ function ready(err, data, data2) {
       }
     });
 
+    data2.forEach(function(d) {
+      d["POINT_X"] = +d["POINT_X"];
+      d["POINT_Y"] = +d["POINT_Y"];
+    });
+
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
@@ -378,7 +357,10 @@ function ready(err, data, data2) {
         .attr('class', function(d) {
           var classname = '';
           if (d.properties.cv == 't') {
-            classname += 'us-county-highlight';
+            classname += 'us-county-highlight ';
+          }
+          if (d.properties.county == "Tulare") {
+            classname += 'gig-step-3-highlight-item';
           }
           return classname;
         })
@@ -395,7 +377,30 @@ function ready(err, data, data2) {
         .on("mousemove", mousemove)
         .on("mouseout", mouseout);
 
-    drawLineChart(data2);
+    map2.append('g')
+      .attr('class' ,'gig-step-3-label')
+      .attr('transform', 'translate(' + projection([-119.327555, 36.143740]) + ')')
+      .append('text')
+      .attr('font-size', 6)
+      .attr('fill', 'white')
+      .attr('transform', 'translate(50, 0)')
+      .text('Tulare County');
+
+    map2.append('g')
+      .attr('class', 'gig-wells')
+      .selectAll('circle')
+      .data(data2)
+      .enter()
+      .append('circle')
+      .attr('r', 0.5)
+      .attr('opacity', 0)
+      .attr('fill', 'none')
+      .attr('stroke', 'white')
+      .attr('stroke-width', 0.25)
+      .attr('transform', function(d) {
+        var pos = projection([d["POINT_X"], d["POINT_Y"]]);
+        return 'translate(' + pos + ')';
+      });
 
       
 
@@ -409,102 +414,6 @@ function ready(err, data, data2) {
       setSlide(getNewStep());
 }
 
-function drawLineChart(linedata) {
-  /*
-  * Takes an array of data and draws a line chart.
-  */
-  var margin = {top: 20, right: 20, bottom: 30, left: 80},
-    width = 960 - margin.left - margin.right,
-    height = 540 - margin.top - margin.bottom
-    
-    if (width > WIDTH) {
-      width = WIDTH - margin.left - margin.right;
-      height = width / (16/9);
-    }
-    console.log(height);
-
-
-var parseDate = d3.time.format("%Y").parse;
-
-var x = d3.time.scale()
-    .range([0, width]);
-
-var y = d3.scale.linear()
-    .range([height, 0]);
-
-var ticksX = 10;
-var ticksY = 10;
-var roundTicksFactor = 5;
-
-// Mobile
-if (window.innerWidth < 800) {
-    ticksX = 5;
-    ticksY = 5;
-}
-
-
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .ticks(ticksX)
-    .orient("bottom");
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .ticks(ticksY)
-    .orient("left");
-
-var line = d3.svg.line()
-    .x(function(d) { return x(d.water_year); })
-    .y(function(d) { return y(d.change); });
-
-linedata = linedata.map(function(d) {
-  return {
-    water_year: parseDate(d.water_year),
-    change: +d["cumulative_change_in_storage_acre-feet"]
-  }
-});
-
-x.domain(d3.extent(linedata, function(d) { return d.water_year; }));
-y.domain(d3.extent(linedata, function(d) { return d.change; }));
-
-if (chart) {
-  chart.remove();
-}
-
-// svg.remove();
-
-chart = d3.select($graphic[0])
-  .append('svg')
-  .attr('class','gig-line-chart')
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  chart.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
-      .attr('fill', 'white');
-
-  chart.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-      .attr('fill', 'white')
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("cumulative decrease in water storage (acre-feet)");
-
-  chart.append("path")
-      .datum(linedata)
-      .attr('fill', 'none')
-      .attr('stroke', 'white')
-      .attr("class", "line")
-      .attr("d", line);
-}
 
 function getNewStep(progress) {
   /*
@@ -566,37 +475,24 @@ function stepTwo() {
   zoomIn([-119.327555, 36.143740], 2); 
   $graphic.removeClass('gig-step-3');
   map.classed("gig-county-highlight", true);
+    map.classed('gig-step-3-highlight', false);
+  d3.select('.gig-wells').selectAll('circle')
+    .transition()
+    .duration(500)
+    .attr('opacity', 0);
 }
 
 function stepThree() {
-  $graphic.addClass('gig-step-3');
-}
+  zoomIn([-119.327555, 36.143740], 6);
+  d3.select('.gig-wells').selectAll('circle')
+    .transition()
+    .duration(500)
+    .delay(function(d, i) {
+      return i;
+    })
+    .attr('opacity', 0.8);
 
-function addOgallalaHighlight() {
-  removeOgallalaOutline();
-  map.classed("gig-haskell-highlight", false);
-  zoomIn([-100.851404, 37.482529], 2);
-  map.classed("gig-haskell-highlight", false);
-  map.classed("gig-county-highlight", true);
-  map.select('.county-detail-text').remove();
-}
-
-function removeOgallalaHighlight() {
-  zoomOut();
-  map.classed("gig-county-highlight", false);
-}
-
-function showHaskell() {
-  // zoomIn([-100.851404, 37.482529], 3);
-  map.append('g')
-    .attr('class', 'county-detail-text')
-    .attr('transform', 'translate(' + projection([-100.851404, 37.482529]) + ')')
-    .append('text')
-    .attr("fill", "white")
-    .attr('transform', 'translate(10, 5)')
-    .text('Haskell, KS');
-  map.classed("gig-county-highlight", false);
-  map.classed("gig-haskell-highlight", true);
+    map.classed('gig-step-3-highlight', true);
 }
 
 function zoomIn(center, zoomLevel) {

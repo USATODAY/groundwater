@@ -57,3 +57,111 @@
       font-family: "Futura Today Bold", Arial,sans-serif;
     }
 }
+
+html, body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+.gig-embed {
+  background: black;
+  left:0;
+}
+
+#gig-slider {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  background: #ccc;
+  overflow: hidden;
+}
+
+.gig-slider.gig-map-slider {
+    position: absolute;
+    width: 100%;
+    .gig-slider-panel-text-container {
+      position: static;
+      top: auto;
+      left: auto;
+      text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8); 
+      transform: none;
+    }
+  .gig-slider-panel {
+      height: auto;
+  }
+}
+
+.gig-embed h3.gig-title {
+  color: #FFCB00;
+  font-family: "Futura Today Light", Arial, sans-serif; 
+  font-size: 2.5em;
+  margin: 1em auto 0 auto;
+  text-align: center;
+
+  @media(max-width: 800px) {
+    font-size: 1.5em;
+  }
+
+  &:after {
+    content: "";
+    display: block;
+    border-bottom: solid 1px white;
+    margin: 10px auto;
+    width: 100px;
+  }
+}
+
+.gig-slider {
+
+  &-panel {
+    position: relative;
+    width: 100%;
+    //background-color: blue;
+    z-index: 6;
+    &-text-container {
+      position: absolute;
+      top: 50%;
+      left: 15%;
+      color: #ffffff;
+      font-family: 'Futura Today Light', sans-serif;
+      font-size: 1.75em;
+      text-align: center;
+      margin-top: 0;
+      max-width: 28em;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.75);
+      transform: translateY(-50%);
+      z-index: 800;
+       @media(max-width: 800px) {
+        font-size: 1.25em;
+      }
+    }
+  }
+  &-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover !important;
+    z-index: 5;
+    opacity: 0;
+    &:first-child {
+      opacity: 1;
+    }
+    &.fixed {
+      position: fixed;
+    }
+  }
+}
+
+.gig-slider-panel {
+  // height: 800px;
+  margin: 0 auto;
+  max-width: 800px;
+  width: 90%;
+}

@@ -151,6 +151,26 @@ html, body {
   }
 }
 
+.gig-step-3-label {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.gig-step-3-highlight {
+    .gig-county-highlight path, .us-county-highlight {
+      opacity: 0.1;
+    }
+    .gig-step-3-highlight-item {
+      opacity: 1;
+      stroke: white;
+      stroke-width: 0.5
+    }
+
+    .gig-step-3-label {
+      opacity: 1;
+    }
+}
+
 
 .map-legend {
   bottom: 0;
