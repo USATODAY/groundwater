@@ -15,6 +15,9 @@ data/output_data/south_america.geo.json: data/shapefiles/ne_110m_land/ne_110m_la
 	mkdir -p data/shapefiles/south_america
 	ogr2ogr -f 'GeoJSON' -clipsrc -83.0 -55.4 -29.3 13.0 $@ $<
 
+data/output_data/peru_coordinates.csv:
+	in2csv data/input_data/Peru_coordinates.xlsx > $@
+
 
 #world aquifers
 data/output_data/world_aquifers.topo.json: data/output_data/aquifer_gw_anomolies.csv data/shapefiles/ne_110m_land/ne_110m_land.shp

@@ -1,8 +1,9 @@
 {
     "HEADLINE": "Ground Water Slider",
-    "GRAPHIC_SLUG": "gig-slider-kansas-map",
+    "GRAPHIC_SLUG": "gig-slider-peru-map",
     "CHATTER": "ABOUT THIS GRAPHIC",
-    "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-kansas-map/data/counties_with_level_changes.json",
+    "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-peru-map/data/peru.topo.json",
+    "DATA_URL_2": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-peru-map/data/peru_coordinates.csv",
     "FULL_WIDTH": true,
     "SOURCE": "USGS",
     "SLIDER_IMAGES": [
@@ -17,11 +18,6 @@
       {
         "title": "Across the southern High Plains, farms have been draining the aquifer.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
-      },
-      {
-        "title": "Haskell County in western Kansas is one of the areas where wells have been going dry and farms are threatened.",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
       }
-     
     ]
 }

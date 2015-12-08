@@ -53,7 +53,9 @@ var $sliderBG;
 var $embedModule;
 var VAL_COLUMN = "avg_chg";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
-var topojson_features_obj = "counties";
+var DATA_URL_2 = getDataURL(GRAPHICINFO.DATA_URL_2);
+var topojson_features_obj = "south_america.geo";
+var topojson_features_obj_2 = "PER_adm3";
 var _ = require("lodash");
 var queue = require("queue-async");
 var tooltip;
@@ -61,14 +63,14 @@ var path;
 var svg;
 var map;
 var scale;
-var currentStep = 1;
+var currentStep = 0;
 var projection;
 var width = 960;
 var height = 600;
 var transisitonDuration;
-var GRAPHICDATA;
-var GRAPHICDATA2;
-var ogallalaDataURL = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/map-scroll/data/ogallala.topojson.json");
+var GRAPHICDATA; //cache 1st data source
+var GRAPHICDATA2; //cache 2nd data source
+var centerCoordinates; //store coordinates for center of focus
 
 
 function prepareContainers() {
@@ -80,8 +82,6 @@ function prepareContainers() {
   $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
   $embedModule.height(HEIGHT * slidesLength + 30);
   $el.height(HEIGHT * slidesLength);
-  console.log($el.height());
-  console.log("embed", $embedModule.height());
   // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
@@ -94,7 +94,7 @@ function setup() {
   WIDTH = window.innerWidth;
   // HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
   // if (window.mobileCheck()) {
-    window.HEIGHT = HEIGHT = window.innerHeight;
+  HEIGHT = window.innerHeight;
   // }
   $sliderBG = $('#gig-slider-background-1');
   transisitonDuration = window.mobileCheck() ? 0 : 500;
@@ -105,7 +105,7 @@ function setup() {
   document.addEventListener('touchmove', updatePosition);
 
   $el = $(id);
-  getNewStep();
+  // getNewStep();
   
   if (debugMode) {
     $('body').append('<div id="debug"></div>');
@@ -201,6 +201,7 @@ function updatePosition(e) {
   }
 
   var newStep = getNewStep(progressBottom);
+  // console.log(newStep);
   if (newStep != currentStep) {
     setSlide(newStep);
   }
@@ -228,7 +229,10 @@ function updatePosition(e) {
 * Begin map code
 */
 var scaleBreaks = [-15, -5, 0];
-var scaleColors = ['#A56600','#F5AE1B', '#F6EB16'];
+var scaleColors = ['#de862e','#F5AE1B', '#F6EB16'];
+
+var rScale = d3.scale.linear()
+  .range([2, 10]);
 
 var colorScale = function(input) {
   var r;
@@ -277,7 +281,7 @@ function start() {
     $details = $graphic.find('#details');
     queue()
       .defer(d3.json, DATA_URL)
-      .defer(d3.json, ogallalaDataURL)
+      .defer(d3.csv, DATA_URL_2)
       .await(draw);
 }
 
@@ -303,14 +307,21 @@ var reDraw = _.throttle(draw, 500, {
 function draw(err, data, data2) {
     width = $(window).width();
     height = width * (9/16);
-    scale = width/1.2;
+    scale = HEIGHT / 2;
     if (width < 800) {
       scale = width;
     }
-    console.log(scale);
     $graphic.empty();
     console.log(data);
+    data2 = data2.map(function(d) {
+      return {
+        region: d.region,
+        volume_withdrawn: +d.volume_withdrawn,
+        coordinates: d.coordinates.split(', ').reverse()
+      }
+    });
     console.log(data2);
+    rScale.domain([0, d3.max(data2.map(function(d) {return d.volume_withdrawn}))]);
 
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
@@ -318,14 +329,16 @@ function draw(err, data, data2) {
     if(!GRAPHICDATA2) {
       GRAPHICDATA2 = data2;
     }
-    var geo = {
-      type: "FeatureCollection",
-      features: topojson.feature(data, data.objects[topojson_features_obj]).features
-    };
+    var geo = topojson.feature(data, data.objects[topojson_features_obj]);
+    var geo2 = topojson.feature(data, data.objects[topojson_features_obj_2]);
 
-    projection = d3.geo.albersUsa()
+    var center = d3.geo.centroid(geo);
+    centerCoordinates = d3.geo.centroid(geo2);
+
+    projection = d3.geo.mercator()
     .scale(scale)
-    .translate([WIDTH/2, HEIGHT / 2]);
+    .center(center)
+    .translate([WIDTH/2, HEIGHT / 2.5]);
 
     path = d3.geo.path()
       .projection(projection);
@@ -341,37 +354,54 @@ function draw(err, data, data2) {
         .attr("height", height)
         .attr("width", width);
 
-    map.append('path')
-      .datum(topojson.merge(data, data.objects["counties"].geometries))
+    map.selectAll('path')
+      .data(geo.features)
+      .enter()
+      .append('path')
       .attr("class", "country-shape")
       .attr("d", path);
 
     map.append("g")
-      .attr("class", "counties")
-      .selectAll("path")
-      .data(geo.features)
-      .enter().append("path")
+      .attr("class", "country-detail")
+      .append("path")
+      .datum(topojson.merge(data, data.objects[topojson_features_obj_2].geometries))
+      // .enter().append("path")
       .attr("fill", function(d) { 
-          if (d.properties[VAL_COLUMN]) {
-            return getColor(parseFloat(d.properties[VAL_COLUMN]));
-          } else {
-            return "none";
-          }
-      })
-      .attr("class", function(d) {
-          var classname = "";
-          if (d.properties.ogallala == "t") {
-            classname += " us-county-highlight";
-          } 
-          if (d.properties.fips == 20081) {
-            classname += " haskell-highlight";
-          }
-          return classname;
+          return "rgba(255, 255, 255, 0.75)";
+          // if (d.properties[VAL_COLUMN]) {
+          //   return getColor(parseFloat(d.properties[VAL_COLUMN]));
+          // } else {
+          //   return "none";
+          // }
       })
       .attr("d", path);
       // .on("mouseover", mouseover)
       // .on("mousemove", mousemove)
       // .on("mouseout", mouseout);
+
+      map.append('g')
+        .attr('class', 'gig-country-label')
+        .attr('transform', 'translate(' + projection(centerCoordinates) + ')')
+        .attr('fill', 'white')
+        .append('text')
+        .attr('transform', 'translate(15, 0)')
+        .text('Peru');
+
+      map.append('g')
+        .attr('class', 'gig-data-point-wrapper')
+        .selectAll('circle')
+        .data(GRAPHICDATA2)
+        .enter()
+        .append('circle')
+        .attr('r', 0)
+        .attr('fill', scaleColors[2])
+        .attr('opacity', 0.5)
+        .attr('cx', function(d) {
+          return projection(d.coordinates)[0];
+        })
+        .attr('cy', function(d) {
+          return projection(d.coordinates)[1];
+        });
 
       
 
@@ -398,19 +428,25 @@ function getNewStep(progress) {
   var padding = 0.05;
   progress = progress - padding;
   var breaks = [] //store each progress break point in this array
-  _.each(d3.range(1,slidesLength), function(slideIndex) {
+  range(slidesLength).forEach(function(slideIndex) {
     var stepBreak = (1/slidesLength) * slideIndex;
     breaks.push(stepBreak);
   });
-  if (progress > breaks[2]) {
-    return 4;
-  } else if (progress > breaks[1]) {
-    return 3;
-  } else if (progress > breaks[0]) {
-    return 2;
-  } else {
-    return 1;
-  }
+    //default new step is 0
+  var result = 0;
+
+  //loop through each break point
+  breaks.forEach(function(breakpoint, i) {
+    //if progress is past a break point, update result
+    if (progress > breakpoint) {
+      result = i;
+    }
+  });
+  return result;
+}
+
+function range(num) {
+  return Array.apply(null, Array(num)).map(function (_, i) {return i;});
 }
 
 function setSlide(newSlide) {
@@ -423,85 +459,37 @@ function setSlide(newSlide) {
 
 //maps each step to a function
 var stepMap = {
-  1: removeOgallalaOutline,
-  2: addOgallalaOutline,
-  3: addOgallalaHighlight,
-  4: showHaskell
+  0: stepOne,
+  1: stepTwo,
+  2: stepThree
 }
 
-function removeOgallalaOutline() {
-  map.classed('gig-step-2', false);
-  var label = map.select('.gig-aquifer-label')
-    .transition()
-    .duration(transisitonDuration)
-    .attr('opacity', 0);
-
-  var shape = map.select('.ogallala-shape')
-    .transition()
-    .duration(transisitonDuration)
-    .attr('opacity', 0);
-
-  label.remove()
-  shape.remove();
-}
-
-function addOgallalaOutline() {
-  removeOgallalaHighlight();
-  map.classed('gig-step-2', true);
-  var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
-
-  var textLabel = map.append('g')
-    .attr('class', 'gig-aquifer-label')
-    .attr('transform', 'translate(' + projection([-95.295983, 39.464040]) + ')')
-    .append('text')
-    .attr('transform', 'translate(-10, 0)')
-    .attr('fill', 'white')
-    .attr('font-size', 10)
-    .text("Ogallala Aquifer");
-
-  var shape = map.append("path")
-        .data(ogallala_data)
-        .attr("class", "ogallala-shape")
-        .attr("stroke", "white")
-        .attr("stroke-width", 1)
-        .attr("fill", "rgba(100, 100, 100, 0.9)")
-        .attr("opacity", 0)
-        .attr("d", path);
- shape
-    .transition()
-    .duration(transisitonDuration)
-    .attr('opacity', 0.8);
-
-}
-
-function addOgallalaHighlight() {
-  removeOgallalaOutline();
-  map.classed("gig-haskell-highlight", false);
-  zoomIn([-100.851404, 37.482529], 2);
-  map.classed("gig-haskell-highlight", false);
-  map.classed("gig-county-highlight", true);
-  map.select('.county-detail-text').remove();
-}
-
-function removeOgallalaHighlight() {
+function stepOne() {
   zoomOut();
-  map.classed("gig-county-highlight", false);
 }
 
-function showHaskell() {
-  // zoomIn([-100.851404, 37.482529], 3);
-  map.append('g')
-    .attr('class', 'county-detail-text')
-    .attr('transform', 'translate(' + projection([-100.851404, 37.482529]) + ')')
-    .append('text')
-    .attr("fill", "white")
-    .attr('transform', 'translate(10, 5)')
-    .text('Haskell County, KS')
-    .attr('font-size', 10);
+function stepTwo() {
+  zoomIn(centerCoordinates, 3);
+  var container = d3.select('.gig-data-point-wrapper');
+  container.selectAll('circle')
+    .transition()
+    .duration(200)
+    .attr('r', 0);
+}
+
+function stepThree() {
+  var container = d3.select('.gig-data-point-wrapper');
+  container.selectAll('circle')
+    .transition()
+    .duration(200)
+    .delay(function(d, i) {
+      return 50 * i;
+    })
+    .attr('r', function(d) {
+      return rScale(d.volume_withdrawn);
+    });
 
 
-  map.classed("gig-county-highlight", false);
-  map.classed("gig-haskell-highlight", true);
 }
 
 function zoomIn(center, zoomLevel) {
@@ -538,7 +526,6 @@ function mousemove() {
 function mouseout(d) {
   tooltip.style("display", "none");
 }
-
 
 
 document.addEventListener('DOMContentLoaded', setup);
