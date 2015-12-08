@@ -232,7 +232,7 @@ var scaleBreaks = [-15, -5, 0];
 var scaleColors = ['#de862e','#F5AE1B', '#F6EB16'];
 
 var rScale = d3.scale.linear()
-  .range([2, 10]);
+  .range([1, 8]);
 
 var colorScale = function(input) {
   var r;
@@ -394,7 +394,7 @@ function draw(err, data, data2) {
         .enter()
         .append('circle')
         .attr('r', 0)
-        .attr('fill', scaleColors[2])
+        .attr('fill', '#0095C4')
         .attr('opacity', 0.5)
         .attr('cx', function(d) {
           return projection(d.coordinates)[0];
@@ -469,7 +469,7 @@ function stepOne() {
 }
 
 function stepTwo() {
-  zoomIn(centerCoordinates, 3);
+  zoomIn(centerCoordinates, 4);
   var container = d3.select('.gig-data-point-wrapper');
   container.selectAll('circle')
     .transition()
@@ -478,6 +478,7 @@ function stepTwo() {
 }
 
 function stepThree() {
+  zoomIn(centerCoordinates, 4);
   var container = d3.select('.gig-data-point-wrapper');
   container.selectAll('circle')
     .transition()
