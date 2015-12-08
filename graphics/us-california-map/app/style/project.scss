@@ -153,14 +153,34 @@ html, body {
 
 
 .map-legend {
-  background: rgba(0, 0, 0, 0.75);
   bottom: 0;
   color: white;
-  left: 0;
+  font-family: "Futura Today Light", Arial, sans-serif;
   padding: 10px;
   position: absolute;
+  left: 0;
   // margin-left: 2em;
+  p {
+    color: white;
+  }
 }
+
+.gig-legend-entry {
+  display: inline-block;
+  text-align: center;
+}
+
+.gig-legend-entries {
+  margin-top: 10px;
+}
+
+.gig-legend-color {
+  display: block;
+  height: 12px;
+  margin: 5px 1px;
+  width: 50px;
+}
+
 
 .gig-progress-indicator-wrap {
   position: absolute;
@@ -239,19 +259,37 @@ svg {
 
 
 
+.triangle {
+  &:after {
+    border-top: solid 10px white;
+    border-left: solid 10px transparent;
+    border-right: solid 10px transparent;
+    content:'';
+    height: 0;
+    left: 50%;
+    position: absolute;
+    top: 100%;
+    transform: translate(-50%, 0);
+    width: 0;
+  }
+}
+
 .gig-tooltip {
-  background: rgba(0, 0, 0, 1);
-  border-radius: 8px;
+  background: white;
+  // border-radius: 8px;
   border: solid 1px white;
-  color: white;
+  color: black;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.22));
+  font-family: "Futura Today Light", Arial, sans-serif;
   padding: 0.5em;
   position: absolute;
   transform: translate(-50%, -100%);
   // width: 200px;
   p { 
-    color: white;
+    color: black;
     margin: 0;
   }
+  @extend .triangle;
 }
 
 /******
