@@ -6,7 +6,7 @@
     "FULL_WIDTH": true,
     "SLIDER_IMAGES": [
      {
-        "title": "About 2 billion people depend on water that is drawn from wells that tap aquifers.",
+        "title": "About 2 billion people depend on water pumped from aquifers.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-1.jpg"
       },
       {
@@ -14,11 +14,11 @@
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-2.jpg"
       },
       {
-        "title": "In places, it's water that seeped into the aquifers over tens of thousands of years.",
+        "title": "In places, it’s water that seeped into the aquifers over tens of thousands of years.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-3.jpg"
       },
       {
-        "title": "As the water is depleted, tapping wells becomes more difficult and expensive.",
+        "title": "As the groundwater is depleted, pumping costs rise. In some areas, wells go dry.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-4.jpg"
       }
     ]

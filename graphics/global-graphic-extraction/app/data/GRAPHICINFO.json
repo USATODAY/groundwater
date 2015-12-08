@@ -4,7 +4,7 @@
     "CHATTER": "Global Extraction",
     "DATA_URL": "",
     "FULL_WIDTH": true,
-    "GRAPHIC_SOURCE": "Source Goes Here",
+    "GRAPHIC_SOURCE": "Sources: U.S. Geological Survey; IOPscience",
     "sourceColor": "white",
     "SLIDER_IMAGES": [
       {
@@ -26,7 +26,7 @@
         "textColor": "black"
       },
       {
-        "title": "California’s Central Valley pumped nearly 5 times that amount in 2013",
+        "title": "About five times that amount of groundwater was depletedin California’s Central Valley in 2013. ",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-4.jpg",
         "backgroundColor": "black",
         "textColor": "white"
@@ -40,6 +40,13 @@
       {
         "title": "But we’re not the biggest users of groundwater",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-extraction/img/extraction-6.jpg",
+        "backgroundColor": "black",
+        "textColor": "white"
+      }
+      ,
+      {
+        "title": "Cubic kilometers used in 2010",
+        "img": "",
         "backgroundColor": "black",
         "textColor": "white"
       }
