@@ -160,4 +160,92 @@ html, body {
   max-width: 800px;
   width: 90%; }
 
+/* map */
+.gig-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 5;
+  backface-visibility: hidden; }
+  .gig-map:first-child {
+    opacity: 1; }
+  .gig-map.fixed {
+    position: fixed; }
+  .gig-map.bottom {
+    top: auto; }
+
+.map-legend {
+  bottom: 0;
+  color: white;
+  font-family: "Futura Today Light", Arial, sans-serif;
+  padding: 10px;
+  position: absolute;
+  text-align: center;
+  left: 50%;
+  transform: translate(-50%, 0); }
+  .map-legend p {
+    color: white; }
+
+.gig-legend-entry {
+  display: inline-block;
+  max-width: calc(25% - 2px);
+  text-align: center; }
+
+.gig-legend-entries {
+  margin-top: 10px; }
+
+.gig-legend-color {
+  display: block;
+  height: 12px;
+  margin: 5px 1px;
+  max-width: 100%;
+  width: 50px; }
+
+.gig-progress-indicator-wrap {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translate(0, -50%); }
+
+.gig-progress-entry {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  margin: 5px 0;
+  height: 10px;
+  width: 10px; }
+  .gig-progress-entry.gig-progress-current {
+    background: white; }
+
+svg {
+  display: block;
+  margin: 0 auto; }
+
+.triangle:after, .gig-tooltip:after {
+  border-top: solid 10px white;
+  border-left: solid 10px transparent;
+  border-right: solid 10px transparent;
+  content: '';
+  height: 0;
+  left: 50%;
+  position: absolute;
+  top: 100%;
+  transform: translate(-50%, 0);
+  width: 0; }
+
+.gig-tooltip {
+  background: white;
+  border: solid 1px white;
+  color: black;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.22));
+  font-family: "Futura Today Light", Arial, sans-serif;
+  padding: 0.5em;
+  position: absolute;
+  transform: translate(-50%, -100%); }
+  .gig-tooltip p {
+    color: black;
+    margin: 0; }
+
 /*# sourceMappingURL=gig-styles.css.map */
