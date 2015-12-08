@@ -288,7 +288,7 @@ function addLegend() {
         html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + colorScale(breakpoint) +"'></span><span>" + Math.abs(breakpoint) + " ft.</span></div>";
     });
     
-        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>no decrease</span></div>";
+        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>none</span></div>";
         html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
    
     html += "</div>"
@@ -306,6 +306,10 @@ function draw(err, data, data2) {
     scale = width/1.2;
     if (width < 800) {
       scale = width;
+    }
+
+    if (scale > 1200) {
+      scale = 1200;
     }
     $graphic.empty();
 
@@ -453,7 +457,7 @@ function addOgallalaOutline() {
     .append('text')
     .attr('transform', 'translate(-10, 0)')
     .attr('fill', 'white')
-    .attr('font-size', 10)
+    .attr('font-size', 14)
     .text("Ogallala Aquifer");
 
   var shape = map.append("path")
@@ -461,7 +465,7 @@ function addOgallalaOutline() {
         .attr("class", "ogallala-shape")
         .attr("stroke", "white")
         .attr("stroke-width", 1)
-        .attr("fill", "rgba(100, 100, 100, 0.9)")
+        .attr("fill", "rgba(255, 255, 255, 0.9)")
         .attr("opacity", 0)
         .attr("d", path);
  shape

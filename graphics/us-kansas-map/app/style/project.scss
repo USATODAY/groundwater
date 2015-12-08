@@ -34,6 +34,26 @@ html, body {
   }
 }
 
+.gig-embed h3.gig-title {
+  color: #FFCB00;
+  font-family: "Futura Today Light", Arial, sans-serif; 
+  font-size: 2.5em;
+  margin: 1em auto 0 auto;
+  text-align: center;
+
+  @media(max-width: 800px) {
+    font-size: 1.5em;
+  }
+
+  &:after {
+    content: "";
+    display: block;
+    border-bottom: solid 1px white;
+    margin: 10px auto;
+    width: 100px;
+  }
+}
+
 .gig-slider {
 
   &-panel {
@@ -46,14 +66,17 @@ html, body {
       top: 50%;
       left: 15%;
       color: #ffffff;
-      font-family: 'Futura Today DemiBold', sans-serif;
-      font-size: 1.2em;
-      text-align: left;
-      margin-top: 1em;
+      font-family: 'Futura Today Light', sans-serif;
+      font-size: 1.75em;
+      text-align: center;
+      margin-top: 0;
       max-width: 28em;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.75);
       transform: translateY(-50%);
       z-index: 800;
+       @media(max-width: 800px) {
+        font-size: 1.25em;
+      }
     }
   }
   &-background {
@@ -81,7 +104,7 @@ html, body {
 .gig-slider-panel {
   // height: 800px;
   margin: 0 auto;
-  max-width: 600px;
+  max-width: 800px;
   width: 90%;
 }
 
@@ -147,8 +170,9 @@ html, body {
   font-family: "Futura Today Light", Arial, sans-serif;
   padding: 10px;
   position: absolute;
-  left: 0;
-  // margin-left: 2em;
+  text-align: center;
+  left: 50%;
+  transform: translate(-50%, 0);
   p {
     color: white;
   }
@@ -156,6 +180,7 @@ html, body {
 
 .gig-legend-entry {
   display: inline-block;
+  max-width: calc(25% - 2px);
   text-align: center;
 }
 
@@ -167,6 +192,7 @@ html, body {
   display: block;
   height: 12px;
   margin: 5px 1px;
+  max-width: 100%;
   width: 50px;
 }
 
