@@ -4,14 +4,20 @@
     "CHATTER": "India Suicides Chatter",
     "DATA_URL": "",
     "FULL_WIDTH": true,
+    "GRAPHIC_SOURCE": "",
+    "sourceColor": "",
     "SLIDER_IMAGES": [
       {
         "title": "4,004 farmers and agricultural laborers committed suicide in Maharashtra last year.",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/india-graphic-suicides/img/india-suicide-1.jpg"
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/india-graphic-suicides/img/india-suicide-1.jpg",
+        "backgroundColor": "white",
+        "textColor": "#F5AB00"
       },
       {
         "title": "For the last 3 years, an average of 10 farmers have killed themselves every day.",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/india-graphic-suicides/img/india-suicide-2.jpg"
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/india-graphic-suicides/img/india-suicide-2.jpg",
+        "backgroundColor": "black",
+        "textColor": "white"
       }
     ]
 }
