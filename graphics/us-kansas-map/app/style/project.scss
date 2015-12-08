@@ -34,22 +34,6 @@ html, body {
   }
 }
 
-.triangle {
-  &:after {
-    border-top: solid 10px white;
-    border-left: solid 20px transparent;
-    border-right: solid 20px transparent;
-    content:'';
-    height: 0;
-    left: 50%;
-    position: absolute;
-    top: 100%;
-    transform: translate(-50%, 0);
-    width: 0;
-  }
-}
-
-
 .gig-slider {
 
   &-panel {
@@ -160,12 +144,30 @@ html, body {
 .map-legend {
   bottom: 0;
   color: white;
+  font-family: "Futura Today Light", Arial, sans-serif;
+  padding: 10px;
   position: absolute;
   left: 0;
   // margin-left: 2em;
   p {
     color: white;
   }
+}
+
+.gig-legend-entry {
+  display: inline-block;
+  text-align: center;
+}
+
+.gig-legend-entries {
+  margin-top: 10px;
+}
+
+.gig-legend-color {
+  display: block;
+  height: 12px;
+  margin: 5px 1px;
+  width: 50px;
 }
 
 .gig-progress-indicator-wrap {
@@ -243,14 +245,27 @@ svg {
   stroke-opacity: 1;
 }
 
-
+.triangle {
+  &:after {
+    border-top: solid 10px white;
+    border-left: solid 10px transparent;
+    border-right: solid 10px transparent;
+    content:'';
+    height: 0;
+    left: 50%;
+    position: absolute;
+    top: 100%;
+    transform: translate(-50%, 0);
+    width: 0;
+  }
+}
 
 .gig-tooltip {
   background: white;
   // border-radius: 8px;
   border: solid 1px white;
   color: black;
-  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.12));
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.22));
   font-family: "Futura Today Light", Arial, sans-serif;
   padding: 0.5em;
   position: absolute;

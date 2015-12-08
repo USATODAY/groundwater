@@ -283,12 +283,12 @@ function start() {
 
 
 function addLegend() {
-    var html = "<div class='map-legend'>average decrease in water levels<div>";
+    var html = "<div class='map-legend'>average decrease in water levels<div class='gig-legend-entries'>";
     scaleBreaks.forEach(function(breakpoint, i) {
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + colorScale(breakpoint) +"'></span><span>>" + Math.abs(breakpoint) + " ft.</span>";
+        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + colorScale(breakpoint) +"'></span><span>" + Math.abs(breakpoint) + " ft.</span></div>";
     });
     
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:#0095C4'></span><span>no decrease</span>";
+        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>no decrease</span></div>";
         html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
    
     html += "</div>"
@@ -516,7 +516,7 @@ function zoomOut() {
 
 function mouseover(d) {
   tooltip.style("display", "block");
-  tooltip.html("<p>" + d.properties.n + "</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
+  tooltip.html("<p>" + d.properties.n + " county</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
 }
 
 function mousemove() {

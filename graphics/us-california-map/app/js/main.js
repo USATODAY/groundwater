@@ -224,7 +224,7 @@ function updatePosition(e) {
 * Begin map code
 */
 var scaleBreaks = [9, 99, 999];
-var scaleColors = ['#F6EB16','#F5AE1B', '#A56600'];
+var scaleColors = ['#de862e','#F5AE1B', '#A56600'];
 
 var colorScale = function(input) {
   var r;
