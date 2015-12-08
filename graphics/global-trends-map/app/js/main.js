@@ -16,15 +16,26 @@ var path;
 //bundle map data into file
 var GRAPHICDATA;
 
-var colorScale = d3.scale.linear()
-  .range(['#deebf7', '#3182bd']);
+var scaleBreaks = [-10, -2];
+var scaleColors = ['#F6EB16','#F5AE1B', '#de862e'];
 
-   
-
+var colorScale = function(input) {
+  var r;
+  if (input <= scaleBreaks[0]) {
+  console.log(input);
+    r = scaleColors[2];
+  } else if (input <= scaleBreaks[1]) {
+    r = scaleColors[1];
+  } else {
+    r = scaleColors[0];
+  }
+  console.log(r);
+  return r;
+}
 
 var COLORS2 = ['#feedaf','#fee27b','#fecb2e'].reverse();
 var COLORS = ['#addefd','#77cafd','#1b9efc'];
-var scaleBreaks = [0, 5, 15];
+// var scaleBreaks = [0, 5, 15];
 var scaleBreaks2 = [-15, -5, 0];
 
 function getDataURL(dataURL) {
@@ -74,11 +85,11 @@ function start() {
     $window = $(window);
     $graphic = $('#' + GRAPHICINFO.GRAPHIC_SLUG);
     $details = $graphic.find('#details');
-    // queue()
-    //   .defer(d3.json, DATA_URL)
-    //   .defer(d3.json, "data/test.topo.json")
-    //   .await(ready);
-    d3.json(DATA_URL, ready);
+    queue()
+      .defer(d3.json, DATA_URL)
+      .defer(d3.json, "data/split.json")
+      .await(ready);
+    // d3.json(DATA_URL, ready);
     addEventListeners();
 }
 
@@ -154,41 +165,41 @@ svg.append("path")
     svg.append('path')
       .datum(topojson.merge(data, data.objects["ne_110m_land"].geometries))
       .attr("class", "country-shape")
+      .attr('fill', 'rgba(255, 255, 255, 0.25)')
       .attr("d", path);
 
-    svg.append("g")
-      .attr("class", "india-states")
-    .selectAll("path")
-      .data(geo.features)
-    .enter().append("path")
-      .attr("fill", function(d) { 
-              // console.log(path.centroid(d));
-              if (d.properties[VAL_COLUMN]) {
-                return getColor(+d.properties[VAL_COLUMN]);
-              } else {
-                return "none";
-              }
-      })
-      .attr("d", path)
-      .on("mouseover", mouseover)
-      .on("mousemove", mousemove)
-      .on("mouseout", mouseout);
+    // svg.append("g")
+    //   .attr("class", "india-states")
+    // .selectAll("path")
+    //   .data(geo.features)
+    // .enter().append("path")
+    //   .attr("fill", function(d) { 
+    //           // console.log(path.centroid(d));
+    //           if (d.properties[VAL_COLUMN]) {
+    //             return getColor(+d.properties[VAL_COLUMN]);
+    //           } else {
+    //             return "none";
+    //           }
+    //   })
+    //   .attr("d", path)
+    //   .on("mouseover", mouseover)
+    //   .on("mousemove", mousemove)
+    //   .on("mouseout", mouseout);
 
-      // svg.append("g")
-      //   .selectAll("path")
-      //   .data(topojson.feature(data2, data2.objects.test).features)
-      //   .enter()
-      //   .append("path")
-      //   .attr("fill", function(d) {
-      //     if (d.properties.DN !== 0) {
-      //       return "steelblue";
-      //     } else {
-      //       console.log(d.properties.DN);
-      //       return "none";
-      //     }
-      //   })
-      //   .attr("opacity", 0.5)
-      //   .attr("d", path);
+      svg.append("g")
+        .selectAll("path")
+        .data(data2.features)
+        .enter()
+        .append("path")
+        .attr("fill", function(d) {
+          if (d.properties.DN > 0) {
+            return "#1b9efc";
+          } else {
+            return colorScale(d.properties.DN);
+          }
+        })
+        // .attr("opacity", 0.5)
+        .attr("d", path);
 
      tooltip = d3.select("#" + GRAPHICINFO.GRAPHIC_SLUG).append("div")
         .attr("class", "gig-tooltip")
