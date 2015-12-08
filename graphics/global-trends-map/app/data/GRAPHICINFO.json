@@ -1,8 +1,8 @@
 {
     "HEADLINE": "Global",
-    "GRAPHIC_SLUG": "global-map",
+    "GRAPHIC_SLUG": "gig-global-map",
     "CHATTER": "Map of changing water levels in India",
-    "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/india-map/data/world_aquifers.topo.json",
+    "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-trends-map/data/world_aquifers.topo.json",
     "FULL_WIDTH": true,
     "SOURCE": "USGS",
     "SLIDER_IMAGES": [
