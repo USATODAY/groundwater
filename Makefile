@@ -1,6 +1,20 @@
 DBNAME=gwater # the name of the database you're using. you can name this whatever you want.
 
-topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json data/output_data/california_wells.topo.json
+topojson_files: map/app/data/county_usage_average_2010.topojson.json map/app/data/county_usage_change.topojson.json map/app/data/county_usage_2010.json data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json map/app/data/aquifers_with_level_changes.json data/output_data/california_wells.topo.json data/output_data/peru.topo.json
+
+#peru/south american shapes
+data/output_data/peru.topo.json: data/shapefiles/PER_adm/PER_adm3.shp data/output_data/south_america.geo.json
+	topojson \
+	-o $@ \
+	--no-pre-quantization \
+	--post-quantization=1e6 \
+	--simplify=7e-7 \
+	-- $< data/output_data/south_america.geo.json
+
+data/output_data/south_america.geo.json: data/shapefiles/ne_110m_land/ne_110m_land.shp
+	mkdir -p data/shapefiles/south_america
+	ogr2ogr -f 'GeoJSON' -clipsrc -83.0 -55.4 -29.3 13.0 $@ $<
+
 
 #world aquifers
 data/output_data/world_aquifers.topo.json: data/output_data/aquifer_gw_anomolies.csv data/shapefiles/ne_110m_land/ne_110m_land.shp
