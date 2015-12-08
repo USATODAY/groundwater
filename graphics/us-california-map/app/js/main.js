@@ -256,11 +256,12 @@ function start() {
 
 function addLegend() {
     var html = "<div class='map-legend'>Household Water Supply Shortages Reported<div>";
-    scaleBreaks.forEach(function(breakpoint, i) {
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + colorScale(breakpoint) +"'></span><span>>" + Math.abs(breakpoint) + "</span>";
-    });
     
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:#0095C4'></span><span>no reports</span>";
+    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[2] + "'></span><span>100+</span></div>";
+    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[1] + "'></span><span>10-99</span></div>"; 
+    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[0] + "'></span><span>1-9</span></div>"; 
+    
+        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>none</span></div>";
         html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
    
     html += "</div>"
@@ -287,7 +288,7 @@ function ready(err, data, data2) {
     height = width * (9/16);
     scale = width * 1.5;
     if (width < 800) {
-      scale = width * 2.5;
+      scale = width * 3;
     }
     $graphic.empty();
     console.log(data);
@@ -321,7 +322,7 @@ function ready(err, data, data2) {
     projection = d3.geo.mercator()
       .center(center)
       .scale(scale)
-      .translate([WIDTH/2, HEIGHT / 2.7]);
+      .translate([WIDTH/2, HEIGHT / 2]);
 
 
     path = d3.geo.path()
@@ -377,13 +378,15 @@ function ready(err, data, data2) {
         .on("mousemove", mousemove)
         .on("mouseout", mouseout);
 
+    var labelTranslateX = WIDTH < 800 ? 20 : 50;
+
     map2.append('g')
       .attr('class' ,'gig-step-3-label')
       .attr('transform', 'translate(' + projection([-119.327555, 36.143740]) + ')')
       .append('text')
-      .attr('font-size', 6)
+      .attr('font-size', 4)
       .attr('fill', 'white')
-      .attr('transform', 'translate(50, 0)')
+      .attr('transform', 'translate(' + labelTranslateX + ', 0)')
       .text('Tulare County');
 
     map2.append('g')
@@ -394,7 +397,7 @@ function ready(err, data, data2) {
       .append('circle')
       .attr('r', 0.5)
       .attr('opacity', 0)
-      .attr('fill', 'none')
+      .attr('fill', 'white')
       .attr('stroke', 'white')
       .attr('stroke-width', 0.25)
       .attr('transform', function(d) {
@@ -483,14 +486,14 @@ function stepTwo() {
 }
 
 function stepThree() {
-  zoomIn([-119.327555, 36.143740], 6);
+  zoomIn([-118.159571, 36.143740], 6);
   d3.select('.gig-wells').selectAll('circle')
     .transition()
     .duration(500)
     .delay(function(d, i) {
       return i;
     })
-    .attr('opacity', 0.8);
+    .attr('opacity', 0.5);
 
     map.classed('gig-step-3-highlight', true);
 }
