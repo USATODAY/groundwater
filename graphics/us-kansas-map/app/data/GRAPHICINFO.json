@@ -4,7 +4,7 @@
     "CHATTER": "ABOUT THIS GRAPHIC",
     "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-kansas-map/data/counties_with_level_changes.json",
     "FULL_WIDTH": true,
-    "SOURCE": "USGS",
+    "SOURCE": "USA TODAY analysis of USGS data",
     "SLIDER_IMAGES": [
       {
         "title": "In many counties across the United States, groundwater levels have been dropping.",
