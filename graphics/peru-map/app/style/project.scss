@@ -222,28 +222,8 @@ svg {
   background: black;
 }
 
-.graticule {
-  fill: none;
-  stroke: #777;
-  stroke-width: .5px;
-  stroke-opacity: 1;
-}
-
-
-
-.gig-tooltip {
-  background: rgba(0, 0, 0, 1);
-  border-radius: 8px;
-  border: solid 1px white;
-  color: white;
-  padding: 0.5em;
-  position: absolute;
-  transform: translate(-50%, -100%);
-  // width: 200px;
-  p { 
-    color: white;
-    margin: 0;
-  }
+.gig-circle-legend {
+  border-radius: 50%;
 }
 
 .q0-9 { fill:#d73027; }

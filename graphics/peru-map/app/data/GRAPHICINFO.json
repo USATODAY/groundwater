@@ -5,18 +5,14 @@
     "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-peru-map/data/peru.topo.json",
     "DATA_URL_2": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-peru-map/data/peru_coordinates.csv",
     "FULL_WIDTH": true,
-    "SOURCE": "USGS",
+    "SOURCE": "Ministerio de Agricultura y Riego, Peru",
     "SLIDER_IMAGES": [
       {
-        "title": "In many counties across the United States, groundwater levels have been dropping.",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/heheh.gif"
+        "title": "",
+        "img": ""
       },
       {
-        "title": "The problem is especially severe in the region that relies on the Ogallala Aquifer.",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
-      },
-      {
-        "title": "Across the southern High Plains, farms have been draining the aquifer.",
+        "title": "Much more groundwater is pumped from this stretch of the coastal desert than any other part of the country.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
       }
     ]

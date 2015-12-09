@@ -260,7 +260,6 @@ function getDataURL(dataURL) {
   } else {
     dataURL = "http://" + hostname + "/services/webproxy/?url=" + dataURL;
   }
-  console.log(dataURL);
   return dataURL;
 }
 
@@ -287,13 +286,12 @@ function start() {
 
 
 function addLegend() {
-    var html = "<div class='map-legend'>average decrease in water levels<div>";
-    scaleBreaks.forEach(function(breakpoint, i) {
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + colorScale(breakpoint) +"'></span><span>>" + Math.abs(breakpoint) + " ft.</span>";
-    });
+    var html = "<div class='map-legend'>groundwater extracted (cubic hectometers)<div>";
     
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:#0095C4'></span><span>no decrease</span>";
-        html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
+        html += "<span class='gig-circle-legend'style='display: inline-block;width:5px; height:5px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
+   
+    
+        html += "<span class='gig-circle-legend'style='display: inline-block;width:63px; height:63px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
    
     html += "</div>"
     $graphic.append(html);
@@ -312,7 +310,6 @@ function draw(err, data, data2) {
       scale = width;
     }
     $graphic.empty();
-    console.log(data);
     data2 = data2.map(function(d) {
       return {
         region: d.region,
@@ -320,7 +317,6 @@ function draw(err, data, data2) {
         coordinates: d.coordinates.split(', ').reverse()
       }
     });
-    console.log(data2);
     rScale.domain([0, d3.max(data2.map(function(d) {return d.volume_withdrawn}))]);
 
     if(!GRAPHICDATA) {
@@ -460,21 +456,32 @@ function setSlide(newSlide) {
 //maps each step to a function
 var stepMap = {
   0: stepOne,
-  1: stepTwo,
-  2: stepThree
+  1: stepTwo
 }
 
 function stepOne() {
   zoomOut();
-}
-
-function stepTwo() {
-  zoomIn(centerCoordinates, 4);
-  var container = d3.select('.gig-data-point-wrapper');
+   var container = d3.select('.gig-data-point-wrapper');
   container.selectAll('circle')
     .transition()
     .duration(200)
     .attr('r', 0);
+}
+
+function stepTwo() {
+  zoomIn(centerCoordinates, 4);
+ 
+
+  var container = d3.select('.gig-data-point-wrapper');
+  container.selectAll('circle')
+    .transition()
+    .duration(200)
+    .delay(function(d, i) {
+      return 50 * i;
+    })
+    .attr('r', function(d) {
+      return rScale(d.volume_withdrawn);
+    });
 }
 
 function stepThree() {
