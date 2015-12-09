@@ -7,21 +7,9 @@
     "SOURCE": "University of California, Irvine",
     "SLIDER_IMAGES": [
       {
-        "title": "Global ground water facts",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/heheh.gif"
-      },
-      {
-        "title": "More groundwater facts",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
-      },
-      {
-        "title": "Aquifers",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
-      },
-      {
-        "title": "global",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
+        "title": "Global aquifers in decline",
+        "img": ""
       }
-      ]
+    ]
 }
 
