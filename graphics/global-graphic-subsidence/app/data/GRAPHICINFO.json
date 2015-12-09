@@ -4,22 +4,32 @@
     "CHATTER": "ABOUT THIS GRAPHIC",
     "DATA_URL": "",
     "FULL_WIDTH": true,
+    "GRAPHIC_SOURCE": " U.S. Geological Survey; IOPscience",
+    "sourceColor": "white",
     "SLIDER_IMAGES": [
       {
-        "title": "test1",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-1.jpg"
+        "title": "Parts of California's Central Valley have sunk more than a foot in less than a year.",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-1.jpg",
+        "backgroundColor": "black",
+        "textColor": "#F5AB00"
       },
       {
-        "title": "test2",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-2.jpg"
+        "title": "Aquifers store water in layers of rocks, sand and clay",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-2.jpg",
+        "backgroundColor": "black",
+        "textColor": "#F5AB00"
       },
       {
-        "title": "test3",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-3.jpg"
+        "title": "When water is pumped, clay layers are compressed, causing the land to sink and ...",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-3.jpg",
+        "backgroundColor": "black",
+        "textColor": "#F5AB00"
       },
       {
-        "title": "test4",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-4.jpg"
+        "title": "permanently reduces the aquifer's capacity to hold water.",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-4.jpg",
+        "backgroundColor": "black",
+        "textColor": "#F5AB00"
       }
     ]
 }
