@@ -14,17 +14,20 @@
       {
         "title": "Aquifers store water like sponges, holding it in the spaces between rocks, sand and clay.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-2.jpg",
-        "textColor": "#F5AB00"
+        "textColor": "#F5AB00",
+        "backgroundColor": "black"
       },
       {
         "title": "In places, it’s water that seeped into the aquifers over tens of thousands of years.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-3.jpg",
-        "textColor": "#F5AB00"
+        "textColor": "#F5AB00",
+        "backgroundColor": "black"
       },
       {
         "title": "As the groundwater is depleted, pumping costs rise. In some areas, wells go dry.",
         "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-aquifer/img/aquifers-4.jpg",
-        "textColor": "#F5AB00"
+        "textColor": "#F5AB00",
+        "backgroundColor": "black"
       }
     ]
 }
