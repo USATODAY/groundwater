@@ -288,10 +288,10 @@ function start() {
 function addLegend() {
     var html = "<div class='map-legend'>groundwater extracted (cubic hectometers)<div>";
     
-        html += "<span class='gig-circle-legend'style='display: inline-block;width:5px; height:5px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
+        html += "<span class='gig-circle-legend'style='display: inline-block;width:8px; height:8px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
    
     
-        html += "<span class='gig-circle-legend'style='display: inline-block;width:63px; height:63px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
+        html += "<span class='gig-circle-legend'style='display: inline-block;width:64px; height:64px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
    
     html += "</div>"
     $graphic.append(html);
@@ -314,10 +314,12 @@ function draw(err, data, data2) {
       return {
         region: d.region,
         volume_withdrawn: +d.volume_withdrawn,
-        coordinates: d.coordinates.split(', ').reverse()
+        coordinates: d.coordinates,
+        lat_long: d.coordinates.split(', ').reverse()
       }
     });
-    rScale.domain([0, d3.max(data2.map(function(d) {return d.volume_withdrawn}))]);
+    rScale.domain([1, d3.max(data2.map(function(d) {return d.volume_withdrawn}))]);
+    console.log(rScale.domain());
 
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
@@ -393,10 +395,10 @@ function draw(err, data, data2) {
         .attr('fill', '#0095C4')
         .attr('opacity', 0.5)
         .attr('cx', function(d) {
-          return projection(d.coordinates)[0];
+          return projection(d.lat_long)[0];
         })
         .attr('cy', function(d) {
-          return projection(d.coordinates)[1];
+          return projection(d.lat_long)[1];
         });
 
       
@@ -405,7 +407,7 @@ function draw(err, data, data2) {
         .attr("class", "gig-tooltip")
         .style("display", "none");
 
-      addLegend();
+      // addLegend();
       addProgressIndicator();
 }
 
@@ -545,4 +547,5 @@ window.addEventListener('resize', function() {
   offsetTop = $el.offset().top;
   setDataPosition();
   reDraw(null, GRAPHICDATA, GRAPHICDATA2);
+  setSlide(getNewStep(progress));
 });
