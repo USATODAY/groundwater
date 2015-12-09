@@ -34,6 +34,7 @@ var $el;                    // jquery saved reference to element
 var offsetTop;              // offsetTop of id
 var elHeight;               // total height of id
 var progress;               // progress of scroll through entire element from 0 - 1
+var progressMiddle;       // progress of bottom of window through entire element from 0 -1
 var progressPerSlide;       // progress of the scroll through specific slide
 var progressWeight = 1;   // weighted factor to move animation progress faster (to finish animation before slide is out of view)
 var targetValue;            // ending value for animation property
@@ -111,8 +112,14 @@ function setDataPosition() {
 }
 
 function updatePosition(e) {
+  offsetTop = $el.offset().top;
   pos = $(document).scrollTop();
   progress = (pos - offsetTop)/elHeight;
+  if (pos + window.innerHeight / 2 > offsetTop) {
+    progressMiddle = ((pos + window.innerHeight/2) - offsetTop)/(elHeight);
+  } else {
+    progressMiddle = 0;
+  } 
   // if (debugMode) $debug.html(pos);
 
   for (var i = 0; i < sliderPosArray.length + 1; i++) {
@@ -126,7 +133,7 @@ function updatePosition(e) {
 
        if (debugMode) $debug.html(progressPerSlide);
 
-       var newStep = getNewStep(progress);
+       var newStep = getNewStep(progressMiddle);
        if (newStep !== currentStep) {
         setStep(newStep);
        }
@@ -191,8 +198,8 @@ function updatePosition(e) {
 
 //returns the correct step based on progress
 function getNewStep(progress) {
-  var padding = 0.1;
-  progress = progress + padding;
+  // var padding = 0.25;
+  // progress = progress - padding;
   var breaks = [] //store each progress break point in this array
   range(slidesLength).forEach(function(slideIndex) {
     var stepBreak = (1/slidesLength) * slideIndex;

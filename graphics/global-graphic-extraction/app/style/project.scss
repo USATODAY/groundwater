@@ -91,13 +91,14 @@ html, body {
   }
 
   .gig-slider-panel-text-container {
+    // bottom: 0;
     font-family: "Futura Today DemiBold", Arial, sans-serif;
     left: 50%;
     margin: 0 auto;
     max-width: 600px;
     position: absolute;
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8); 
-    top: 33%;
+    top: 50%;
     transform: translate(-50%, -50%);
     &.gig-slider-dark-text {
       color: black;
