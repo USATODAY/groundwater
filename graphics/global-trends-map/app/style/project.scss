@@ -204,7 +204,7 @@ svg {
 .country-shape {
   fill: rgba(255, 255, 255, 0.21);
   stroke: white;
-  stroke-width: 1px;
+  stroke-width: 0.5px;
 }
 
 #india-map {
@@ -249,6 +249,12 @@ svg {
     margin: 0;
   }
   @extend .triangle;
+}
+
+#gig-global-map .stroke {
+  fill: none;
+  stroke: white;
+  stroke-width: 0.5px;
 }
 
 #sphere {

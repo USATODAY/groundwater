@@ -71,6 +71,7 @@ var transisitonDuration;
 var GRAPHICDATA; //cache 1st data source
 var GRAPHICDATA2; //cache 2nd data source
 var centerCoordinates; //store coordinates for center of focus
+var icaCoordinates = [-75.738620, -14.074261] //store city coordinates
 
 
 function prepareContainers() {
@@ -286,12 +287,13 @@ function start() {
 
 
 function addLegend() {
-    var html = "<div class='map-legend'>groundwater extracted (cubic hectometers)<div>";
+    var html = "<div class='map-legend'>";
     
-        html += "<span class='gig-circle-legend'style='display: inline-block;width:8px; height:8px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
+        // html += "<span class='gig-circle-legend'style='display: inline-block;width:8px; height:8px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
    
     
-        html += "<span class='gig-circle-legend'style='display: inline-block;width:64px; height:64px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
+        // html += "<span class='gig-circle-legend'style='display: inline-block;width:64px; height:64px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
+        html+= "<p>Source: " + GRAPHICINFO.SOURCE + "</p>"
    
     html += "</div>"
     $graphic.append(html);
@@ -385,6 +387,7 @@ function draw(err, data, data2) {
         .attr('transform', 'translate(15, 0)')
         .text('Peru');
 
+
       map.append('g')
         .attr('class', 'gig-data-point-wrapper')
         .selectAll('circle')
@@ -402,14 +405,43 @@ function draw(err, data, data2) {
         });
 
       
+      var townLabel = map.append('g')
+        .attr('class', 'gig-town-label')
+        .attr('transform', 'translate(' + projection(icaCoordinates) + ')')
+        .attr('fill', 'white')
+        .append('text')
+        .attr('font-size', 4)
+        .attr('transform', 'translate(5, -5)');
+
+     townLabel.append('tspan')
+        .attr('dy', "1.2em")
+        .text('Ica');
+     
+     townLabel.append('tspan')
+        .attr('dy', "1.2em")
+        .attr('x', 0)
+        .text(numberWithCommas(Math.round(hectometerToAcreFeet(563.35))) + ' acre-feet');
 
      tooltip = d3.select($graphic[0]).append("div")
         .attr("class", "gig-tooltip")
+        .attr('x', 0)
         .style("display", "none");
 
-      // addLegend();
+      addLegend();
       addProgressIndicator();
 }
+
+function hectometerToAcreFeet(val) {
+  return val * 810.714;
+}
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+
+var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+function formatPower(d) { return (d + "").split("").map(function(c) { return superscript[c]; }).join(""); };
 
 function addProgressIndicator() {
   var html = '<div class="gig-progress-indicator-wrap">'
@@ -472,7 +504,6 @@ function stepOne() {
 
 function stepTwo() {
   zoomIn(centerCoordinates, 4);
- 
 
   var container = d3.select('.gig-data-point-wrapper');
   container.selectAll('circle')
@@ -518,6 +549,14 @@ function zoomOut() {
 function mouseover(d) {
   tooltip.style("display", "block");
   tooltip.html("<p>" + d.properties.n + "</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
+}
+
+function showTooltip(pos) {
+  tooltip.style("display", "block");
+  tooltip
+    .html("<p>Ica</p> Water pumped: 1200 cubic hectometers")
+    .style("left", pos[0] + "px")
+    .style("top", pos[1] + "px");
 }
 
 function mousemove() {

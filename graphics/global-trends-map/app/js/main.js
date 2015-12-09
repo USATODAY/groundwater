@@ -282,16 +282,16 @@ var reDraw = _.throttle(draw, 500, {
 });
 
 function draw(err, data) {
-    width = $(window).width();
+    width = WIDTH;
     // height = width * (9/16);
     height = HEIGHT;
-    scale = width/6;
+    scale = 167;
     // if (width < 800) {
       // scale = width;
     // }
 
     if (scale > 250) {
-      scale = 250;
+      scale = 167;
     }
     $graphic.empty();
     if(!GRAPHICDATA) {
@@ -309,8 +309,8 @@ function draw(err, data) {
 
     var projection = d3.geo.naturalEarth()
     .scale(scale)
-    .center(center)
-    .translate([width/1.8, height / 2.8]);
+    // .center(center)
+    .translate([width/2, height / 2]);
 
     path = d3.geo.path()
       .projection(projection);

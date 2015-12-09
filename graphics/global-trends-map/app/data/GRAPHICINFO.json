@@ -1,5 +1,5 @@
 {
-    "HEADLINE": "Global",
+    "HEADLINE": "Declining Aquifers Around The World",
     "GRAPHIC_SLUG": "gig-global-map",
     "CHATTER": "",
     "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-trends-map/data/world_aquifers.topo.json",
@@ -7,7 +7,7 @@
     "SOURCE": "University of California, Irvine",
     "SLIDER_IMAGES": [
       {
-        "title": "Global aquifers in decline",
+        "title": "",
         "img": ""
       }
     ]
