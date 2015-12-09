@@ -226,7 +226,6 @@ function getDataURL(dataURL) {
   } else {
     dataURL = "http://" + hostname + "/services/webproxy/?url=" + dataURL;
   }
-  console.log(dataURL);
   return dataURL;
 }
 
@@ -291,12 +290,9 @@ function ready(err, data, data2) {
       scale = width * 3;
     }
     $graphic.empty();
-    console.log(data);
-    console.log(data2);
 
     _.each(data.objects[topojson_features_obj_2].geometries, function(d) {
       if (d.properties[VAL_COLUMN_2] == "No private wells in the county") {
-        console.log(d.properties[VAL_COLUMN_2]);
         d.properties[VAL_COLUMN_2] = "0";
       }
     });
