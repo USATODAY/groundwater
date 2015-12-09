@@ -351,6 +351,7 @@ function ready(err, data, data2) {
       .attr("d", path);
 
       map2.append('g')
+        .attr('class', 'gig-counties')
         .selectAll('path')
         .data(topojson.feature(data, data.objects[topojson_features_obj_2]).features)
         .enter()
@@ -456,29 +457,33 @@ var stepMap = {
 }
 
 function stepOne() {
-  // map.select('.counties')
-  //   .attr('opacity', 1);
-
-  // map2
-  //   .transition()
-  //   .duration(500)
-  //   .attr('opacity', 0);
+  //turn on mouse hover in zoomed out state 
+  map2.select('.gig-counties')
+    .selectAll('path')
+    .on("mouseover", mouseover)
+    .on("mousemove", mousemove)
+    .on("mouseout", mouseout);
 
   map.classed("gig-county-highlight", false);
   zoomOut();
-  // var shape = map.select('.ogallala-shape')
-  //   .transition()
-  //   .duration(500)
-  //   .attr('opacity', 0);
-
-  // shape.remove();
 }
 
 function stepTwo() {
   zoomIn([-119.327555, 36.143740], 2); 
   $graphic.removeClass('gig-step-3');
   map.classed("gig-county-highlight", true);
-    map.classed('gig-step-3-highlight', false);
+  map.classed('gig-step-3-highlight', false);
+
+  //make sure tooltip is hidden
+  mouseout();
+  
+  //turn off mouse hover in zoomed in state 
+  map2.select('.gig-counties')
+    .selectAll('path')
+    .on("mouseover", null)
+    .on("mousemove", null)
+    .on("mouseout", null);
+
   d3.select('.gig-wells').selectAll('circle')
     .transition()
     .duration(500)
@@ -494,7 +499,18 @@ function stepThree() {
       return i;
     })
     .attr('opacity', 0.5);
+  
+  //make sure tooltip is hidden
+  mouseout();
 
+  //turn off mouse hover in zoomed in state 
+  map2.select('.gig-counties')
+    .selectAll('path')
+    .on("mouseover", null)
+    .on("mousemove", null)
+    .on("mouseout", null);
+
+    map.classed("gig-county-highlight", true);
     map.classed('gig-step-3-highlight', true);
 }
 
