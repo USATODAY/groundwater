@@ -36,9 +36,10 @@ var $graphic;
 var $details;
 var $sliderBG;
 var $embedModule;
-var VAL_COLUMN = "avg_chg";
+var VAL_COLUMN = "sub-surface_storage_trends_mm_per_yr";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
 var topojson_features_obj = "ne_110m_land";
+var topojson_features_obj_2 = "world_aquifer_systems_nocoast";
 var _ = require("lodash");
 var queue = require("queue-async");
 var tooltip;
@@ -63,8 +64,6 @@ function prepareContainers() {
   $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
   $embedModule.height(HEIGHT * slidesLength);
   $el.height(HEIGHT * slidesLength);
-  console.log($el.height());
-  console.log("embed", $embedModule.height());
   // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
@@ -77,7 +76,7 @@ function setup() {
   WIDTH = window.innerWidth;
   // HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
   // if (window.mobileCheck()) {
-    window.HEIGHT = HEIGHT = window.innerHeight;
+  HEIGHT = window.innerHeight;
   // }
   $sliderBG = $('#gig-slider-background-1');
   transisitonDuration = window.mobileCheck() ? 0 : 500;
@@ -210,7 +209,7 @@ function updatePosition(e) {
 /*
 * Begin map code
 */
-var scaleBreaks = [-15, -5, 0];
+var scaleBreaks = [-10, -5, 0];
 var scaleColors = ['#de862e','#F5AE1B', '#F6EB16'];
 
 var colorScale = function(input) {
@@ -239,7 +238,6 @@ function getDataURL(dataURL) {
   } else {
     dataURL = "http://" + hostname + "/services/webproxy/?url=" + dataURL;
   }
-  console.log(dataURL);
   return dataURL;
 }
 
@@ -266,9 +264,9 @@ function start() {
 
 
 function addLegend() {
-    var html = "<div class='map-legend'>average decrease in water levels<div class='gig-legend-entries'>";
+    var html = "<div class='map-legend'>Sub-surface storage trends (mm/year)<div class='gig-legend-entries'>";
     scaleBreaks.forEach(function(breakpoint, i) {
-        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + colorScale(breakpoint) +"'></span><span>" + Math.abs(breakpoint) + " ft.</span></div>";
+        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + colorScale(breakpoint) +"'></span><span>" + breakpoint + "</span></div>";
     });
     
         html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>none</span></div>";
@@ -285,17 +283,17 @@ var reDraw = _.throttle(draw, 500, {
 
 function draw(err, data) {
     width = $(window).width();
-    height = width * (9/16);
-    scale = width/1.2;
-    if (width < 800) {
-      scale = width;
-    }
+    // height = width * (9/16);
+    height = HEIGHT;
+    scale = width/6;
+    // if (width < 800) {
+      // scale = width;
+    // }
 
-    if (scale > 1200) {
-      scale = 1200;
+    if (scale > 250) {
+      scale = 250;
     }
     $graphic.empty();
-    console.log(data);
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
@@ -310,7 +308,7 @@ function draw(err, data) {
      var center = d3.geo.centroid(geo);
 
     var projection = d3.geo.naturalEarth()
-    .scale(width / 6)
+    .scale(scale)
     .center(center)
     .translate([width/1.8, height / 2.8]);
 
@@ -351,6 +349,31 @@ function draw(err, data) {
       .attr("class", "country-shape")
       .attr('fill', 'rgba(255, 255, 255, 0.25)')
       .attr("d", path);
+
+
+    svg.append('g')
+      .attr('class', 'gig-world-aquifers')
+      .selectAll('path')
+      .data(topojson.feature(data, data.objects[topojson_features_obj_2]).features)
+      .enter()
+      .append('path')
+      .attr('fill', function(d) {
+        var val = +d.properties[VAL_COLUMN];
+        if (val >= 0) {
+          return '#0095C4';
+        } else {
+          return colorScale(val);
+        }
+      })
+      .attr('d', path)
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseout", mouseout);
+
+      tooltip = d3.select($graphic[0]).append("div")
+        .attr("class", "gig-tooltip")
+        .style("display", "none");
+
       addLegend();
       addProgressIndicator();
 }
@@ -395,86 +418,17 @@ function setSlide(newSlide) {
 
 //maps each step to a function
 var stepMap = {
-  1: removeOgallalaOutline,
-  2: addOgallalaOutline,
-  3: addOgallalaHighlight,
-  4: showHaskell
+  1: stepOne,
+  2: stepOne,
+  3: stepOne,
+  4: stepOne
 }
 
-function removeOgallalaOutline() {
-  map.classed('gig-step-2', false);
-  var label = map.select('.gig-aquifer-label')
-    .transition()
-    .duration(transisitonDuration)
-    .attr('opacity', 0);
+function stepOne() {
 
-  var shape = map.select('.ogallala-shape')
-    .transition()
-    .duration(transisitonDuration)
-    .attr('opacity', 0);
-
-  label.remove()
-  shape.remove();
-}
-
-function addOgallalaOutline() {
-  removeOgallalaHighlight();
-  map.classed('gig-step-2', true);
-  var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
-
-  var textLabel = map.append('g')
-    .attr('class', 'gig-aquifer-label')
-    .attr('transform', 'translate(' + projection([-95.295983, 39.464040]) + ')')
-    .append('text')
-    .attr('transform', 'translate(-10, 0)')
-    .attr('fill', 'white')
-    .attr('font-size', 14)
-    .text("Ogallala Aquifer");
-
-  var shape = map.append("path")
-        .data(ogallala_data)
-        .attr("class", "ogallala-shape")
-        .attr("stroke", "white")
-        .attr("stroke-width", 1)
-        .attr("fill", "rgba(255, 255, 255, 0.9)")
-        .attr("opacity", 0)
-        .attr("d", path);
- shape
-    .transition()
-    .duration(transisitonDuration)
-    .attr('opacity', 0.8);
 
 }
 
-function addOgallalaHighlight() {
-  removeOgallalaOutline();
-  map.classed("gig-haskell-highlight", false);
-  zoomIn([-100.851404, 37.482529], 2);
-  map.classed("gig-haskell-highlight", false);
-  map.classed("gig-county-highlight", true);
-  map.select('.county-detail-text').remove();
-}
-
-function removeOgallalaHighlight() {
-  zoomOut();
-  map.classed("gig-county-highlight", false);
-}
-
-function showHaskell() {
-  // zoomIn([-100.851404, 37.482529], 3);
-  map.append('g')
-    .attr('class', 'county-detail-text')
-    .attr('transform', 'translate(' + projection([-100.851404, 37.482529]) + ')')
-    .append('text')
-    .attr("fill", "white")
-    .attr('transform', 'translate(10, 5)')
-    .text('Haskell County, KS')
-    .attr('font-size', 10);
-
-
-  map.classed("gig-county-highlight", false);
-  map.classed("gig-haskell-highlight", true);
-}
 
 function zoomIn(center, zoomLevel) {
   var coordinates = projection(center);
@@ -491,7 +445,7 @@ function zoomOut() {
 
 function mouseover(d) {
   tooltip.style("display", "block");
-  tooltip.html("<p>" + d.properties.n + " county</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
+  tooltip.html("<p>" + d.properties.aquifer_name + " county</p>" + "Sub-surface storage trend: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " (mm/year)");
 }
 
 function mousemove() {
