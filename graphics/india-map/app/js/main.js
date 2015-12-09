@@ -88,7 +88,7 @@ function prepareContainers() {
 
 function setup() {
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  HEIGHT = window.innerHeight; 
   $sliderBG = $('#gig-slider-background-1');
 
   slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
@@ -249,7 +249,6 @@ function getDataURL(dataURL) {
   } else {
     dataURL = "http://" + hostname + "/services/webproxy/?url=" + dataURL;
   }
-  console.log(dataURL);
   return dataURL;
 }
 
@@ -277,12 +276,13 @@ function start() {
 
 
 function addLegend() {
-    var html = "<div class='map-legend'>decrease in water level<div>";
-    scaleBreaks.forEach(function(breakpoint, i) {
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:" + colorScale(breakpoint) +"'></span><span>>" + Math.abs(breakpoint) + " ft.</span>";
-    });
+    var html = "<div class='map-legend'>Average decrease in water level<div>";
     
-        html += "<span style='display: inline-block;width:20px; height:20px;background-color:#0095C4'></span><span>no decrease</span>";
+    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[2] + "'></span><span>15ft.+</span></div>";
+    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[1] + "'></span><span>5-15ft.</span></div>"; 
+    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[0] + "'></span><span>1-4ft.</span></div>"; 
+    
+        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>none</span></div>";
         html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
    
     html += "</div>"
@@ -309,7 +309,6 @@ function ready(err, data, ) {
     height = width * (9/16);
     scale = width/1.2;
     $graphic.empty();
-    console.log(data);
 
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
@@ -416,8 +415,7 @@ function setSlide(newSlide) {
 //maps each step to a function
 var stepMap = {
   1: stepOne,
-  2: stepTwo,
-  3: stepThree
+  2: stepTwo
 }
 
 function stepOne() {
@@ -432,8 +430,8 @@ function stepOne() {
 }
 
 function stepTwo() {
-  zoomIn([75.394651, 30.889173], 2);
-  map.classed("gig-county-highlight", true);
+  // zoomIn([75.394651, 30.889173], 2);
+  // map.classed("gig-county-highlight", true);
   // removeOgallalaHighlight();
   // var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
   // var shape = map.append("path")
@@ -492,7 +490,6 @@ function zoomOut() {
 }
 
 function mouseover(d) {
-  console.log(d);
   tooltip.style("display", "block");
   tooltip.html("<p>" + d.properties.district + "</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
 }
