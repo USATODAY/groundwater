@@ -6,16 +6,20 @@
     "FULL_WIDTH": true,
     "SLIDER_IMAGES": [
       {
-        "title": "Slide One Title",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/heheh.gif"
+        "title": "test1",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-1.jpg"
       },
       {
-        "title": "Why Am I So Cool?",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
+        "title": "test2",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-2.jpg"
       },
       {
-        "title": "Possibly a Third Slide",
-        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-3.jpg"
+        "title": "test3",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-3.jpg"
+      },
+      {
+        "title": "test4",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-graphic-subsidence/img/subsidence-4.jpg"
       }
     ]
 }
