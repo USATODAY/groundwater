@@ -445,7 +445,7 @@ function zoomOut() {
 
 function mouseover(d) {
   tooltip.style("display", "block");
-  tooltip.html("<p>" + d.properties.aquifer_name + " county</p>" + "Sub-surface storage trend: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " (mm/year)");
+  tooltip.html("<p>" + d.properties.aquifer_name + "</p>" + "<p>Stress classification: " + d.properties.stress_classification + "<p>Sub-surface storage trend: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " (mm/year)</p>");
 }
 
 function mousemove() {
