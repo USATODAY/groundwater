@@ -285,14 +285,12 @@ function draw(err, data) {
     width = WIDTH;
     // height = width * (9/16);
     height = HEIGHT;
-    scale = 167;
-    // if (width < 800) {
-      // scale = width;
-    // }
+    scale = width > 950 ? 167 : width/5.75;
 
-    if (scale > 250) {
-      scale = 167;
+    if (width > 1200) {
+      scale = 175;
     }
+
     $graphic.empty();
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
