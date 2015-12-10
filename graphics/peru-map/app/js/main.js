@@ -367,7 +367,7 @@ function draw(err, data, data2) {
       .datum(topojson.merge(data, data.objects[topojson_features_obj_2].geometries))
       // .enter().append("path")
       .attr("fill", function(d) { 
-          return "rgba(255, 255, 255, 0.75)";
+          return "rgba(255, 255, 255, 0.25)";
           // if (d.properties[VAL_COLUMN]) {
           //   return getColor(parseFloat(d.properties[VAL_COLUMN]));
           // } else {

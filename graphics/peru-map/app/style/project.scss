@@ -142,18 +142,6 @@ html, body {
   .counties path {opacity: 0.1}
 }
 
-
-.map-legend {
-  bottom: 0;
-  color: white;
-  position: absolute;
-  left: 0;
-  // margin-left: 2em;
-  p {
-    color: white;
-  }
-}
-
 .gig-progress-indicator-wrap {
   position: absolute;
   right: 10px;
@@ -213,7 +201,7 @@ svg {
 }
 
 .country-shape {
-  fill: rgba(255, 255, 255, 0.21);
+  fill: rgba(255, 255, 255, 0.1);
   stroke: white;
   stroke-width: 1px;
 }
