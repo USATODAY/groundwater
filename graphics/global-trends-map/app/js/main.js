@@ -256,7 +256,7 @@ function addLegend2() {
     $legend.remove();
     $legend = null;
   }
-  var html = "<div class='map-legend'>GRACE tws trends changes 2002-2015 (inches H20)<div class='gig-legend-entries'>";
+  var html = "<div class='map-legend'>GRACE tws trends: overall changes from 2002-2015 (inches H20)<div class='gig-legend-entries'>";
   html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[0] + "'></span><span>-10 -</span></div>";
   html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[1] + "'></span><span>-5 - -10</span></div>";
   html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[2] + "'></span><span>0 - -5</span></div>";
