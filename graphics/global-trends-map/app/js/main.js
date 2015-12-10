@@ -69,6 +69,7 @@ function prepareContainers() {
   // $el.height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
   // $el.find('.gig-slider-panel').height(HEIGHT);
   $el.find('.gig-slider-panel-text-container').css({"margin-bottom": HEIGHT - 75});
+  $el.find('.gig-slider-panel-text-container').eq(slidesLength -1).css({"margin-bottom": 0});
   $el.find('.gig-slider-background').height(HEIGHT);
   $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
   $embedModule.height(HEIGHT * slidesLength);
@@ -355,6 +356,7 @@ function draw(err, data, data2, data3, data4, data5) {
     //     .attr("d", path);
 
 
+    //draw continents
     map.append('path')
       .datum(topojson.merge(data, data.objects["ne_110m_land"].geometries))
       .attr("class", "country-shape")
@@ -362,25 +364,9 @@ function draw(err, data, data2, data3, data4, data5) {
       .attr("d", path);
 
 
-    map.append('g')
-      .attr('class', 'gig-world-aquifers')
-      .selectAll('path')
-      .data(topojson.feature(data, data.objects[topojson_features_obj_2]).features)
-      .enter()
-      .append('path')
-      .attr('fill', function(d) {
-        var val = +d.properties[VAL_COLUMN];
-        if (val >= 0) {
-          return '#0095C4';
-        } else {
-          return colorScale(val);
-        }
-      })
-      .attr('d', path)
-      .on("mouseover", mouseover)
-      .on("mousemove", mousemove)
-      .on("mouseout", mouseout);
+    
 
+      //draw regional data
       map.append('g')
         .attr('class', 'region-1')
         .attr('opacity', 0)
@@ -453,6 +439,26 @@ function draw(err, data, data2, data3, data4, data5) {
           }
         })
         .attr('d', path);
+
+      //draw aquifers
+      map.append('g')
+      .attr('class', 'gig-world-aquifers')
+      .selectAll('path')
+      .data(topojson.feature(data, data.objects[topojson_features_obj_2]).features)
+      .enter()
+      .append('path')
+      .attr('fill', function(d) {
+        var val = +d.properties[VAL_COLUMN];
+        if (val >= 0) {
+          return '#0095C4';
+        } else {
+          return colorScale(val);
+        }
+      })
+      .attr('d', path)
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseout", mouseout);
 
       tooltip = d3.select($graphic[0]).append("div")
         .attr("class", "gig-tooltip")
