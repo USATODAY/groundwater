@@ -59,7 +59,10 @@ var height = 600;
 var transisitonDuration;
 var GRAPHICDATA;
 var GRAPHICDATA2;
-var locations = []  // array of lat/long coordinates that point the different focal areas
+var GRAPHICDATA3;
+var GRAPHICDATA4;
+var GRAPHICDATA5;
+var locations = [[-89.0853276, 38.7860603], [77.9741001, 26.2406482], [-66.7848378, -26.2154076], [22.2739966, 26.7051597]];  // array of lat/long coordinates that point the different focal areas
 
 function prepareContainers() {
   // set app container to height of viewport
@@ -70,20 +73,12 @@ function prepareContainers() {
   $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
   $embedModule.height(HEIGHT * slidesLength);
   $el.height(HEIGHT * slidesLength);
-  // $('.gig-slider-container').height(HEIGHT);
-
-  // set framework wrapper container to height of viewport plus length of scroll
-  // if ( $(id).parents('.story-oembed') ) {
-  //   $(id).parents('.story-oembed').height(HEIGHT * GRAPHICINFO.SLIDER_IMAGES.length);
-  // }
+  
 }
 
 function setup() {
   WIDTH = window.innerWidth;
-  // HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
-  // if (window.mobileCheck()) {
   HEIGHT = window.innerHeight;
-  // }
   $sliderBG = $('#gig-slider-background-1');
   transisitonDuration = window.mobileCheck() ? 0 : 500;
 
@@ -141,41 +136,6 @@ function updatePosition(e) {
     progressBottom = 0;
   }
   if (debugMode) $debug.html(progressBottom);
-
-  
-
-  // for (var i = 0; i < sliderPosArray.length + 1; i++) {
-  //   if ( pos > sliderPosArray[i] && pos <= sliderPosArray[i+1] ) {
-  //     progressPerSlide = (pos - sliderPosArray[i]) / HEIGHT;
-
-      /**
-       * PER SLIDE CODE GOES HERE
-       * use [progressPerSlide] to get progress of current slide 0-1
-       */
-
-       // if ( (progressPerSlide * progressWeight) < 0 ) {
-       //   targetValue = 0;
-       // }
-       // else if ( (progressPerSlide * progressWeight) < 1 ) {
-       //   targetValue = (progressPerSlide * progressWeight);
-       // }
-       // else {
-       //   targetValue = 1;
-       // }
-
-       // $el.find('.gig-slider-background').eq(i+1).css({
-       //   'opacity': targetValue
-       // });
-       // if ( $el.find('.gig-slider-background').eq(i+2) ) {
-       //   $el.find('.gig-slider-background').eq(i+2).css({
-       //     opacity: 0
-       //   });
-       // }
-
-       /* END PER SLIDE CODE */
-  //   }
-  // }
-
   /**
    * ENTIRE ELEMENT PROGRESS ANIMATION GOES HERE
    * use [progress] to get progress of current slide 0-1
@@ -273,17 +233,43 @@ function start() {
 
 
 function addLegend() {
+    if ($legend) {
+      $legend.remove();
+      $legend = null;
+    }
     var html = "<div class='map-legend'>Sub-surface storage trends (mm/year)<div class='gig-legend-entries'>";
-    scaleBreaks.forEach(function(breakpoint, i) {
-        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + colorScale(breakpoint) +"'></span><span>" + breakpoint + "</span></div>";
-    });
+    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[0] + "'></span><span>-10 -</span></div>";
+  html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[1] + "'></span><span>-5 - -10</span></div>";
+  html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[2] + "'></span><span>0 - -5</span></div>";
     
-        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>none</span></div>";
+        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>0+</span></div>";
         html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
    
     html += "</div>"
     $graphic.append(html);
     $legend = $graphic.find('.map-legend');
+}
+
+function addLegend2() {
+  if ($legend) {
+    $legend.remove();
+    $legend = null;
+  }
+  var html = "<div class='map-legend'>GRACE tws trends changes 2002-2015 (inches H20)<div class='gig-legend-entries'>";
+  html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[0] + "'></span><span>-10 -</span></div>";
+  html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[1] + "'></span><span>-5 - -10</span></div>";
+  html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[2] + "'></span><span>0 - -5</span></div>";
+
+  html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>0+</span></div>";
+  html += "<p>Source: " + GRAPHICINFO.SOURCE_2 + "</p>";
+
+  html += "</div>"
+  $graphic.append(html);
+  $legend = $graphic.find('.map-legend');
+}
+
+function updateLegend() {
+
 }
 
 var reDraw = _.throttle(draw, 500, {
@@ -302,12 +288,24 @@ function draw(err, data, data2, data3, data4, data5) {
     }
 
     $graphic.empty();
+
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
     if(!GRAPHICDATA2) {
       GRAPHICDATA2 = data2;
     }
+    if(!GRAPHICDATA3) {
+      GRAPHICDATA3 = data3;
+    }
+    if(!GRAPHICDATA4) {
+      GRAPHICDATA4 = data4;
+    }
+    if(!GRAPHICDATA5) {
+      GRAPHICDATA5 = data5;
+    }
+
+
     var geo = {
       type: "FeatureCollection",
       features: topojson.feature(data, data.objects[topojson_features_obj]).features
@@ -336,25 +334,25 @@ function draw(err, data, data2, data3, data4, data5) {
     map = svg.append('g')
       .attr('class', 'gig-map');
 
-    map.append("defs").append("path")
-    .datum({type: "Sphere"})
-    .attr("id", "sphere")
-    .attr("d", path);
+    // map.append("defs").append("path")
+    // .datum({type: "Sphere"})
+    // .attr("id", "sphere")
+    // .attr("d", path);
 
-    map.append("use")
-    .attr("class", "stroke")
-    .attr("xlink:href", "#sphere");
+    // map.append("use")
+    // .attr("class", "stroke")
+    // .attr("xlink:href", "#sphere");
 
-    map.append("use")
-        .attr("class", "fill")
-        .attr("xlink:href", "#sphere");
+    // map.append("use")
+    //     .attr("class", "fill")
+    //     .attr("xlink:href", "#sphere");
 
     
 
-    map.append("path")
-        .datum(graticule)
-        .attr("class", "graticule")
-        .attr("d", path);
+    // map.append("path")
+    //     .datum(graticule)
+    //     .attr("class", "graticule")
+    //     .attr("d", path);
 
 
     map.append('path')
@@ -460,8 +458,13 @@ function draw(err, data, data2, data3, data4, data5) {
         .attr("class", "gig-tooltip")
         .style("display", "none");
 
-      addLegend();
+      if (currentStep == 1) {
+        addLegend();
+      } else {
+        addLegend2();
+      }
       addProgressIndicator();
+      setSlide(currentStep);
 }
 
 function addProgressIndicator() {
@@ -514,6 +517,7 @@ var stepMap = {
 }
 
 function stepOne() {
+  addLegend();
   zoomOut();
   map.select('.gig-world-aquifers').transition().attr('opacity', 1);
   map.select('.region-1').transition().attr('opacity', 0);
@@ -523,7 +527,8 @@ function stepOne() {
 }
 
 function stepTwo() {
-  // zoomIn([-110.0853276, 41.7860603], 3);
+  addLegend2();
+  zoomIn(locations[0], 3);
   map.select('.gig-world-aquifers').transition().attr('opacity', 0);
   map.select('.region-1').transition().attr('opacity', 1);
   map.select('.region-2').transition().attr('opacity', 0);
@@ -532,14 +537,8 @@ function stepTwo() {
 }
 
 function stepThree() {
-  map.select('.gig-world-aquifers').transition().attr('opacity', 0);
-  map.select('.region-1').transition().attr('opacity', 0);
-  map.select('.region-2').transition().attr('opacity', 1);
-  map.select('.region-3').transition().attr('opacity', 0);
-  map.select('.region-4').transition().attr('opacity', 0);
-}
-
-function stepFour() {
+  addLegend2();
+  zoomIn(locations[1], 3);
   map.select('.gig-world-aquifers').transition().attr('opacity', 0);
   map.select('.region-1').transition().attr('opacity', 0);
   map.select('.region-2').transition().attr('opacity', 0);
@@ -547,7 +546,19 @@ function stepFour() {
   map.select('.region-4').transition().attr('opacity', 0);
 }
 
+function stepFour() {
+  addLegend2();
+  zoomIn(locations[2], 3);
+  map.select('.gig-world-aquifers').transition().attr('opacity', 0);
+  map.select('.region-1').transition().attr('opacity', 0);
+  map.select('.region-2').transition().attr('opacity', 1);
+  map.select('.region-3').transition().attr('opacity', 0);
+  map.select('.region-4').transition().attr('opacity', 0);
+}
+
 function stepFive() {
+  addLegend2();
+  zoomIn(locations[3], 3);
   map.select('.gig-world-aquifers').transition().attr('opacity', 0);
   map.select('.region-1').transition().attr('opacity', 0);
   map.select('.region-2').transition().attr('opacity', 0);
@@ -602,5 +613,5 @@ window.addEventListener('resize', function() {
   elHeight = $el.height();
   offsetTop = $el.offset().top;
   setDataPosition();
-  reDraw(null, GRAPHICDATA, GRAPHICDATA2);
+  reDraw(null, GRAPHICDATA, GRAPHICDATA2, GRAPHICDATA3, GRAPHICDATA4, GRAPHICDATA5);
 });
