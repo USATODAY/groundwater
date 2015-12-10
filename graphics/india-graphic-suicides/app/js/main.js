@@ -198,8 +198,8 @@ function updatePosition(e) {
 
 //returns the correct step based on progress
 function getNewStep(progress) {
-  // var padding = 0.25;
-  // progress = progress - padding;
+  var padding = 0.1;
+  progress = progress + padding;
   var breaks = [] //store each progress break point in this array
   range(slidesLength).forEach(function(slideIndex) {
     var stepBreak = (1/slidesLength) * slideIndex;
