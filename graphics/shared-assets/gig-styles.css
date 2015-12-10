@@ -83,7 +83,6 @@ html, body {
   left: 0; }
 
 #gig-slider {
-  position: relative;
   z-index: 1;
   width: 100%;
   background: #ccc;

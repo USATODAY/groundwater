@@ -36,8 +36,13 @@ var $graphic;
 var $details;
 var $sliderBG;
 var $embedModule;
+var $legend;
 var VAL_COLUMN = "sub-surface_storage_trends_mm_per_yr";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
+var DATA_URL_2 = getDataURL(GRAPHICINFO.DATA_URL_2);
+var DATA_URL_3 = getDataURL(GRAPHICINFO.DATA_URL_3);
+var DATA_URL_4 = getDataURL(GRAPHICINFO.DATA_URL_4);
+var DATA_URL_5 = getDataURL(GRAPHICINFO.DATA_URL_5);
 var topojson_features_obj = "ne_110m_land";
 var topojson_features_obj_2 = "world_aquifer_systems_nocoast";
 var _ = require("lodash");
@@ -54,6 +59,7 @@ var height = 600;
 var transisitonDuration;
 var GRAPHICDATA;
 var GRAPHICDATA2;
+var locations = []  // array of lat/long coordinates that point the different focal areas
 
 function prepareContainers() {
   // set app container to height of viewport
@@ -258,7 +264,10 @@ function start() {
     $details = $graphic.find('#details');
     queue()
       .defer(d3.json, DATA_URL)
-      // .defer(d3.json, ogallalaDataURL)
+      .defer(d3.json, DATA_URL_2)
+      .defer(d3.json, DATA_URL_3)
+      .defer(d3.json, DATA_URL_4)
+      .defer(d3.json, DATA_URL_5)
       .await(draw);
 }
 
@@ -274,6 +283,7 @@ function addLegend() {
    
     html += "</div>"
     $graphic.append(html);
+    $legend = $graphic.find('.map-legend');
 }
 
 var reDraw = _.throttle(draw, 500, {
@@ -281,7 +291,7 @@ var reDraw = _.throttle(draw, 500, {
   trailing: true
 });
 
-function draw(err, data) {
+function draw(err, data, data2, data3, data4, data5) {
     width = WIDTH;
     // height = width * (9/16);
     height = HEIGHT;
@@ -295,9 +305,9 @@ function draw(err, data) {
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
-    // if(!GRAPHICDATA2) {
-    //   GRAPHICDATA2 = data2;
-    // }
+    if(!GRAPHICDATA2) {
+      GRAPHICDATA2 = data2;
+    }
     var geo = {
       type: "FeatureCollection",
       features: topojson.feature(data, data.objects[topojson_features_obj]).features
@@ -305,7 +315,7 @@ function draw(err, data) {
 
      var center = d3.geo.centroid(geo);
 
-    var projection = d3.geo.naturalEarth()
+    projection = d3.geo.naturalEarth()
     .scale(scale)
     // .center(center)
     .translate([width/2, height / 2]);
@@ -317,39 +327,44 @@ function draw(err, data) {
 
 
 
-    var svg = d3.select($graphic[0]).append("svg")
+    svg = d3.select($graphic[0]).append("svg")
     .attr("width", width)
     .attr("height", height)
     .attr("fill", "rgba(255, 255, 255, 0.5)")
     .attr("style", "background: black");
 
-    svg.append("defs").append("path")
+    map = svg.append('g')
+      .attr('class', 'gig-map');
+
+    map.append("defs").append("path")
     .datum({type: "Sphere"})
     .attr("id", "sphere")
     .attr("d", path);
 
-    svg.append("use")
+    map.append("use")
     .attr("class", "stroke")
     .attr("xlink:href", "#sphere");
 
-    svg.append("use")
+    map.append("use")
         .attr("class", "fill")
         .attr("xlink:href", "#sphere");
 
-    svg.append("path")
+    
+
+    map.append("path")
         .datum(graticule)
         .attr("class", "graticule")
         .attr("d", path);
 
 
-    svg.append('path')
+    map.append('path')
       .datum(topojson.merge(data, data.objects["ne_110m_land"].geometries))
       .attr("class", "country-shape")
       .attr('fill', 'rgba(255, 255, 255, 0.25)')
       .attr("d", path);
 
 
-    svg.append('g')
+    map.append('g')
       .attr('class', 'gig-world-aquifers')
       .selectAll('path')
       .data(topojson.feature(data, data.objects[topojson_features_obj_2]).features)
@@ -367,6 +382,79 @@ function draw(err, data) {
       .on("mouseover", mouseover)
       .on("mousemove", mousemove)
       .on("mouseout", mouseout);
+
+      map.append('g')
+        .attr('class', 'region-1')
+        .attr('opacity', 0)
+        .selectAll('path')
+        .data(data2.features)
+        .enter()
+        .append('path')
+        .attr('opacity', 1)
+        .attr('fill', function(d) {
+          var val = d.properties.DN;
+          if (val >= 0) {
+            return '#0095C4';
+          } else {
+            return colorScale(val);
+          }
+        })
+        .attr('d', path);
+
+
+      map.append('g')
+        .attr('class', 'region-2')
+        .attr('opacity', 0)
+        .selectAll('path')
+        .data(data3.features)
+        .enter()
+        .append('path')
+        .attr('opacity', 1)
+        .attr('fill', function(d) {
+          var val = d.properties.DN;
+          if (val >= 0) {
+            return '#0095C4';
+          } else {
+            return colorScale(val);
+          }
+        })
+        .attr('d', path);
+
+      map.append('g')
+        .attr('class', 'region-3')
+        .attr('opacity', 0)
+        .selectAll('path')
+        .data(data4.features)
+        .enter()
+        .append('path')
+        .attr('opacity', 1)
+        .attr('fill', function(d) {
+          var val = d.properties.DN;
+          if (val >= 0) {
+            return '#0095C4';
+          } else {
+            return colorScale(val);
+          }
+        })
+        .attr('d', path);
+
+      map.append('g')
+        .attr('class', 'region-4')
+        .attr('opacity', 0)
+        .selectAll('path')
+        .data(data5.features)
+        .enter()
+        .append('path')
+        .attr('opacity', 1)
+        .attr('fill', function(d) {
+          var val = d.properties.DN;
+          if (val >= 0) {
+            return '#0095C4';
+          } else {
+            return colorScale(val);
+          }
+        })
+        .attr('d', path);
 
       tooltip = d3.select($graphic[0]).append("div")
         .attr("class", "gig-tooltip")
@@ -395,7 +483,9 @@ function getNewStep(progress) {
     var stepBreak = (1/slidesLength) * slideIndex;
     breaks.push(stepBreak);
   });
-  if (progress > breaks[2]) {
+  if (progress > breaks[3]) {
+    return 5;
+  } else if (progress > breaks[2]) {
     return 4;
   } else if (progress > breaks[1]) {
     return 3;
@@ -417,19 +507,58 @@ function setSlide(newSlide) {
 //maps each step to a function
 var stepMap = {
   1: stepOne,
-  2: stepOne,
-  3: stepOne,
-  4: stepOne
+  2: stepTwo,
+  3: stepThree,
+  4: stepFour,
+  5: stepFive
 }
 
 function stepOne() {
+  zoomOut();
+  map.select('.gig-world-aquifers').transition().attr('opacity', 1);
+  map.select('.region-1').transition().attr('opacity', 0);
+  map.select('.region-2').transition().attr('opacity', 0);
+  map.select('.region-3').transition().attr('opacity', 0);
+  map.select('.region-4').transition().attr('opacity', 0);
+}
 
+function stepTwo() {
+  // zoomIn([-110.0853276, 41.7860603], 3);
+  map.select('.gig-world-aquifers').transition().attr('opacity', 0);
+  map.select('.region-1').transition().attr('opacity', 1);
+  map.select('.region-2').transition().attr('opacity', 0);
+  map.select('.region-3').transition().attr('opacity', 0);
+  map.select('.region-4').transition().attr('opacity', 0);
+}
 
+function stepThree() {
+  map.select('.gig-world-aquifers').transition().attr('opacity', 0);
+  map.select('.region-1').transition().attr('opacity', 0);
+  map.select('.region-2').transition().attr('opacity', 1);
+  map.select('.region-3').transition().attr('opacity', 0);
+  map.select('.region-4').transition().attr('opacity', 0);
+}
+
+function stepFour() {
+  map.select('.gig-world-aquifers').transition().attr('opacity', 0);
+  map.select('.region-1').transition().attr('opacity', 0);
+  map.select('.region-2').transition().attr('opacity', 0);
+  map.select('.region-3').transition().attr('opacity', 1);
+  map.select('.region-4').transition().attr('opacity', 0);
+}
+
+function stepFive() {
+  map.select('.gig-world-aquifers').transition().attr('opacity', 0);
+  map.select('.region-1').transition().attr('opacity', 0);
+  map.select('.region-2').transition().attr('opacity', 0);
+  map.select('.region-3').transition().attr('opacity', 0);
+  map.select('.region-4').transition().attr('opacity', 1);
 }
 
 
 function zoomIn(center, zoomLevel) {
   var coordinates = projection(center);
+  console.log('zoom')
   map.transition()
       .duration(transisitonDuration)
       .attr("transform", "translate(" + ((width/2) - (coordinates[0] * zoomLevel)) + ", " + ((HEIGHT/2) - coordinates[1] * zoomLevel) + ")scale(" + zoomLevel + ")");

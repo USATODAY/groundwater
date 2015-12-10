@@ -3,9 +3,29 @@
     "GRAPHIC_SLUG": "gig-global-map",
     "CHATTER": "",
     "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-trends-map/data/world_aquifers.topo.json",
+    "DATA_URL_2": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-trends-map/data/region_1.geo.json",
+    "DATA_URL_3": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-trends-map/data/region_2.geo.json",
+    "DATA_URL_4": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-trends-map/data/region_3.geo.json",
+    "DATA_URL_5": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/global-trends-map/data/region_4.geo.json",
     "FULL_WIDTH": true,
     "SOURCE": "University of California, Irvine",
     "SLIDER_IMAGES": [
+      {
+        "title": "",
+        "img": ""
+      },
+      {
+        "title": "",
+        "img": ""
+      },
+      {
+        "title": "",
+        "img": ""
+      },
+      {
+        "title": "",
+        "img": ""
+      },
       {
         "title": "",
         "img": ""
