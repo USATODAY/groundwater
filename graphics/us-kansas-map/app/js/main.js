@@ -285,9 +285,9 @@ function start() {
 function addLegend() {
     var html = "<div class='map-legend'>Average decrease in water level<div>";
     
-    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[2] + "'></span><span>15ft.+</span></div>";
+    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[0] + "'></span><span>15ft.+</span></div>";
     html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[1] + "'></span><span>5-15ft.</span></div>"; 
-    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[0] + "'></span><span>0-4ft.</span></div>"; 
+    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[2] + "'></span><span>0-4ft.</span></div>"; 
     
         html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>none</span></div>";
         html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
