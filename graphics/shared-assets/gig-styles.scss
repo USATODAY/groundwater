@@ -171,6 +171,12 @@ html, body {
 
 /* map */
 
+.group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 .gig-map {
   position: absolute;
     top: 0;
@@ -195,6 +201,7 @@ html, body {
   bottom: 0;
   color: white;
   font-family: "Futura Today Light", Arial, sans-serif;
+  font-size: 12px;
   padding: 10px;
   position: absolute;
   text-align: center;
@@ -205,12 +212,14 @@ html, body {
   p {
     color: white;
   }
+  @extend .group;
 }
 
 .gig-legend-entry {
   display: inline-block;
   max-width: calc(25% - 2px);
   text-align: center;
+  vertical-align: top;
 }
 
 .gig-legend-entries {
