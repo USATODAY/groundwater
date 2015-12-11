@@ -28,7 +28,7 @@ function removeEmbeds() {
 
 function isNative() {
     //checks to see if page is a native view
-    return (!typeof(GD) == "undefined");
+    return typeof GD !== 'undefined';
 }
 
 function check() {
