@@ -69,6 +69,13 @@ var transisitonDuration;
 var GRAPHICDATA;
 var GRAPHICDATA2;
 var ogallalaDataURL = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/map-scroll/data/ogallala.topojson.json");
+var ogallala_data;
+var ogallala_shape;
+var ogallala_label;
+var haskell_label;
+var isMobile;
+var $mobileImgs;
+var mobileSVG = ['http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-kansas-map/img/us_1.png', 'http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-kansas-map/img/us_2.png', 'http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-kansas-map/img/us_3.png', 'http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-kansas-map/img/us_4.png'];
 
 
 function prepareContainers() {
@@ -80,8 +87,6 @@ function prepareContainers() {
   $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
   $embedModule.height(HEIGHT * slidesLength + 30);
   $el.height(HEIGHT * slidesLength);
-  console.log($el.height());
-  console.log("embed", $embedModule.height());
   // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
@@ -106,6 +111,8 @@ function setup() {
 
   $el = $(id);
   getNewStep();
+
+  isMobile = mobileCheck();
   
   if (debugMode) {
     $('body').append('<div id="debug"></div>');
@@ -275,10 +282,15 @@ function start() {
     $window = $(window);
     $graphic = $el.find(".gig-map");
     $details = $graphic.find('#details');
-    queue()
-      .defer(d3.json, DATA_URL)
-      .defer(d3.json, ogallalaDataURL)
-      .await(draw);
+
+    if (!isMobile) {
+      queue()
+        .defer(d3.json, DATA_URL)
+        .defer(d3.json, ogallalaDataURL)
+        .await(draw);
+    } else {
+      drawMobile();
+    }
 }
 
 
@@ -300,6 +312,18 @@ var reDraw = _.throttle(draw, 500, {
   leading: true,
   trailing: true
 });
+
+function drawMobile() {
+  mobileSVG.forEach(function(imgURL) {
+    var html = ('<div class="gig-mobile-img" style="background-image: url(' + imgURL + ');" />');
+    $graphic.append(html);
+  });
+  $mobileImgs = $el.find('.gig-mobile-img');
+  $mobileImgs.eq(0).addClass('gig-mobile-active');
+
+  $mobileImgs.height(HEIGHT);
+
+}
 
 function draw(err, data, data2) {
     width = $(window).width();
@@ -380,6 +404,8 @@ function draw(err, data, data2) {
      tooltip = d3.select($graphic[0]).append("div")
         .attr("class", "gig-tooltip")
         .style("display", "none");
+  
+      ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
 
       addLegend();
       addProgressIndicator();
@@ -432,57 +458,101 @@ var stepMap = {
 }
 
 function removeOgallalaOutline() {
-  map.classed('gig-step-2', false);
-  var label = map.select('.gig-aquifer-label')
-    .transition()
-    .duration(transisitonDuration)
-    .attr('opacity', 0);
+  if (!isMobile) {
 
-  var shape = map.select('.ogallala-shape')
-    .transition()
-    .duration(transisitonDuration)
-    .attr('opacity', 0);
+    map.classed('gig-step-2', false);
 
-  label.remove()
-  shape.remove();
+    if(ogallala_label) {
+      ogallala_label
+        .transition()
+        .duration(transisitonDuration)
+        .attr('opacity', 0)
+        .attr('hidden', 'true');
+    }
+
+    if (ogallala_shape) {
+      ogallala_shape
+        .transition()
+        .duration(transisitonDuration)
+        .attr('opacity', 0);
+      
+      ogallala_shape.attr("hidden", "true");
+    }
+  } else {
+    $mobileImgs.removeClass('gig-mobile-active');
+    $mobileImgs.eq(0).addClass('gig-mobile-active');
+  }
+
 }
 
 function addOgallalaOutline() {
-  removeOgallalaHighlight();
-  map.classed('gig-step-2', true);
-  var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
+  if (!isMobile) {
+    removeOgallalaHighlight();
+    map.classed('gig-step-2', true);
 
-  var textLabel = map.append('g')
-    .attr('class', 'gig-aquifer-label')
-    .attr('transform', 'translate(' + projection([-95.295983, 39.464040]) + ')')
-    .append('text')
-    .attr('transform', 'translate(-10, 0)')
-    .attr('fill', 'white')
-    .attr('font-size', 14)
-    .text("Ogallala Aquifer");
+    if (!ogallala_label) {
+      ogallala_label = map.append('g')
+        .attr('class', 'gig-aquifer-label')
+        .attr('transform', 'translate(' + projection([-95.295983, 39.464040]) + ')');
 
-  var shape = map.append("path")
-        .data(ogallala_data)
-        .attr("class", "ogallala-shape")
-        .attr("stroke", "white")
-        .attr("stroke-width", 1)
-        .attr("fill", "rgba(255, 255, 255, 0.9)")
-        .attr("opacity", 0)
-        .attr("d", path);
- shape
-    .transition()
-    .duration(transisitonDuration)
-    .attr('opacity', 0.8);
+      ogallala_label
+        .append('text')
+        .attr('transform', 'translate(-10, 0)')
+        .attr('fill', 'white')
+        .attr('font-size', 14)
+        .text("Ogallala Aquifer");
+    } else {
+      ogallala_label
+        .transition()
+        .duration(transisitonDuration)
+        .attr('hidden', 'false')
+        .attr('opacity', 1);
+    }
+
+    if (!ogallala_shape) {
+      ogallala_shape = map.append("path")
+            .data(ogallala_data)
+            .attr("class", "ogallala-shape")
+            .attr("stroke", "white")
+            .attr("stroke-width", 1)
+            .attr("fill", "rgba(255, 255, 255, 0.9)")
+            .attr("opacity", 0)
+            .attr("d", path);
+    }
+    ogallala_shape
+      .transition()
+      .duration(transisitonDuration)
+      .attr('hidden', 'false')
+      .attr('opacity', 0.8);
+
+  } else {
+    $mobileImgs.removeClass('gig-mobile-active');
+    $mobileImgs.eq(1).addClass('gig-mobile-active');
+  }
+  
 
 }
 
 function addOgallalaHighlight() {
-  removeOgallalaOutline();
-  map.classed("gig-haskell-highlight", false);
-  zoomIn([-100.851404, 37.482529], 2);
-  map.classed("gig-haskell-highlight", false);
-  map.classed("gig-county-highlight", true);
-  map.select('.county-detail-text').remove();
+  if (!isMobile) {
+    removeOgallalaOutline();
+    map.classed("gig-haskell-highlight", false);
+    zoomIn([-100.851404, 37.482529], 2);
+    map.classed("gig-haskell-highlight", false);
+    map.classed("gig-county-highlight", true);
+
+    if (haskell_label) {
+      haskell_label
+        .transition()
+        .attr('hidden', 'true')
+        .attr('opacity', 0);
+    }
+
+  } else {
+    $mobileImgs.removeClass('gig-mobile-active');
+    $mobileImgs.eq(2).addClass('gig-mobile-active');
+  }
+  
 }
 
 function removeOgallalaHighlight() {
@@ -491,19 +561,35 @@ function removeOgallalaHighlight() {
 }
 
 function showHaskell() {
-  // zoomIn([-100.851404, 37.482529], 3);
-  map.append('g')
-    .attr('class', 'county-detail-text')
-    .attr('transform', 'translate(' + projection([-100.851404, 37.482529]) + ')')
-    .append('text')
-    .attr("fill", "white")
-    .attr('transform', 'translate(10, 5)')
-    .text('Haskell County, KS')
-    .attr('font-size', 10);
+
+   if (!isMobile) {
+
+      if( !haskell_label) {
+        haskell_label = map.append('g')
+          .attr('class', 'county-detail-text')
+          .attr('transform', 'translate(' + projection([-100.851404, 37.482529]) + ')')
+
+        haskell_label
+          .append('text')
+          .attr("fill", "white")
+          .attr('transform', 'translate(10, 5)')
+          .text('Haskell County, KS')
+          .attr('font-size', 10);
+      } else {
+        haskell_label
+          .transition()
+          .attr('hidden', 'false')
+          .attr('opacity', 1);
+      }
 
 
-  map.classed("gig-county-highlight", false);
-  map.classed("gig-haskell-highlight", true);
+      map.classed("gig-county-highlight", false);
+      map.classed("gig-haskell-highlight", true);
+
+    } else {
+      $mobileImgs.removeClass('gig-mobile-active');
+      $mobileImgs.eq(3).addClass('gig-mobile-active');
+    }
 }
 
 function zoomIn(center, zoomLevel) {
@@ -551,5 +637,8 @@ window.addEventListener('resize', function() {
   elHeight = $el.height();
   offsetTop = $el.offset().top;
   setDataPosition();
-  reDraw(null, GRAPHICDATA, GRAPHICDATA2);
+
+  if(!isMobile) {
+    reDraw(null, GRAPHICDATA, GRAPHICDATA2);
+  }
 });
