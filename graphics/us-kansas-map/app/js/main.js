@@ -323,6 +323,8 @@ function drawMobile() {
 
   $mobileImgs.height(HEIGHT);
 
+  addLegend();
+
 }
 
 function draw(err, data, data2) {
