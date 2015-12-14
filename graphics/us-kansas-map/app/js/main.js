@@ -323,7 +323,10 @@ function drawMobile() {
 
   $mobileImgs.height(HEIGHT);
 
+  $graphic.height(HEIGHT);
+
   addLegend();
+  addProgressIndicator();
 
 }
 
