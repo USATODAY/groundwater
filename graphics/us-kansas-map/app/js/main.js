@@ -510,7 +510,7 @@ function addOgallalaOutline() {
       ogallala_label
         .transition()
         .duration(transisitonDuration)
-        .attr('hidden', 'false')
+        .attr('hidden', null)
         .attr('opacity', 1);
     }
 
@@ -527,7 +527,7 @@ function addOgallalaOutline() {
     ogallala_shape
       .transition()
       .duration(transisitonDuration)
-      .attr('hidden', 'false')
+      .attr('hidden', null)
       .attr('opacity', 0.8);
 
   } else {
@@ -583,7 +583,7 @@ function showHaskell() {
       } else {
         haskell_label
           .transition()
-          .attr('hidden', 'false')
+          .attr('hidden', null)
           .attr('opacity', 1);
       }
 
