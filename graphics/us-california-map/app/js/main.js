@@ -46,13 +46,13 @@ var sliderPosArray = [];    // array to store offset().top positions internally
 var debugMode = false;      // set [true] to enable box to output stuff
 var $debug;                 // jquery saved reference to debug element
 
-var $window;
-var $graphic;
-var $details;
-var $sliderBG;
-var $embedModule;
-var VAL_COLUMN = "avg_chg";
-var VAL_COLUMN_2 = "reported_outages";
+var $window;                // save jquery reference to window
+var $graphic;                // save jquery reference to graphic element
+var $details;                // save jquery reference to details element
+var $sliderBG;                // save jquery reference to slider background element
+var $embedModule;                // save jquery reference to parent embed element
+var VAL_COLUMN = "avg_chg";     // column name of map value
+var VAL_COLUMN_2 = "reported_outages";     // column name of map value
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
 var DATA_URL_2 = getDataURL(GRAPHICINFO.DATA_URL_2);
 var topojson_features_obj = "counties";
@@ -72,6 +72,9 @@ var width = 960;
 var height = 600;
 var GRAPHICDATA;
 var GRAPHICDATA2;
+var isMobile;       //global to store value of mobileCheck()
+var counties;     //store d3 reference to counties
+var circles;     //store d3 reference to well circles
 
 
 function prepareContainers() {
@@ -211,9 +214,6 @@ var colorScale = function(input) {
   }
   return r;
 }
-// var colorScale = d3.scale.quantize()
-//   .domain(scaleBreaks)
-//   .range(scaleColors);
 
 function getDataURL(dataURL) {
   var hostname = window.location.hostname;
@@ -246,7 +246,6 @@ function start() {
     $details = $graphic.find('#details');
     
     queue()
-      // .defer(d3.json, DATA_URL_2)
       .defer(d3.json, DATA_URL)
       .defer(d3.csv, DATA_URL_2)
       .await(ready);
@@ -346,7 +345,7 @@ function ready(err, data, data2) {
       .attr('fill', 'none')
       .attr("d", path);
 
-      map2.append('g')
+      counties = map2.append('g')
         .attr('class', 'gig-counties')
         .selectAll('path')
         .data(topojson.feature(data, data.objects[topojson_features_obj_2]).features)
@@ -386,7 +385,7 @@ function ready(err, data, data2) {
       .attr('transform', 'translate(' + labelTranslateX + ', 0)')
       .text('Tulare County');
 
-    map2.append('g')
+    circles = map2.append('g')
       .attr('class', 'gig-wells')
       .selectAll('circle')
       .data(data2)
@@ -404,7 +403,7 @@ function ready(err, data, data2) {
 
       
 
-    // zoomIn(center, 2);
+    
      tooltip = d3.select($graphic[0]).append("div")
         .attr("class", "gig-tooltip")
         .style("display", "none");
@@ -480,15 +479,17 @@ function stepTwo() {
     .on("mousemove", null)
     .on("mouseout", null);
 
-  d3.select('.gig-wells').selectAll('circle')
+
+  circles
     .transition()
     .duration(500)
     .attr('opacity', 0);
+
 }
 
 function stepThree() {
   zoomIn([-118.159571, 36.143740], 6);
-  d3.select('.gig-wells').selectAll('circle')
+  circles
     .transition()
     .duration(500)
     .delay(function(d, i) {
@@ -500,8 +501,7 @@ function stepThree() {
   mouseout();
 
   //turn off mouse hover in zoomed in state 
-  map2.select('.gig-counties')
-    .selectAll('path')
+  counties
     .on("mouseover", null)
     .on("mousemove", null)
     .on("mouseout", null);
