@@ -75,6 +75,7 @@ var GRAPHICDATA2;
 var isMobile;       //global to store value of mobileCheck()
 var counties;     //store d3 reference to counties
 var circles;     //store d3 reference to well circles
+var transitionDuration //duration for d3 transition
 
 
 function prepareContainers() {
@@ -90,6 +91,11 @@ function setup() {
   $sliderBG = $('#gig-slider-background-1');
 
   slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
+
+  isMobile = mobileCheck() //set isMobile on setup
+
+  transitionDuration = isMobile ? 0 : 500;
+  console.log(transitionDuration);
 
   document.addEventListener('scroll', updatePosition);
   document.addEventListener('touchmove', updatePosition);
@@ -482,7 +488,7 @@ function stepTwo() {
 
   circles
     .transition()
-    .duration(500)
+    .duration(transitionDuration)
     .attr('opacity', 0);
 
 }
@@ -491,9 +497,9 @@ function stepThree() {
   zoomIn([-118.159571, 36.143740], 6);
   circles
     .transition()
-    .duration(500)
+    .duration(transitionDuration)
     .delay(function(d, i) {
-      return i;
+      return isMobile ? 0 : i;
     })
     .attr('opacity', 0.5);
   
@@ -513,13 +519,13 @@ function stepThree() {
 function zoomIn(center, zoomLevel) {
   var coordinates = projection(center);
   map.transition()
-      .duration(500)
+      .duration(transitionDuration)
       .attr("transform", "translate(" + ((width/2) - (coordinates[0] * zoomLevel)) + ", " + ((HEIGHT/2) - coordinates[1] * zoomLevel) + ")scale(" + zoomLevel + ")");
 }
 
 function zoomOut() {
   map.transition()
-      .duration(500)
+      .duration(transitionDuration)
       .attr("transform", "");
 }
 
