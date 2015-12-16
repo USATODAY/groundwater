@@ -76,6 +76,9 @@ var isMobile;       //global to store value of mobileCheck()
 var counties;     //store d3 reference to counties
 var circles;     //store d3 reference to well circles
 var transitionDuration //duration for d3 transition
+var $mobileImgs;
+var mobileSVG = ['http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-california-map/img/california_01.png', 'http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-california-map/img/california_02.png', 'http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/us-california-map/img/california_03.png'];
+
 
 
 function prepareContainers() {
@@ -250,11 +253,15 @@ function start() {
     $window = $(window);
     $graphic = $el.find(".gig-map");
     $details = $graphic.find('#details');
-    
-    queue()
-      .defer(d3.json, DATA_URL)
-      .defer(d3.csv, DATA_URL_2)
-      .await(ready);
+   
+    if (!isMobile) {
+      queue()
+        .defer(d3.json, DATA_URL)
+        .defer(d3.csv, DATA_URL_2)
+        .await(ready);
+    } else {
+      drawMobile();
+    }
 }
 
 
@@ -286,6 +293,25 @@ var reDraw = _.throttle(ready, 500, {
   leading: false,
   trailing: true
 });
+
+
+function drawMobile() {
+  mobileSVG.forEach(function(imgURL) {
+    var html = ('<div class="gig-mobile-img" style="background-image: url(' + imgURL + ');" />');
+    $graphic.append(html);
+  });
+  $mobileImgs = $el.find('.gig-mobile-img');
+  $mobileImgs.eq(0).addClass('gig-mobile-active');
+
+  $mobileImgs.height(HEIGHT);
+
+  $graphic.height(HEIGHT);
+
+  addLegend();
+  addProgressIndicator();
+
+}
+
 
 function ready(err, data, data2) {
     width = $(window).width();
@@ -458,62 +484,79 @@ var stepMap = {
 }
 
 function stepOne() {
-  //turn on mouse hover in zoomed out state 
-  map2.select('.gig-counties')
-    .selectAll('path')
-    .on("mouseover", mouseover)
-    .on("mousemove", mousemove)
-    .on("mouseout", mouseout);
+  if (!isMobile) {
+    //turn on mouse hover in zoomed out state 
+    map2.select('.gig-counties')
+      .selectAll('path')
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseout", mouseout);
 
-  map.classed("gig-county-highlight", false);
-  zoomOut();
+    map.classed("gig-county-highlight", false);
+    zoomOut();
+  } else {
+    $mobileImgs.removeClass('gig-mobile-active');
+    $mobileImgs.eq(0).addClass('gig-mobile-active');
+  }
 }
 
 function stepTwo() {
-  zoomIn([-119.327555, 36.143740], 2); 
-  $graphic.removeClass('gig-step-3');
-  map.classed("gig-county-highlight", true);
-  map.classed('gig-step-3-highlight', false);
+  if (!isMobile) {
+    zoomIn([-119.327555, 36.143740], 2); 
+    $graphic.removeClass('gig-step-3');
+    map.classed("gig-county-highlight", true);
+    map.classed('gig-step-3-highlight', false);
 
-  //make sure tooltip is hidden
-  mouseout();
+    //make sure tooltip is hidden
+    mouseout();
+    
+    //turn off mouse hover in zoomed in state 
+    map2.select('.gig-counties')
+      .selectAll('path')
+      .on("mouseover", null)
+      .on("mousemove", null)
+      .on("mouseout", null);
+
+
+    circles
+      .transition()
+      .duration(transitionDuration)
+      .attr('opacity', 0);
+    } else {
+      $mobileImgs.removeClass('gig-mobile-active');
+      $mobileImgs.eq(1).addClass('gig-mobile-active');
+    }
   
-  //turn off mouse hover in zoomed in state 
-  map2.select('.gig-counties')
-    .selectAll('path')
-    .on("mouseover", null)
-    .on("mousemove", null)
-    .on("mouseout", null);
-
-
-  circles
-    .transition()
-    .duration(transitionDuration)
-    .attr('opacity', 0);
 
 }
 
 function stepThree() {
-  zoomIn([-118.159571, 36.143740], 6);
-  circles
-    .transition()
-    .duration(transitionDuration)
-    .delay(function(d, i) {
-      return isMobile ? 0 : i;
-    })
-    .attr('opacity', 0.5);
+  if (!isMobile) {
+   zoomIn([-118.159571, 36.143740], 6);
+    circles
+      .transition()
+      .duration(transitionDuration)
+      .delay(function(d, i) {
+        return isMobile ? 0 : i;
+      })
+      .attr('opacity', 0.5);
+    
+    //make sure tooltip is hidden
+    mouseout();
+
+    //turn off mouse hover in zoomed in state 
+    counties
+      .on("mouseover", null)
+      .on("mousemove", null)
+      .on("mouseout", null);
+
+      map.classed("gig-county-highlight", true);
+      map.classed('gig-step-3-highlight', true); 
+    } else {
+      $mobileImgs.removeClass('gig-mobile-active');
+      $mobileImgs.eq(2).addClass('gig-mobile-active');
+    }
   
-  //make sure tooltip is hidden
-  mouseout();
-
-  //turn off mouse hover in zoomed in state 
-  counties
-    .on("mouseover", null)
-    .on("mousemove", null)
-    .on("mouseout", null);
-
-    map.classed("gig-county-highlight", true);
-    map.classed('gig-step-3-highlight', true);
 }
 
 function zoomIn(center, zoomLevel) {
@@ -561,5 +604,7 @@ window.addEventListener('resize', function() {
   elHeight = $el.height();
   offsetTop = $el.offset().top;
   setDataPosition();
-  reDraw(null, GRAPHICDATA, GRAPHICDATA2);
+  if(!isMobile) {
+    reDraw(null, GRAPHICDATA, GRAPHICDATA2);
+  }
 });
