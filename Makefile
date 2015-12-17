@@ -2,6 +2,152 @@ DBNAME=gwater # the name of the database you're using. you can name this whateve
 
 all: topojson_files data/output_data/tulare_dry_wells.csv
 
+#geotiff conversion
+.PHONY: geojson topojson_files
+
+geojson: data/output_data/region_1.geo.json data/output_data/region_2.geo.json data/output_data/region_3.geo.json data/output_data/region_4.geo.json
+
+data/output_data/region_4.geo.json: data/output_data/exploded_polygons/region_4.shp
+	-rm $@
+	ogr2ogr -f 'GeoJSON' $@ $<
+
+data/output_data/region_3.geo.json: data/output_data/exploded_polygons/region_3.shp
+	-rm $@
+	ogr2ogr -f 'GeoJSON' $@ $<
+
+data/output_data/region_2.geo.json: data/output_data/exploded_polygons/region_2.shp
+	-rm $@
+	ogr2ogr -f 'GeoJSON' $@ $<
+
+data/output_data/region_1.geo.json: data/output_data/exploded_polygons/region_1.shp
+	-rm $@
+	ogr2ogr -f 'GeoJSON' $@ $<
+
+data/output_data/exploded_polygons/region_4.shp: data/dbtables/region_4_exploded
+	mkdir -p data/output_data/exploded_polygons
+	pgsql2shp -f $@ $(DBNAME) "SELECT * FROM region_4_exploded;"
+
+data/output_data/exploded_polygons/region_3.shp: data/dbtables/region_3_exploded
+	mkdir -p data/output_data/exploded_polygons
+	pgsql2shp -f $@ $(DBNAME) "SELECT * FROM region_3_exploded;"
+
+data/output_data/exploded_polygons/region_2.shp: data/dbtables/region_2_exploded
+	mkdir -p data/output_data/exploded_polygons
+	pgsql2shp -f $@ $(DBNAME) "SELECT * FROM region_2_exploded;"
+
+data/output_data/exploded_polygons/region_1.shp: data/dbtables/region_1_exploded
+	mkdir -p data/output_data/exploded_polygons
+	pgsql2shp -f $@ $(DBNAME) "SELECT * FROM region_1_exploded;"
+
+data/dbtables/region_4_exploded: data/dbtables/region_4_merged
+	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS region_4_exploded;"
+	psql -d $(DBNAME) -c "CREATE TABLE region_4_exploded AS SELECT dn,(ST_Dump(geom)).geom FROM region_4_merged;"
+	touch $@;
+
+data/dbtables/region_3_exploded: data/dbtables/region_3_merged
+	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS region_3_exploded;"
+	psql -d $(DBNAME) -c "CREATE TABLE region_3_exploded AS SELECT dn,(ST_Dump(geom)).geom FROM region_3_merged;"
+	touch $@;
+
+data/dbtables/region_2_exploded: data/dbtables/region_2_merged
+	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS region_2_exploded;"
+	psql -d $(DBNAME) -c "CREATE TABLE region_2_exploded AS SELECT dn,(ST_Dump(geom)).geom FROM region_2_merged;"
+	touch $@;
+
+data/dbtables/region_1_exploded: data/dbtables/region_1_merged
+	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS region_1_exploded;"
+	psql -d $(DBNAME) -c "CREATE TABLE region_1_exploded AS SELECT dn,(ST_Dump(geom)).geom FROM region_1_merged;"
+	touch $@;
+
+data/dbtables/region_4_merged: data/dbtables/region_4_extracted
+	python data/scripts/graceconvert/merge_features.py $(DBNAME) 4
+	touch $@
+
+data/dbtables/region_3_merged: data/dbtables/region_3_extracted
+	python data/scripts/graceconvert/merge_features.py $(DBNAME) 3
+	touch $@
+
+data/dbtables/region_2_merged: data/dbtables/region_2_extracted
+	python data/scripts/graceconvert/merge_features.py $(DBNAME) 2
+	touch $@
+
+data/dbtables/region_1_merged: data/dbtables/region_1_extracted
+	python data/scripts/graceconvert/merge_features.py $(DBNAME) 1	
+	touch $@
+
+data/dbtables/region_4_extracted: data/output_data/extracted_polygons/region_4_extracted.shp data/dbtables 
+	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS region_4_extracted;"
+	shp2pgsql -I -s 4269 $< | psql -d $(DBNAME)
+	touch $@
+
+data/dbtables/region_3_extracted: data/output_data/extracted_polygons/region_3_extracted.shp data/dbtables 
+	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS region_3_extracted;"
+	shp2pgsql -I -s 4269 $< | psql -d $(DBNAME)
+	touch $@
+
+data/dbtables/region_2_extracted: data/output_data/extracted_polygons/region_2_extracted.shp data/dbtables 
+	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS region_2_extracted;"
+	shp2pgsql -I -s 4269 $< | psql -d $(DBNAME)
+	touch $@
+
+data/dbtables/region_1_extracted: data/output_data/extracted_polygons/region_1_extracted.shp data/dbtables 
+	psql -d $(DBNAME) -c "DROP TABLE IF EXISTS region_1_extracted;"
+	shp2pgsql -I -s 4269 $< | psql -d $(DBNAME)
+	touch $@
+
+data/output_data/extracted_polygons/region_4_extracted.shp: data/output_data/masks/region_4_mask.tif
+	mkdir -p data/output_data/extracted_polygons
+	gdal_polygonize.py \
+	-mask $< \
+	data/input_data/GRACE_TWS_trends.042002-09-2015.reg_map.4.tif \
+	-f 'ESRI Shapefile' \
+	$@
+
+data/output_data/extracted_polygons/region_3_extracted.shp: data/output_data/masks/region_3_mask.tif
+	mkdir -p data/output_data/extracted_polygons
+	gdal_polygonize.py \
+	-mask $< \
+	data/input_data/GRACE_TWS_trends.042002-09-2015.reg_map.3.tif \
+	-f 'ESRI Shapefile' \
+	$@
+
+data/output_data/extracted_polygons/region_2_extracted.shp: data/output_data/masks/region_2_mask.tif
+	mkdir -p data/output_data/extracted_polygons
+	gdal_polygonize.py \
+	-mask $< \
+	data/input_data/GRACE_TWS_trends.042002-09-2015.reg_map.2.tif \
+	-f 'ESRI Shapefile' \
+	$@
+
+data/output_data/extracted_polygons/region_1_extracted.shp: data/output_data/masks/region_1_mask.tif
+	mkdir -p data/output_data/extracted_polygons
+	gdal_polygonize.py \
+	-mask $< \
+	data/input_data/GRACE_TWS_trends.042002-09-2015.reg_map.1.tif \
+	-f 'ESRI Shapefile' \
+	$@
+
+data/output_data/masks/region_4_mask.tif:
+	mkdir -p data/output_data/masks
+	-rm $@
+	python data/scripts/graceconvert/create_mask.py 4
+
+data/output_data/masks/region_3_mask.tif:
+	mkdir -p data/output_data/masks
+	-rm $@
+	python data/scripts/graceconvert/create_mask.py 3
+
+data/output_data/masks/region_2_mask.tif:
+	mkdir -p data/output_data/masks
+	-rm $@
+	python data/scripts/graceconvert/create_mask.py 2
+
+data/output_data/masks/region_1_mask.tif:
+	mkdir -p data/output_data/masks
+	-rm $@
+	python data/scripts/graceconvert/create_mask.py 1
+
+#topojson creation
 topojson_files: data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json data/output_data/california_wells.topo.json data/output_data/peru.topo.json, data/output_data/world_aquifers.topo.json
 
 #peru/south american shapes
