@@ -1,15 +1,4 @@
 /**
- * TODO
- * - xx
- */
-
- // TODO - Canvid
- // var c = canvid({
- //
- // });
- // console.log(c);
-
-/**
  * Setup platform detection
  */
 
@@ -53,9 +42,7 @@ var $sliderBG;
 var $embedModule;
 var VAL_COLUMN = "avg_chg";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
-var DATA_URL_2 = getDataURL(GRAPHICINFO.DATA_URL_2);
-var topojson_features_obj = "south_america.geo";
-var topojson_features_obj_2 = "PER_adm3";
+var topojson_features_obj = "africa";
 var _ = require("lodash");
 var queue = require("queue-async");
 var tooltip;
@@ -281,7 +268,6 @@ function start() {
     $details = $graphic.find('#details');
     queue()
       .defer(d3.json, DATA_URL)
-      .defer(d3.csv, DATA_URL_2)
       .await(draw);
 }
 
@@ -304,7 +290,7 @@ var reDraw = _.throttle(draw, 500, {
   trailing: true
 });
 
-function draw(err, data, data2) {
+function draw(err, data) {
     width = $(window).width();
     height = width * (9/16);
     scale = HEIGHT / 2;
@@ -312,29 +298,18 @@ function draw(err, data, data2) {
       scale = width;
     }
     $graphic.empty();
-    data2 = data2.map(function(d) {
-      return {
-        region: d.region,
-        volume_withdrawn: +d.volume_withdrawn,
-        coordinates: d.coordinates,
-        lat_long: d.coordinates.split(', ').reverse()
-      }
-    });
-    rScale.domain([1, d3.max(data2.map(function(d) {return d.volume_withdrawn}))]);
-    console.log(rScale.domain());
+    console.log(data);
 
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
-    if(!GRAPHICDATA2) {
-      GRAPHICDATA2 = data2;
-    }
     var geo = topojson.feature(data, data.objects[topojson_features_obj]);
-    var geo2 = topojson.feature(data, data.objects[topojson_features_obj_2]);
-
+    console.log(geo);
     var center = d3.geo.centroid(geo);
-    centerCoordinates = d3.geo.centroid(geo2);
-
+    geo.features = geo.features.filter(function(d) {
+        return d.properties.name == 'Morocco';
+    });
+    console.log(geo);
     projection = d3.geo.mercator()
     .scale(scale)
     .center(center)
@@ -354,55 +329,61 @@ function draw(err, data, data2) {
         .attr("height", height)
         .attr("width", width);
 
-    map.selectAll('path')
-      .data(geo.features)
-      .enter()
-      .append('path')
+    map.append('path')
+      .datum(topojson.merge(data, data.objects[topojson_features_obj].geometries))
       .attr("class", "country-shape")
       .attr("d", path);
 
-    map.append("g")
-      .attr("class", "country-detail")
-      .append("path")
-      .datum(topojson.merge(data, data.objects[topojson_features_obj_2].geometries))
-      // .enter().append("path")
-      .attr("fill", function(d) { 
-          return "rgba(255, 255, 255, 0.25)";
-          // if (d.properties[VAL_COLUMN]) {
-          //   return getColor(parseFloat(d.properties[VAL_COLUMN]));
-          // } else {
-          //   return "none";
-          // }
-      })
-      .attr("d", path);
-      // .on("mouseover", mouseover)
-      // .on("mousemove", mousemove)
-      // .on("mouseout", mouseout);
+    map.selectAll('.country')
+      .data(geo.features)
+      .enter()
+      .append('path')
+      .attr('class', 'country')
+      .attr('fill', 'rgba(255, 255, 255, 0.25)')
+      .attr('d', path);
 
-      map.append('g')
-        .attr('class', 'gig-country-label')
-        .attr('transform', 'translate(' + projection(centerCoordinates) + ')')
-        .attr('fill', 'white')
-        .append('text')
-        .attr('transform', 'translate(15, 0)')
-        .text('Peru');
-
-
-      map.append('g')
-        .attr('class', 'gig-data-point-wrapper')
-        .selectAll('circle')
-        .data(GRAPHICDATA2)
-        .enter()
-        .append('circle')
-        .attr('r', 0)
-        .attr('fill', '#0095C4')
-        .attr('opacity', 0.5)
-        .attr('cx', function(d) {
-          return projection(d.lat_long)[0];
-        })
-        .attr('cy', function(d) {
-          return projection(d.lat_long)[1];
-        });
+    // map.append("g")
+    //   .attr("class", "country-detail")
+    //   .append("path")
+    //   .datum(topojson.merge(data, data.objects[topojson_features_obj_2].geometries))
+    //   // .enter().append("path")
+    //   .attr("fill", function(d) { 
+    //       return "rgba(255, 255, 255, 0.25)";
+    //       // if (d.properties[VAL_COLUMN]) {
+    //       //   return getColor(parseFloat(d.properties[VAL_COLUMN]));
+    //       // } else {
+    //       //   return "none";
+    //       // }
+    //   })
+    //   .attr("d", path);
+    //   // .on("mouseover", mouseover)
+    //   // .on("mousemove", mousemove)
+    //   // .on("mouseout", mouseout);
+    //
+    //   map.append('g')
+    //     .attr('class', 'gig-country-label')
+    //     .attr('transform', 'translate(' + projection(centerCoordinates) + ')')
+    //     .attr('fill', 'white')
+    //     .append('text')
+    //     .attr('transform', 'translate(15, 0)')
+    //     .text('Peru');
+    //
+    //
+    //   map.append('g')
+    //     .attr('class', 'gig-data-point-wrapper')
+    //     .selectAll('circle')
+    //     .data(GRAPHICDATA2)
+    //     .enter()
+    //     .append('circle')
+    //     .attr('r', 0)
+    //     .attr('fill', '#0095C4')
+    //     .attr('opacity', 0.5)
+    //     .attr('cx', function(d) {
+    //       return projection(d.lat_long)[0];
+    //     })
+    //     .attr('cy', function(d) {
+    //       return projection(d.lat_long)[1];
+    //     });
 
       
       var townLabel = map.append('g')

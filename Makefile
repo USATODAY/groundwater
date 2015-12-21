@@ -156,6 +156,7 @@ data/output_data/africa.topo.json: data/shapefiles/africa/africa.shp
 	--no-pre-quantization \
 	--post-quantization=1e6 \
 	--simplify=7e-7 \
+	-p name \
 	-- $<
 
 # morocco/african shapes
@@ -503,6 +504,11 @@ data/shapefiles/PER_adm/PER_adm3.shp:
 	wget http://biogeo.ucdavis.edu/data/diva/adm/PER_adm.zip
 	unzip PER_adm.zip -d data/shapefiles/PER_adm
 	rm PER_adm.zip
+
+data/shapefiles/MOR_adm/MAR_adm3.shp:
+	wget http://biogeo.ucdavis.edu/data/diva/adm/MAR_adm.zip
+	unzip MAR_adm.zip -d data/shapefiles/MAR_adm
+	rm MAR_adm.zip
 
 data/shapefiles/IND_adm/IND_adm3.shp:
 	wget http://biogeo.ucdavis.edu/data/diva/adm/IND_adm.zip
