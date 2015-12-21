@@ -1,0 +1,19 @@
+{
+    "HEADLINE": "Ground Water Slider",
+    "GRAPHIC_SLUG": "gig-slider-peru-map",
+    "CHATTER": "ABOUT THIS GRAPHIC",
+    "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/peru-map/data/peru.topo.json",
+    "DATA_URL_2": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/peru-map/data/peru_coordinates.csv",
+    "FULL_WIDTH": true,
+    "SOURCE": "Peru’s National Water Authority, 2012",
+    "SLIDER_IMAGES": [
+      {
+        "title": "",
+        "img": ""
+      },
+      {
+        "title": "This illustration shows amounts of groundwater pumped from regions in Peru. In one year, 35 percent of all groundwater pumped nationally in the regions studied was pumped in the Ica area, represented by the largest blue circle. Other dots represent relative groundwater pumping by comparison.",
+        "img": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/gw-slider/img/unsplash-2.jpg"
+      }
+    ]
+}
