@@ -150,6 +150,19 @@ data/output_data/masks/region_1_mask.tif:
 #topojson creation
 topojson_files: data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json data/output_data/california_wells.topo.json data/output_data/peru.topo.json, data/output_data/world_aquifers.topo.json
 
+data/output_data/africa.topo.json: data/shapefiles/africa/africa.shp
+	topojson \
+	-o $@ \
+	--no-pre-quantization \
+	--post-quantization=1e6 \
+	--simplify=7e-7 \
+	-- $<
+
+# morocco/african shapes
+data/shapefiles/africa/africa.shp: data/shapefiles/ne_110m_admin_0_countries_lakes/ne_110m_admin_0_countries_lakes.shp
+	mkdir -p data/shapefiles/africa
+	ogr2ogr -where "continent = 'Africa'" -f 'ESRI Shapefile' $@ $<
+
 #peru/south american shapes
 data/output_data/peru.topo.json: data/shapefiles/PER_adm/PER_adm3.shp data/output_data/south_america.geo.json
 	topojson \
