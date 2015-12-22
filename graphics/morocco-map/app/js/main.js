@@ -1,15 +1,4 @@
 /**
- * TODO
- * - xx
- */
-
- // TODO - Canvid
- // var c = canvid({
- //
- // });
- // console.log(c);
-
-/**
  * Setup platform detection
  */
 
@@ -51,9 +40,9 @@ var $graphic;
 var $details;
 var $sliderBG;
 var $embedModule;
-var VAL_COLUMN = "differece";
+var VAL_COLUMN = "avg_chg";
 var DATA_URL = getDataURL(GRAPHICINFO.DATA_URL);
-var topojson_features_obj = "IND_adm3";
+var topojson_features_obj = "africa";
 var _ = require("lodash");
 var queue = require("queue-async");
 var tooltip;
@@ -61,13 +50,15 @@ var path;
 var svg;
 var map;
 var scale;
-var currentStep = 1;
+var currentStep = 0;
 var projection;
 var width = 960;
 var height = 600;
-var GRAPHICDATA;
-var GRAPHICDATA2;
-var ogallalaDataURL = getDataURL("http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/map-scroll/data/ogallala.topojson.json");
+var transisitonDuration;
+var GRAPHICDATA; //cache 1st data source
+var GRAPHICDATA2; //cache 2nd data source
+var centerCoordinates; //store coordinates for center of focus
+var icaCoordinates = [-75.738620, -14.074261] //store city coordinates
 
 
 function prepareContainers() {
@@ -76,8 +67,9 @@ function prepareContainers() {
   // $el.find('.gig-slider-panel').height(HEIGHT);
   $el.find('.gig-slider-panel-text-container').css({"margin-bottom": HEIGHT - 75});
   $el.find('.gig-slider-background').height(HEIGHT);
-  $el.height(HEIGHT * slidesLength);
+  $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
   $embedModule.height(HEIGHT * slidesLength + 30);
+  $el.height(HEIGHT * slidesLength);
   // $('.gig-slider-container').height(HEIGHT);
 
   // set framework wrapper container to height of viewport plus length of scroll
@@ -88,8 +80,12 @@ function prepareContainers() {
 
 function setup() {
   WIDTH = window.innerWidth;
-  HEIGHT = window.innerHeight; 
+  // HEIGHT = window.innerHeight + 162; // 162 extra pixels to account for browser ui
+  // if (window.mobileCheck()) {
+  HEIGHT = window.innerHeight;
+  // }
   $sliderBG = $('#gig-slider-background-1');
+  transisitonDuration = window.mobileCheck() ? 0 : 500;
 
   slidesLength = GRAPHICINFO.SLIDER_IMAGES.length;
 
@@ -97,8 +93,7 @@ function setup() {
   document.addEventListener('touchmove', updatePosition);
 
   $el = $(id);
-  $embedModule = $('#' + GRAPHICINFO.GRAPHIC_SLUG).parents('.oembed-asset, .oembed');
-  getNewStep();
+  // getNewStep();
   
   if (debugMode) {
     $('body').append('<div id="debug"></div>');
@@ -194,6 +189,7 @@ function updatePosition(e) {
   }
 
   var newStep = getNewStep(progressBottom);
+  // console.log(newStep);
   if (newStep != currentStep) {
     setSlide(newStep);
   }
@@ -222,6 +218,9 @@ function updatePosition(e) {
 */
 var scaleBreaks = [-15, -5, 0];
 var scaleColors = ['#de862e','#F5AE1B', '#F6EB16'];
+
+var rScale = d3.scale.linear()
+  .range([1, 8]);
 
 var colorScale = function(input) {
   var r;
@@ -267,72 +266,54 @@ function start() {
     $window = $(window);
     $graphic = $el.find(".gig-map");
     $details = $graphic.find('#details');
-    // queue()
-    //   .defer(d3.json, DATA_URL)
-    //   .defer(d3.json, ogallalaDataURL)
-    //   .await(ready);
-    d3.json(DATA_URL, ready);
+    queue()
+      .defer(d3.json, DATA_URL)
+      .await(draw);
 }
 
 
 function addLegend() {
-    var html = "<div class='map-legend'>Average decrease in water level<div>";
+    var html = "<div class='map-legend'>";
     
-    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[0] + "'></span><span>15ft.+</span></div>";
-    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[1] + "'></span><span>5-15ft.</span></div>"; 
-    html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:" + scaleColors[2] + "'></span><span>0-5ft.</span></div>"; 
+        // html += "<span class='gig-circle-legend'style='display: inline-block;width:8px; height:8px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
+   
     
-        html += "<div class='gig-legend-entry'><span class='gig-legend-color' style='background-color:#0095C4'></span><span>increase or stable</span></div>";
-        html += "<p>Source: " + GRAPHICINFO.SOURCE + "</p>";
+        // html += "<span class='gig-circle-legend'style='display: inline-block;width:64px; height:64px;background-color:" + "#0095C4" +"'></span><span>>" + d3.max(GRAPHICDATA, function(d) {return d[VAL_COLUMN];}) + " ft.</span>";
+        html+= "<p>Source: " + GRAPHICINFO.SOURCE + "</p>"
    
     html += "</div>"
     $graphic.append(html);
 }
 
-function addProgressIndicator() {
-  var html = '<div class="gig-progress-indicator-wrap">'
-  _.each(GRAPHICINFO.SLIDER_IMAGES, function(image, i) {
-    html += '<div class="gig-progress-entry"></div>';
-  });
-  
-  html += '</div>'
-  $graphic.append(html);
-}
-
-var reDraw = _.throttle(ready, 500, {
-  leading: false,
+var reDraw = _.throttle(draw, 500, {
+  leading: true,
   trailing: true
 });
 
-function ready(err, data) {
+function draw(err, data) {
     width = $(window).width();
     height = width * (9/16);
-    scale = width/1.5;
-    console.log(scale);
-    $graphic.empty();
-
-    if (width < 600) {
-        scale = 400;
+    scale = HEIGHT / 2;
+    if (width < 800) {
+      scale = width;
     }
+    $graphic.empty();
+    console.log(data);
+
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
-    // if(!GRAPHICDATA2) {
-    //   GRAPHICDATA2 = data2;
-    // }
-    var geo = {
-      type: "FeatureCollection",
-      features: topojson.feature(data, data.objects[topojson_features_obj]).features
-    };
-
+    var geo = topojson.feature(data, data.objects[topojson_features_obj]);
+    console.log(geo);
     var center = d3.geo.centroid(geo);
-
-    var verticalTranslateFactor = width < 600 ? 1.5 : 2;
-
+    geo.features = geo.features.filter(function(d) {
+        return d.properties.name == 'Morocco';
+    });
+    console.log(geo);
     projection = d3.geo.mercator()
     .scale(scale)
     .center(center)
-    .translate([width / 2, height / verticalTranslateFactor]);
+    .translate([WIDTH/2, HEIGHT / 2.5]);
 
     path = d3.geo.path()
       .projection(projection);
@@ -353,53 +334,104 @@ function ready(err, data) {
       .attr("class", "country-shape")
       .attr("d", path);
 
-    map.append("g")
-      .attr("class", "counties")
-      .selectAll("path")
+    map.selectAll('.country')
       .data(geo.features)
-      .enter().append("path")
-      .attr("fill", function(d) { 
-          if (d.properties[VAL_COLUMN]) {
-            return getColor(parseFloat(d.properties[VAL_COLUMN]));
-          } else {
-            return "none";
-          }
-      })
-      .attr("class", function(d) {
-          var classname = "";
-          if (d.properties.st == "Punjab") {
-            classname += " us-county-highlight";
-          } 
-          // if (d.properties.fips == 20081) {
-          //   classname += " haskell-highlight";
-          // }
-          return classname;
-      })
-      .attr("d", path)
-      .on("mouseover", mouseover)
-      .on("mousemove", mousemove)
-      .on("mouseout", mouseout);
+      .enter()
+      .append('path')
+      .attr('class', 'country')
+      .attr('fill', 'rgba(255, 255, 255, 0.25)')
+      .attr('d', path);
 
-      map.append('g')
-        .attr('class', 'disputed-territory')
-        .append('path')
-        .datum(topojson.merge(data, data.objects.india_disputed_territory.geometries))
-        .attr('fill', 'rgba(0, 0, 0, 0)')
-        .attr('stroke', 'white')
-        .style("stroke-dasharray", "3, 3")
-        .attr('d', path)
-        .on("mouseover", mouseover)
-        .on("mousemove", mousemove)
-        .on("mouseout", mouseout);
+    // map.append("g")
+    //   .attr("class", "country-detail")
+    //   .append("path")
+    //   .datum(topojson.merge(data, data.objects[topojson_features_obj_2].geometries))
+    //   // .enter().append("path")
+    //   .attr("fill", function(d) { 
+    //       return "rgba(255, 255, 255, 0.25)";
+    //       // if (d.properties[VAL_COLUMN]) {
+    //       //   return getColor(parseFloat(d.properties[VAL_COLUMN]));
+    //       // } else {
+    //       //   return "none";
+    //       // }
+    //   })
+    //   .attr("d", path);
+    //   // .on("mouseover", mouseover)
+    //   // .on("mousemove", mousemove)
+    //   // .on("mouseout", mouseout);
+    //
+    //   map.append('g')
+    //     .attr('class', 'gig-country-label')
+    //     .attr('transform', 'translate(' + projection(centerCoordinates) + ')')
+    //     .attr('fill', 'white')
+    //     .append('text')
+    //     .attr('transform', 'translate(15, 0)')
+    //     .text('Peru');
+    //
+    //
+    //   map.append('g')
+    //     .attr('class', 'gig-data-point-wrapper')
+    //     .selectAll('circle')
+    //     .data(GRAPHICDATA2)
+    //     .enter()
+    //     .append('circle')
+    //     .attr('r', 0)
+    //     .attr('fill', '#0095C4')
+    //     .attr('opacity', 0.5)
+    //     .attr('cx', function(d) {
+    //       return projection(d.lat_long)[0];
+    //     })
+    //     .attr('cy', function(d) {
+    //       return projection(d.lat_long)[1];
+    //     });
 
       
+      var townLabel = map.append('g')
+        .attr('class', 'gig-town-label')
+        .attr('transform', 'translate(' + projection(icaCoordinates) + ')')
+        .attr('fill', 'white')
+        .append('text')
+        .attr('font-size', 4)
+        .attr('transform', 'translate(5, -5)');
+
+     townLabel.append('tspan')
+        .attr('dy', "1.2em")
+        .text('Ica');
+     
+     townLabel.append('tspan')
+        .attr('dy', "1.2em")
+        .attr('x', 0)
+        .text(numberWithCommas(Math.round(hectometerToAcreFeet(563.35))) + ' acre-feet');
 
      tooltip = d3.select($graphic[0]).append("div")
         .attr("class", "gig-tooltip")
+        .attr('x', 0)
         .style("display", "none");
 
       addLegend();
       addProgressIndicator();
+}
+
+function hectometerToAcreFeet(val) {
+  return val * 810.714;
+}
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+
+var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+function formatPower(d) { return (d + "").split("").map(function(c) { return superscript[c]; }).join(""); };
+
+function addProgressIndicator() {
+  var html = '<div class="gig-progress-indicator-wrap">'
+  _.each(GRAPHICINFO.SLIDER_IMAGES, function(image, i) {
+    html += '<div class="gig-progress-entry"></div>';
+  });
+  
+  html += '</div>'
+  $graphic.append(html);
 }
 
 //returns the correct step based on progress
@@ -407,19 +439,25 @@ function getNewStep(progress) {
   var padding = 0.05;
   progress = progress - padding;
   var breaks = [] //store each progress break point in this array
-  _.each(d3.range(1,slidesLength), function(slideIndex) {
+  range(slidesLength).forEach(function(slideIndex) {
     var stepBreak = (1/slidesLength) * slideIndex;
     breaks.push(stepBreak);
   });
-  if (progress > breaks[2]) {
-    return 4;
-  } else if (progress > breaks[1]) {
-    return 3;
-  } else if (progress > breaks[0]) {
-    return 2;
-  } else {
-    return 1;
-  }
+    //default new step is 0
+  var result = 0;
+
+  //loop through each break point
+  breaks.forEach(function(breakpoint, i) {
+    //if progress is past a break point, update result
+    if (progress > breakpoint) {
+      result = i;
+    }
+  });
+  return result;
+}
+
+function range(num) {
+  return Array.apply(null, Array(num)).map(function (_, i) {return i;});
 }
 
 function setSlide(newSlide) {
@@ -432,89 +470,74 @@ function setSlide(newSlide) {
 
 //maps each step to a function
 var stepMap = {
-  1: stepOne,
-  2: stepTwo
+  0: stepOne,
+  1: stepTwo
 }
 
 function stepOne() {
   zoomOut();
-  map.classed("gig-county-highlight", false);
-  // var shape = map.select('.ogallala-shape')
-  //   .transition()
-  //   .duration(500)
-  //   .attr('opacity', 0);
-
-  // shape.remove();
+   var container = d3.select('.gig-data-point-wrapper');
+  container.selectAll('circle')
+    .transition()
+    .duration(200)
+    .attr('r', 0);
 }
 
 function stepTwo() {
-  // zoomIn([75.394651, 30.889173], 2);
-  // map.classed("gig-county-highlight", true);
-  // removeOgallalaHighlight();
-  // var ogallala_data = topojson.feature(GRAPHICDATA2, GRAPHICDATA2.objects.ogallala).features;
-  // var shape = map.append("path")
-  //       .data(ogallala_data)
-  //       .attr("class", "ogallala-shape")
-  //       .attr("stroke", "white")
-  //       .attr("stroke-width", 1)
-  //       .attr("fill", "#1B9CFA")
-  //       .attr("opacity", 0)
-  //       .attr("d", path);
- // shape
- //    .transition()
- //    .duration(500)
- //    .attr('opacity', 0.8);
+  zoomIn(centerCoordinates, 4);
 
+  var container = d3.select('.gig-data-point-wrapper');
+  container.selectAll('circle')
+    .transition()
+    .duration(200)
+    .delay(function(d, i) {
+      return 50 * i;
+    })
+    .attr('r', function(d) {
+      return rScale(d.volume_withdrawn);
+    });
 }
 
 function stepThree() {
-  removeOgallalaOutline();
-  map.classed("gig-haskell-highlight", false);
-  zoomIn([-100.851404, 37.482529], 2);
-  map.classed("gig-haskell-highlight", false);
-  map.classed("gig-county-highlight", true);
-  map.select('.county-detail-text').remove();
-}
+  zoomIn(centerCoordinates, 4);
+  var container = d3.select('.gig-data-point-wrapper');
+  container.selectAll('circle')
+    .transition()
+    .duration(200)
+    .delay(function(d, i) {
+      return 50 * i;
+    })
+    .attr('r', function(d) {
+      return rScale(d.volume_withdrawn);
+    });
 
-function removeOgallalaHighlight() {
-  zoomOut();
-  map.classed("gig-county-highlight", false);
-}
 
-function showHaskell() {
-  // zoomIn([-100.851404, 37.482529], 3);
-  map.append('g')
-    .attr('class', 'county-detail-text')
-    .attr('transform', 'translate(' + projection([-100.851404, 37.482529]) + ')')
-    .append('text')
-    .attr("fill", "white")
-    .attr('transform', 'translate(10, 5)')
-    .text('Haskell, KS');
-  map.classed("gig-county-highlight", false);
-  map.classed("gig-haskell-highlight", true);
 }
 
 function zoomIn(center, zoomLevel) {
   var coordinates = projection(center);
   map.transition()
-      .duration(500)
+      .duration(transisitonDuration)
       .attr("transform", "translate(" + ((width/2) - (coordinates[0] * zoomLevel)) + ", " + ((HEIGHT/2) - coordinates[1] * zoomLevel) + ")scale(" + zoomLevel + ")");
 }
 
 function zoomOut() {
   map.transition()
-      .duration(500)
+      .duration(transisitonDuration)
       .attr("transform", "");
 }
 
 function mouseover(d) {
-    console.log(d);
   tooltip.style("display", "block");
-  if (!d.properties) {
-    tooltip.html("<p>In a decades-old dispute, India and Pakistan both claim ownership of territory within Kashmir.</p>");
-  } else {
-    tooltip.html("<p>" + d.properties.district + "</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
-  }
+  tooltip.html("<p>" + d.properties.n + "</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
+}
+
+function showTooltip(pos) {
+  tooltip.style("display", "block");
+  tooltip
+    .html("<p>Ica</p> Water pumped: 1200 cubic hectometers")
+    .style("left", pos[0] + "px")
+    .style("top", pos[1] + "px");
 }
 
 function mousemove() {
@@ -535,7 +558,6 @@ function mouseout(d) {
 }
 
 
-
 document.addEventListener('DOMContentLoaded', setup);
 window.addEventListener('resize', function() {
   WIDTH = window.innerWidth;
@@ -544,5 +566,6 @@ window.addEventListener('resize', function() {
   elHeight = $el.height();
   offsetTop = $el.offset().top;
   setDataPosition();
-  reDraw(null, GRAPHICDATA);
+  reDraw(null, GRAPHICDATA, GRAPHICDATA2);
+  setSlide(getNewStep(progress));
 });

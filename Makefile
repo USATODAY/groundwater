@@ -148,7 +148,21 @@ data/output_data/masks/region_1_mask.tif:
 	python data/scripts/graceconvert/create_mask.py 1
 
 #topojson creation
-topojson_files: data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json data/output_data/california_wells.topo.json data/output_data/peru.topo.json, data/output_data/world_aquifers.topo.json
+topojson_files: data/output_data/ogallala.topojson.json data/output_data/india.topo.json data/output_data/counties_with_level_changes.json data/output_data/california_wells.topo.json data/output_data/peru.topo.json, data/output_data/world_aquifers.topo.json
+
+data/output_data/africa.topo.json: data/shapefiles/africa/africa.shp
+	topojson \
+	-o $@ \
+	--no-pre-quantization \
+	--post-quantization=1e6 \
+	--simplify=7e-7 \
+	-p name \
+	-- $<
+
+# morocco/african shapes
+data/shapefiles/africa/africa.shp: data/shapefiles/ne_110m_admin_0_countries_lakes/ne_110m_admin_0_countries_lakes.shp
+	mkdir -p data/shapefiles/africa
+	ogr2ogr -where "continent = 'Africa'" -f 'ESRI Shapefile' $@ $<
 
 #peru/south american shapes
 data/output_data/peru.topo.json: data/shapefiles/PER_adm/PER_adm3.shp data/output_data/south_america.geo.json
@@ -220,7 +234,7 @@ data/output_data/india.topo.json: data/shapefiles/IND_adm/IND_adm3.shp data/outp
 	-e data/output_data/india_levels.csv \
 	-p district=District,differece=Difference_Feet,st=NAME_1 \
 	--id-property=District,NAME_2 \
-	-- $<
+	-- $< data/input_data/india_disputed/india_disputed_territory.shp
 
 map/app/data/county_usage_change.topojson.json: data/output_data/county_usage_change.topojson.json
 	cp $< $@
@@ -490,6 +504,11 @@ data/shapefiles/PER_adm/PER_adm3.shp:
 	wget http://biogeo.ucdavis.edu/data/diva/adm/PER_adm.zip
 	unzip PER_adm.zip -d data/shapefiles/PER_adm
 	rm PER_adm.zip
+
+data/shapefiles/MOR_adm/MAR_adm3.shp:
+	wget http://biogeo.ucdavis.edu/data/diva/adm/MAR_adm.zip
+	unzip MAR_adm.zip -d data/shapefiles/MAR_adm
+	rm MAR_adm.zip
 
 data/shapefiles/IND_adm/IND_adm3.shp:
 	wget http://biogeo.ucdavis.edu/data/diva/adm/IND_adm.zip

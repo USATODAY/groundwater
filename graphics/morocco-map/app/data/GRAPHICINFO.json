@@ -1,0 +1,18 @@
+{
+    "HEADLINE": "Ground Water Slider",
+    "GRAPHIC_SLUG": "gig-slider-morocco-map",
+    "CHATTER": "ABOUT THIS GRAPHIC",
+    "DATA_URL": "http://www.gannett-cdn.com/experiments/usatoday/2015/groundwater/graphics/morocco-map/data/africa.topo.json",
+    "FULL_WIDTH": true,
+    "SOURCE": "",
+    "SLIDER_IMAGES": [
+      {
+        "title": "",
+        "img": ""
+      },
+      {
+        "title": "This illustration shows amounts of groundwater pumped from regions in Peru. In one year, 35 percent of all groundwater pumped nationally in the regions studied was pumped in the Ica area, represented by the largest blue circle. Other dots represent relative groundwater pumping by comparison.",
+        "img": ""
+      }
+    ]
+}
