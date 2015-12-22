@@ -148,7 +148,7 @@ data/output_data/masks/region_1_mask.tif:
 	python data/scripts/graceconvert/create_mask.py 1
 
 #topojson creation
-topojson_files: data/output_data/ogallala.topojson.json map/app/data/india.topo.json data/output_data/counties_with_level_changes.json data/output_data/california_wells.topo.json data/output_data/peru.topo.json, data/output_data/world_aquifers.topo.json
+topojson_files: data/output_data/ogallala.topojson.json data/output_data/india.topo.json data/output_data/counties_with_level_changes.json data/output_data/california_wells.topo.json data/output_data/peru.topo.json, data/output_data/world_aquifers.topo.json
 
 data/output_data/africa.topo.json: data/shapefiles/africa/africa.shp
 	topojson \
@@ -234,7 +234,7 @@ data/output_data/india.topo.json: data/shapefiles/IND_adm/IND_adm3.shp data/outp
 	-e data/output_data/india_levels.csv \
 	-p district=District,differece=Difference_Feet,st=NAME_1 \
 	--id-property=District,NAME_2 \
-	-- $<
+	-- $< data/input_data/india_disputed/india_disputed_territory.shp
 
 map/app/data/county_usage_change.topojson.json: data/output_data/county_usage_change.topojson.json
 	cp $< $@

@@ -304,12 +304,16 @@ var reDraw = _.throttle(ready, 500, {
   trailing: true
 });
 
-function ready(err, data, ) {
+function ready(err, data) {
     width = $(window).width();
     height = width * (9/16);
-    scale = width/1.2;
+    scale = width/1.5;
+    console.log(scale);
     $graphic.empty();
 
+    if (width < 600) {
+        scale = 400;
+    }
     if(!GRAPHICDATA) {
       GRAPHICDATA = data;
     }
@@ -323,10 +327,12 @@ function ready(err, data, ) {
 
     var center = d3.geo.centroid(geo);
 
+    var verticalTranslateFactor = width < 600 ? 1.5 : 2;
+
     projection = d3.geo.mercator()
-    .scale(width/1.5)
+    .scale(scale)
     .center(center)
-    .translate([width / 2, height / 2]);
+    .translate([width / 2, height / verticalTranslateFactor]);
 
     path = d3.geo.path()
       .projection(projection);
@@ -373,6 +379,18 @@ function ready(err, data, ) {
       .on("mouseover", mouseover)
       .on("mousemove", mousemove)
       .on("mouseout", mouseout);
+
+      map.append('g')
+        .attr('class', 'disputed-territory')
+        .append('path')
+        .datum(topojson.merge(data, data.objects.india_disputed_territory.geometries))
+        .attr('fill', 'rgba(0, 0, 0, 0)')
+        .attr('stroke', 'white')
+        .style("stroke-dasharray", "3, 3")
+        .attr('d', path)
+        .on("mouseover", mouseover)
+        .on("mousemove", mousemove)
+        .on("mouseout", mouseout);
 
       
 
@@ -490,8 +508,13 @@ function zoomOut() {
 }
 
 function mouseover(d) {
+    console.log(d);
   tooltip.style("display", "block");
-  tooltip.html("<p>" + d.properties.district + "</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
+  if (!d.properties) {
+    tooltip.html("<p>In a decades-old dispute, India and Pakistan both claim ownership of territory within Kashmir.</p>");
+  } else {
+    tooltip.html("<p>" + d.properties.district + "</p>" + "average water level change: " + Math.round(d.properties[VAL_COLUMN] * 100) / 100 + " ft.");
+  }
 }
 
 function mousemove() {
