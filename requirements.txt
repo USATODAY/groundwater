@@ -1,6 +1,6 @@
 BeautifulSoup==3.2.1
 Fiona==1.6.2
-GDAL==1.11.3
+GDAL==1.11.2
 SQLAlchemy==1.0.9
 appnope==0.1.0
 beautifulsoup4==4.4.1
@@ -14,7 +14,7 @@ envoy==0.0.3
 gnureadline==6.3.3
 ipython==4.0.0
 ipython-genutils==0.1.0
-jdcal==1.0
+jdcal==1.0.1
 numpy==1.10.2
 openpyxl==2.2.0-b1
 path.py==8.1.2

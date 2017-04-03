@@ -261,9 +261,8 @@ function getDataURL(dataURL) {
   } else if (hostname == "www.gannett-cdn.com") {
     dataURL = dataURL;
   } else {
-    dataURL = "http://" + hostname + "/services/webproxy/?url=" + dataURL;
+    dataURL = dataURL;
   }
-  console.log(dataURL);
   return dataURL;
 }
 

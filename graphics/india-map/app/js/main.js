@@ -247,7 +247,7 @@ function getDataURL(dataURL) {
   } else if (hostname == "www.gannett-cdn.com") {
     dataURL = dataURL;
   } else {
-    dataURL = "http://" + hostname + "/services/webproxy/?url=" + dataURL;
+    dataURL = dataURL;
   }
   return dataURL;
 }
@@ -308,7 +308,6 @@ function ready(err, data) {
     width = $(window).width();
     height = width * (9/16);
     scale = width/1.5;
-    console.log(scale);
     $graphic.empty();
 
     if (width < 600) {
@@ -508,7 +507,6 @@ function zoomOut() {
 }
 
 function mouseover(d) {
-    console.log(d);
   tooltip.style("display", "block");
   if (!d.properties) {
     tooltip.html("<p>In a decades-old dispute, India and Pakistan both claim ownership of territory within Kashmir.</p>");
